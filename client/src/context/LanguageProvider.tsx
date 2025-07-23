@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type Language = 'en' | 'hi' | 'bn' | 'te' | 'mr' | 'ta' | 'gu' | 'ur' | 'kn' | 'ml' | 'pa' | 'es' | 'fr' | 'de' | 'pt' | 'ar' | 'zh';
 
@@ -154,7 +154,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Profile Page
     'profile.title': 'प्रोफ़ाइल',
-    'profile.premium.active': 'प्रीमियम सक्रिय',
+    'profile.premium.active': 'प्���ीमियम सक्रिय',
     'profile.premium.enjoying': 'सभी प्रीमियम सुविधाओं का आनंद ले रहे हैं! ✨',
     'profile.premium.upgrade': 'प्रीमियम में अपग्रेड करें',
     'profile.premium.unlock': 'विशेष सुविधाओं और बेहतर अनुभव को अनलॉक करें!',
@@ -167,7 +167,7 @@ const translations: Record<Language, Record<string, string>> = {
     'profile.referral.id': 'आपका रेफरल आईडी',
     'profile.referral.copy': 'कॉपी करें',
     'profile.referral.reward': '🎁 1 दोस्त को सफलतापूर्वक रेफर करें = 24 घंटे प्रीमियम मुफ्त!',
-    'profile.referral.share': 'अपना कोड शेयर करें और आप और आपके दोस्त दोनों को प्रीमियम लाभ मिलें',
+    'profile.referral.share': 'अपना कोड शेयर करें और आप और आपके दोस्त दोनों ��ो प्रीमियम लाभ मिलें',
     'profile.settings': 'सेटिंग्स',
     'profile.settings.privacy': 'प्राइवेसी सेटिंग्स',
     'profile.settings.notifications': 'नोटिफिकेशन प्राथमिकताएं',
@@ -246,7 +246,7 @@ const translations: Record<Language, Record<string, string>> = {
     'onboarding.welcome': 'అజ్ఞాతక్యామ్‌కు స్వాగతం',
     'onboarding.subtitle': 'ప్రారంభించడానికి మీ ప్రొఫైల్‌ను సెట్ చేయండి',
     'onboarding.username': 'వినియోగదారు పేరు',
-    'onboarding.username.placeholder': 'మీ వినియోగదారు పేరును నమోదు చేయండి',
+    'onboarding.username.placeholder': 'మీ వినియో��దారు పేరును నమోదు చేయండి',
     'onboarding.gender': 'లింగం',
     'onboarding.gender.male': 'పురుషుడు',
     'onboarding.gender.female': 'స్త్రీ',
@@ -294,11 +294,11 @@ const translations: Record<Language, Record<string, string>> = {
     'onboarding.gender': 'लिंग',
     'onboarding.gender.male': 'पुरुष',
     'onboarding.gender.female': 'स्त्री',
-    'onboarding.language': 'भाषा',
+    'onboarding.language': '���ाषा',
     'onboarding.continue': 'सुरू ठेवा',
     'onboarding.skip': 'आत्तासाठी वगळा',
     'language.english': 'English',
-    'language.hindi': 'हिंदी (Hindi)',
+    'language.hindi': 'हिं���ी (Hindi)',
     'language.bengali': 'বাংলা (Bengali)',
     'language.telugu': 'తెలుగు (Telugu)',
     'language.marathi': 'मराठी (Marathi)',
