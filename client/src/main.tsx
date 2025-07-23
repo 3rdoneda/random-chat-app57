@@ -14,8 +14,16 @@ import { FriendsProvider } from "./context/FriendsProvider.tsx";
 import { HelmetProvider } from "react-helmet-async";
 import { preloadSounds } from "./lib/audio.ts";
 
-// Preload sounds on app start
-preloadSounds();
+// Add debugging
+console.log("🚀 App starting up...");
+
+// Preload sounds on app start (with error handling)
+try {
+  preloadSounds();
+  console.log("✅ Sounds preloaded successfully");
+} catch (error) {
+  console.error("⚠️ Sound preloading failed:", error);
+}
 
 // Error fallback component
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
