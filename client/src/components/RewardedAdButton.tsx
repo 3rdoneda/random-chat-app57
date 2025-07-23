@@ -14,41 +14,88 @@ interface RewardedAdButtonProps {
   preferUnity?: boolean; // Prefer Unity Ads for higher eCPM
 }
 
-export default function RewardedAdButton({ 
+export default function RewardedAdButton({
   onRewardEarned,
   disabled = false,
   variant = 'default',
-  className = ''
+  className = '',
+  preferUnity = true
 }: RewardedAdButtonProps) {
   const [isWatching, setIsWatching] = useState(false);
+  const [adNetwork, setAdNetwork] = useState<string>('checking...');
   const { addCoins } = useCoin();
 
   const handleWatchAd = async () => {
     if (isWatching || disabled) return;
 
     setIsWatching(true);
-    
+    setAdNetwork('loading...');
+
     try {
-      const result = await adService.showRewardedAd();
-      
+      let result;
+      let networkUsed = 'Unknown';
+
+      // Try Unity Ads first if preferred and available
+      if (preferUnity && unityAdsService.isReady('rewarded')) {
+        console.log('🎮 Trying Unity Ads first...');
+        setAdNetwork('Unity Ads');
+        result = await unityAdsService.showRewardedAd();
+        networkUsed = 'Unity Ads';
+
+        if (!result.success) {
+          console.log('🔄 Unity failed, trying mediation fallback...');
+          setAdNetwork('AdMob Mediation');
+          result = await adMobService.showMediatedRewardedAd();
+          networkUsed = result.network || 'AdMob';
+        }
+      } else {
+        // Use AdMob mediation (includes Unity + other networks)
+        console.log('📱 Using AdMob mediation...');
+        setAdNetwork('AdMob Mediation');
+        result = await adMobService.showMediatedRewardedAd();
+        networkUsed = result.network || 'AdMob';
+
+        // Fallback to basic ad service if mediation fails
+        if (!result.success) {
+          console.log('🔄 Mediation failed, trying basic ad service...');
+          setAdNetwork('AdSense');
+          const basicResult = await adService.showRewardedAd();
+          result = {
+            success: basicResult.success,
+            reward: basicResult.rewardAmount,
+            network: 'AdSense'
+          };
+          networkUsed = 'AdSense';
+        }
+      }
+
       if (result.success) {
+        const rewardAmount = result.reward || result.rewardAmount || 10;
+
         // Add coins to user's balance
-        await addCoins(result.rewardAmount);
-        
-        // Track the event
-        adService.trackAdEvent('rewarded', 'video');
-        
+        await addCoins(rewardAmount);
+
+        // Track the event with network info
+        adService.trackAdEvent('rewarded', `${networkUsed.toLowerCase()}_video`);
+
         // Notify parent component
-        onRewardEarned?.(result.rewardAmount);
-        
-        // Show success message
-        alert(`🎉 You earned ${result.rewardAmount} coins! Keep watching ads to earn more.`);
+        onRewardEarned?.(rewardAmount);
+
+        // Show success message with network info
+        const networkEmoji = networkUsed === 'Unity Ads' ? '🎮' :
+                           networkUsed.includes('Facebook') ? '📘' :
+                           networkUsed.includes('AppLovin') ? '🔷' : '📱';
+
+        alert(`🎉 You earned ${rewardAmount} coins from ${networkEmoji} ${networkUsed}!`);
+        setAdNetwork('completed');
       } else {
         alert(`❌ Could not complete ad: ${result.error || 'Unknown error'}`);
+        setAdNetwork('failed');
       }
     } catch (error) {
       console.error('Rewarded ad error:', error);
       alert('❌ Failed to load ad. Please try again later.');
+      setAdNetwork('error');
     } finally {
       setIsWatching(false);
     }
