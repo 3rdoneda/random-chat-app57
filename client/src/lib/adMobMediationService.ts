@@ -116,7 +116,7 @@ class AdMobMediationService {
       script.crossOrigin = 'anonymous';
       
       script.onload = () => {
-        console.log('📱 AdMob SDK loaded');
+        console.log('��� AdMob SDK loaded');
         resolve();
       };
       script.onerror = () => reject(new Error('Failed to load AdMob SDK'));
@@ -639,7 +639,7 @@ class AdMobMediationService {
   getRevenueInsights() {
     const metrics = this.getMediationMetrics();
     const totalRevenue = parseFloat(localStorage.getItem('admob_total_revenue') || '0');
-    
+
     return {
       todayRevenue: totalRevenue,
       projectedMonthly: totalRevenue * 30,
@@ -653,6 +653,95 @@ class AdMobMediationService {
         'Test more premium ad placements'
       ]
     };
+  }
+
+  /**
+   * Network initialization methods
+   */
+  private async initializeFacebookAudienceNetwork(): Promise<void> {
+    // In production, initialize Facebook Audience Network SDK
+    console.log('📘 Facebook Audience Network - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeAppLovin(): Promise<void> {
+    // In production, initialize AppLovin MAX SDK
+    console.log('🔷 AppLovin MAX - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeVungle(): Promise<void> {
+    // In production, initialize Vungle SDK
+    console.log('🟣 Vungle - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeIronSource(): Promise<void> {
+    // In production, initialize IronSource SDK
+    console.log('⚫ IronSource - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeAdColony(): Promise<void> {
+    // In production, initialize AdColony SDK
+    console.log('🔴 AdColony - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeChartboost(): Promise<void> {
+    // In production, initialize Chartboost SDK
+    console.log('📊 Chartboost - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  private async initializeTapjoy(): Promise<void> {
+    // In production, initialize Tapjoy SDK
+    console.log('🎯 Tapjoy - Web integration via mediation');
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  /**
+   * Simulate network interstitial for non-integrated networks
+   */
+  private async simulateNetworkInterstitial(network: string, successRate: number): Promise<boolean> {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+
+    const success = Math.random() < successRate;
+    console.log(`${success ? '✅' : '❌'} ${network} interstitial ${success ? 'succeeded' : 'failed'}`);
+
+    return success;
+  }
+
+  /**
+   * Simulate rewarded ad for non-integrated networks
+   */
+  private async simulateRewardedAd(rewardAmount: number, successRate: number): Promise<{ success: boolean; reward: number }> {
+    // Simulate watch time
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+
+    const success = Math.random() < successRate;
+    return {
+      success,
+      reward: success ? rewardAmount : 0
+    };
+  }
+
+  /**
+   * Get Unity Ads mediation status
+   */
+  getUnityAdsStatus() {
+    return {
+      ...unityAdsService.getMetrics(),
+      mediationConfig: unityAdsService.getMediationConfig()
+    };
+  }
+
+  /**
+   * Optimize Unity Ads within mediation
+   */
+  optimizeUnityAds() {
+    unityAdsService.optimizeForMediation();
   }
 }
 
