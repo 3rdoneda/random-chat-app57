@@ -40,28 +40,41 @@ function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBou
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <HelmetProvider>
-      <LanguageProvider>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <PremiumProvider>
-            <CoinProvider>
-              <FriendsProvider>
-                <BrowserRouter>
-                  <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <SocketProvider>
-                      <ErrorBoundary FallbackComponent={ErrorFallback}>
-                        <App />
-                      </ErrorBoundary>
-                    </SocketProvider>
-                  </ErrorBoundary>
-                </BrowserRouter>
-              </FriendsProvider>
-            </CoinProvider>
-          </PremiumProvider>
-        </ThemeProvider>
-      </LanguageProvider>
-    </HelmetProvider>
-  </StrictMode>
-);
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  console.error("❌ Root element not found!");
+  throw new Error("Root element not found");
+}
+
+console.log("✅ Root element found, rendering React app...");
+
+try {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <HelmetProvider>
+        <LanguageProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <PremiumProvider>
+              <CoinProvider>
+                <FriendsProvider>
+                  <BrowserRouter>
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                      <SocketProvider>
+                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                          <App />
+                        </ErrorBoundary>
+                      </SocketProvider>
+                    </ErrorBoundary>
+                  </BrowserRouter>
+                </FriendsProvider>
+              </CoinProvider>
+            </PremiumProvider>
+          </ThemeProvider>
+        </LanguageProvider>
+      </HelmetProvider>
+    </StrictMode>
+  );
+  console.log("✅ React app rendered successfully");
+} catch (error) {
+  console.error("❌ Failed to render React app:", error);
+}
