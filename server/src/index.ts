@@ -40,13 +40,16 @@ const waitingUsers: string[] = [];
 const activeConnections = new Map(); // Track active peer connections
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log(`🔗 User connected: ${socket.id}`);
+  console.log(`   - Total users now: ${connectedUsers.size + 1}`);
 
   connectedUsers.set(socket.id, {
     id: socket.id,
     isPremium: false,
     genderFilter: "any",
   });
+
+  console.log(`✅ User ${socket.id} added to connected users`);
 
   // Handle user profile updates
   socket.on("user:profile", (data) => {
