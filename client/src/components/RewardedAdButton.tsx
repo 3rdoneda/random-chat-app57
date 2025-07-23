@@ -117,12 +117,16 @@ export default function RewardedAdButton({
         {isWatching ? (
           <>
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-            Watching...
+            {adNetwork}
           </>
         ) : (
           <>
-            <Play className="w-4 h-4 mr-1" />
-            +10
+            {preferUnity && unityAdsService.isReady('rewarded') ? (
+              <Gamepad2 className="w-4 h-4 mr-1" />
+            ) : (
+              <Play className="w-4 h-4 mr-1" />
+            )}
+            +{preferUnity ? '15' : '10'}
           </>
         )}
       </Button>
