@@ -295,4 +295,4 @@ const ChatPage: React.FC = () => {
   );
 };
 
-export { ChatPage as default };
+export default ChatPage;
