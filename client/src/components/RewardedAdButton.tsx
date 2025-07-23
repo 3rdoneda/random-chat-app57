@@ -134,22 +134,41 @@ export default function RewardedAdButton({
   }
 
   if (variant === 'premium') {
+    const isUnityReady = preferUnity && unityAdsService.isReady('rewarded');
+    const expectedReward = isUnityReady ? 15 : 10;
+
     return (
       <Button
         {...buttonProps}
-        className={`bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 ${className}`}
+        className={`${
+          isUnityReady
+            ? 'bg-gradient-to-r from-orange-500 via-red-500 to-purple-500 hover:from-orange-600 hover:via-red-600 hover:to-purple-600'
+            : 'bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600'
+        } text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 ${className}`}
       >
         {isWatching ? (
           <div className="flex items-center">
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
-            <span>Watching Ad...</span>
+            <div className="text-left">
+              <div className="text-lg">Watching...</div>
+              <div className="text-sm opacity-90">{adNetwork}</div>
+            </div>
           </div>
         ) : (
           <div className="flex items-center">
-            <Gift className="w-5 h-5 mr-3" />
+            {isUnityReady ? (
+              <Gamepad2 className="w-5 h-5 mr-3" />
+            ) : (
+              <Gift className="w-5 h-5 mr-3" />
+            )}
             <div className="text-left">
-              <div className="text-lg">Watch Ad</div>
-              <div className="text-sm opacity-90">Earn 10 Coins</div>
+              <div className="text-lg">
+                {isUnityReady ? 'Unity Ad' : 'Watch Ad'}
+              </div>
+              <div className="text-sm opacity-90">
+                Earn {expectedReward} Coins
+                {isUnityReady && <span className="ml-1">🎮</span>}
+              </div>
             </div>
           </div>
         )}
