@@ -47,8 +47,6 @@ function LoadingScreen() {
 
 
 function App() {
-  console.log("🏁 App component rendering...");
-
   const [showSplash, setShowSplash] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
   const navigate = useNavigate();
@@ -57,13 +55,15 @@ function App() {
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
-    console.log("❌ App has error state");
     return <div className="min-h-screen flex items-center justify-center"><p>Something went wrong. Please refresh the page.</p></div>;
   }
 
-  console.log("📊 Skipping analytics for debugging...");
-  // Initialize analytics (temporarily disabled for debugging)
-  // useAnalytics();
+  // Initialize analytics with error handling
+  try {
+    useAnalytics();
+  } catch (error) {
+    console.error("Analytics initialization failed:", error);
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
