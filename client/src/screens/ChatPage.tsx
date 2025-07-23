@@ -17,8 +17,7 @@ interface Message {
   isOwnMessage: boolean;
 }
 
-// Chat page component for text messaging
-export default function ChatPage() {
+function ChatPage() {
   const navigate = useNavigate();
   const { isUltraPremium } = usePremium();
   const socketContext = useSocket();
@@ -302,3 +301,5 @@ export default function ChatPage() {
     </>
   );
 }
+
+export default ChatPage;
