@@ -85,7 +85,7 @@ export default function BannerAd({
     <div className={`banner-ad ${className}`} style={baseStyles}>
       <div ref={adRef} style={{ width: '100%', height: '100%' }}>
         {/* Fallback content for development or when ads fail */}
-        {(adError || process.env.NODE_ENV === 'development') && (
+        {(adError || import.meta.env.DEV) && (
           <div style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
