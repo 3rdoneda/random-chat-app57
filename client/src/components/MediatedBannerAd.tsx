@@ -99,7 +99,7 @@ export default function MediatedBannerAd({
         )}
 
         {/* Error/fallback state */}
-        {(adError || process.env.NODE_ENV === 'development') && !loadingNetwork && (
+        {(adError || import.meta.env.DEV) && !loadingNetwork && (
           <div style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
