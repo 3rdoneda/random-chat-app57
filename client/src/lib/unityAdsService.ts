@@ -118,7 +118,7 @@ class UnityAdsService {
             }
           };
 
-          window.UnityAds.initialize(
+          window.UnityAds!.initialize(
             this.config.gameId,
             this.config.testMode,
             this.config.enablePerPlacementLoad,
@@ -374,7 +374,7 @@ class UnityAdsService {
         }
       };
 
-      window.UnityAds.load(placementId, loadListener);
+      window.UnityAds!.load(placementId, loadListener);
       
       // Timeout after 10 seconds
       setTimeout(() => resolve(false), 10000);
