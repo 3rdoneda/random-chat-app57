@@ -89,7 +89,7 @@ export default function RewardedAdButton({
         alert(`🎉 You earned ${rewardAmount} coins from ${networkEmoji} ${networkUsed}!`);
         setAdNetwork('completed');
       } else {
-        alert(`❌ Could not complete ad: ${result.error || 'Unknown error'}`);
+        alert(`❌ Could not complete ad: ${(result as any).error || 'Unknown error'}`);
         setAdNetwork('failed');
       }
     } catch (error) {
