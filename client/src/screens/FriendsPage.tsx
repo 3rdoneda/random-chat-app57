@@ -243,7 +243,10 @@ const FriendsPage: React.FC = () => {
                 compatibility: Math.floor(Math.random() * 40) + 60 // 60-100% compatibility
               }))}
               isUltraPremium={true}
-              onVideoCall={handleVideoCall}
+              onVideoCall={(friendId) => {
+                const friend = friends.find(f => f.id === friendId);
+                handleVideoCall(friendId, friend?.name || 'Friend');
+              }}
               onMessage={(friendId) => {
                 // Handle message
                 console.log(`Starting chat with friend ${friendId}`);
