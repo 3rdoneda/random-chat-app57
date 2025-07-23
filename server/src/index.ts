@@ -186,11 +186,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log(`❌ User disconnected: ${socket.id}`);
 
     // Clean up active connections
     const partnerId = activeConnections.get(socket.id);
     if (partnerId) {
+      console.log(`📤 Notifying partner ${partnerId} of disconnection`);
       io.to(partnerId).emit("partnerDisconnected");
       activeConnections.delete(partnerId);
     }
@@ -202,7 +203,12 @@ io.on("connection", (socket) => {
     const index = waitingUsers.indexOf(socket.id);
     if (index > -1) {
       waitingUsers.splice(index, 1);
+      console.log(`🗑️ Removed ${socket.id} from waiting list`);
     }
+
+    console.log(`   - Total users now: ${connectedUsers.size}`);
+    console.log(`   - Waiting users: ${waitingUsers.length}`);
+    console.log(`   - Active connections: ${activeConnections.size}`);
   });
 });
 
