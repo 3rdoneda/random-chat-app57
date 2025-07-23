@@ -133,6 +133,65 @@ export default function AdMobRevenueDashboard() {
         </Card>
       </div>
 
+      {/* Unity Ads Status */}
+      {unityStatus && (
+        <Card className="p-6 bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            🎮 Unity Ads Status
+            <Gamepad2 className="w-5 h-5 text-orange-600" />
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="text-sm text-gray-600 mb-1">SDK Status</div>
+              <div className={`font-bold ${unityStatus.isInitialized ? 'text-green-600' : 'text-red-600'}`}>
+                {unityStatus.isInitialized ? '✅ Initialized' : '❌ Not Ready'}
+              </div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="text-sm text-gray-600 mb-1">Fill Rate</div>
+              <div className="font-bold text-blue-600">
+                {(unityStatus.fillRate * 100).toFixed(1)}%
+              </div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="text-sm text-gray-600 mb-1">Avg eCPM</div>
+              <div className="font-bold text-purple-600">
+                ${unityStatus.estimatedECPM?.rewarded?.toFixed(2) || '0.00'}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+            {Object.entries(unityStatus.placementStates || {}).map(([placement, ready]: [string, any]) => (
+              <div key={placement} className={`text-center p-2 rounded ${ready ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                <div className="capitalize font-medium">{placement}</div>
+                <div className={ready ? 'text-green-600' : 'text-gray-500'}>
+                  {ready ? '✓ Ready' : '○ Loading'}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <Button
+              onClick={testUnityAds}
+              size="sm"
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+            >
+              <Gamepad2 className="w-4 h-4 mr-2" />
+              Test Unity Ad
+            </Button>
+            <Button
+              onClick={() => unityAdsService.optimizeForMediation()}
+              size="sm"
+              variant="outline"
+            >
+              Optimize Unity
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Network Performance */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">📊 Network Performance</h3>
