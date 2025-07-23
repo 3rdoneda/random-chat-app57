@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, TestTube } from 'lucide-react';
+import { ArrowLeft, TestTube, Gamepad2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import MobileAdTester from '../components/MobileAdTester';
+import UnityAdsTestPanel from '../components/UnityAdsTestPanel';
 import BottomNavBar from '../components/BottomNavBar';
+import { useState } from 'react';
 
 export default function AdTestingPage() {
   const navigate = useNavigate();
