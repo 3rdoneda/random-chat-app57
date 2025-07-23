@@ -32,6 +32,8 @@ import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 import { ensureUserDocumentExists } from "./lib/firestoreUtils";
+import { unityAdsService } from "./lib/unityAdsService";
+import { adMobService } from "./lib/adMobMediationService";
 
 // Loading component
 function LoadingScreen() {
