@@ -12,6 +12,13 @@ const io = new Server(server, {
       "http://localhost:5000",
       "https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com",
       "https://ajnabicam.com",
+      // Add more development URLs
+      "http://172.19.7.42:5173",
+      "http://172.19.7.43:5173",
+      // Allow any localhost and webcontainer URLs for development
+      /^https?:\/\/localhost:\d+$/,
+      /^https?:\/\/.*\.webcontainer-api\.io$/,
+      /^https?:\/\/.*\.w-credentialless-staticblitz\.com$/
     ],
     methods: ["GET", "POST"],
     credentials: true,
