@@ -61,9 +61,9 @@ function App() {
     return <div className="min-h-screen flex items-center justify-center"><p>Something went wrong. Please refresh the page.</p></div>;
   }
 
-  console.log("📊 Initializing analytics...");
-  // Initialize analytics
-  useAnalytics();
+  console.log("📊 Skipping analytics for debugging...");
+  // Initialize analytics (temporarily disabled for debugging)
+  // useAnalytics();
 
   useEffect(() => {
     const timer = setTimeout(() => {
