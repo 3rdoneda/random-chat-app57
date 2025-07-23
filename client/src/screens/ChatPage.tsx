@@ -301,3 +301,6 @@ export default function ChatPage() {
     </>
   );
 }
+
+// Explicit export to ensure module resolution
+export default ChatPage;
