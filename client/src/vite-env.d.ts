@@ -13,6 +13,11 @@ interface ImportMetaEnv {
   readonly VITE_UNITY_REWARDED_PLACEMENT: string
   readonly VITE_ENABLE_UNITY_ADS: string
   readonly VITE_ENABLE_AD_MEDIATION: string
+  readonly VITE_AD_FREQUENCY_MINUTES: string
+  readonly VITE_REWARDED_AD_COIN_AMOUNT: string
+  readonly DEV: boolean
+  readonly PROD: boolean
+  readonly MODE: string
 }
 
 interface ImportMeta {
