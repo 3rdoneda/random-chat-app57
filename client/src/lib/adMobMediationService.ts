@@ -56,7 +56,7 @@ class AdMobMediationService {
       'Chartboost',
       'Tapjoy'
     ],
-    testMode: process.env.NODE_ENV === 'development'
+    testMode: import.meta.env.DEV
   };
 
   private constructor() {
