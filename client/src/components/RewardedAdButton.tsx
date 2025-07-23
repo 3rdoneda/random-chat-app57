@@ -11,6 +11,7 @@ interface RewardedAdButtonProps {
   disabled?: boolean;
   variant?: 'default' | 'premium' | 'compact';
   className?: string;
+  preferUnity?: boolean; // Prefer Unity Ads for higher eCPM
 }
 
 export default function RewardedAdButton({ 
