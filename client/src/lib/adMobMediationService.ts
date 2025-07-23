@@ -356,16 +356,31 @@ class AdMobMediationService {
    * Show interstitial from specific network
    */
   private async showInterstitialFromNetwork(network: string): Promise<boolean> {
-    // Simulate network-specific interstitial logic
     console.log(`📱 Attempting interstitial from ${network}...`);
-    
-    if (network === 'AdSense') {
-      return this.showAdSenseInterstitial();
+
+    switch (network) {
+      case 'AdSense':
+        return this.showAdSenseInterstitial();
+
+      case 'Unity Ads':
+        return await unityAdsService.showInterstitialAd();
+
+      case 'Facebook Audience Network':
+        // Implement Facebook Audience Network interstitial
+        return this.simulateNetworkInterstitial(network, 0.88);
+
+      case 'AppLovin':
+        // Implement AppLovin MAX interstitial
+        return this.simulateNetworkInterstitial(network, 0.90);
+
+      case 'Vungle':
+        // Implement Vungle interstitial
+        return this.simulateNetworkInterstitial(network, 0.82);
+
+      default:
+        // For other networks, simulate success/failure
+        return this.simulateNetworkInterstitial(network, 0.85);
     }
-    
-    // For other networks, simulate success/failure
-    const successRate = 0.85; // 85% success rate
-    return Math.random() < successRate;
   }
 
   /**
