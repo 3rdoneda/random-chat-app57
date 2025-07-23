@@ -30,8 +30,22 @@ export default function AdMobRevenueDashboard() {
 
   const optimizeWaterfall = () => {
     adMobService.optimizeMediationWaterfall();
+    adMobService.optimizeUnityAds();
     alert('🎯 Mediation waterfall optimized! Networks reordered by performance.');
     loadData();
+  };
+
+  const testUnityAds = async () => {
+    try {
+      const result = await unityAdsService.showRewardedAd();
+      if (result.success) {
+        alert(`🎮 Unity test successful! Earned ${result.rewardAmount} coins`);
+      } else {
+        alert(`❌ Unity test failed: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ Unity test error: ${error}`);
+    }
   };
 
   useEffect(() => {
