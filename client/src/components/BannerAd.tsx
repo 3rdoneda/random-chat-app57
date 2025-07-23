@@ -62,7 +62,7 @@ export default function BannerAd({
   }, [size, position]);
 
   // Don't render if ad failed and we're not in development
-  if (adError && process.env.NODE_ENV !== 'development') {
+  if (adError && !import.meta.env.DEV) {
     return null;
   }
 
