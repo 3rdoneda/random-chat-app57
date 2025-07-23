@@ -185,7 +185,7 @@ const UnityMediatedAd: React.FC<UnityMediatedAdProps> = ({
       )}
       
       {/* Status indicator for debugging */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <div className="mt-2">
           {renderStatusIndicator()}
         </div>
