@@ -58,13 +58,14 @@ io.on("connection", (socket) => {
 
   // Handle matching logic
   socket.on("find:match", () => {
-    console.log(
-      `User ${socket.id} looking for match. Waiting users: ${waitingUsers.length}`,
-    );
+    console.log(`🔍 User ${socket.id} looking for match. Current state:`);
+    console.log(`   - Waiting users: ${waitingUsers.length} [${waitingUsers.join(', ')}]`);
+    console.log(`   - Active connections: ${activeConnections.size}`);
+    console.log(`   - Total connected users: ${connectedUsers.size}`);
 
     // Don't add to waiting list if already waiting or already connected
     if (waitingUsers.includes(socket.id) || activeConnections.has(socket.id)) {
-      console.log(`User ${socket.id} already waiting or connected`);
+      console.log(`❌ User ${socket.id} already waiting or connected - skipping`);
       return;
     }
 
@@ -79,20 +80,22 @@ io.on("connection", (socket) => {
         activeConnections.set(socket.id, partnerId);
         activeConnections.set(partnerId, socket.id);
 
-        console.log(`Match found: ${socket.id} <-> ${partnerId}`);
+        console.log(`✅ Match found: ${socket.id} <-> ${partnerId}`);
 
         socket.emit("user:connect", partnerId);
         io.to(partnerId).emit("user:connect", socket.id);
+
+        console.log(`📤 Sent user:connect events to both users`);
       } else {
         // Partner disconnected, add current user to waiting list
         waitingUsers.push(socket.id);
         console.log(
-          `Partner ${partnerId} not available, added ${socket.id} to waiting list`,
+          `⚠️ Partner ${partnerId} not available, added ${socket.id} to waiting list`,
         );
       }
     } else {
       waitingUsers.push(socket.id);
-      console.log(`Added ${socket.id} to waiting list`);
+      console.log(`⏳ Added ${socket.id} to waiting list (now ${waitingUsers.length} waiting)`);
     }
   });
 
