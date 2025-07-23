@@ -146,21 +146,49 @@ class AdMobMediationService {
    * Initialize individual mediation network
    */
   private async initializeNetwork(network: string): Promise<void> {
-    // Simulate network initialization delay
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // In a real implementation, this would initialize each network's SDK
+    // Initialize actual network SDKs
     switch (network) {
       case 'Facebook Audience Network':
         // Initialize Facebook Audience Network
+        await this.initializeFacebookAudienceNetwork();
         break;
       case 'Unity Ads':
         // Initialize Unity Ads
+        console.log('🎮 Initializing Unity Ads for mediation...');
+        const unitySuccess = await unityAdsService.initialize();
+        if (unitySuccess) {
+          console.log('✅ Unity Ads integrated with mediation');
+        } else {
+          console.warn('⚠️ Unity Ads initialization failed');
+        }
         break;
       case 'AppLovin':
         // Initialize AppLovin MAX
+        await this.initializeAppLovin();
         break;
-      // ... other networks
+      case 'Vungle':
+        // Initialize Vungle
+        await this.initializeVungle();
+        break;
+      case 'IronSource':
+        // Initialize IronSource
+        await this.initializeIronSource();
+        break;
+      case 'AdColony':
+        // Initialize AdColony
+        await this.initializeAdColony();
+        break;
+      case 'Chartboost':
+        // Initialize Chartboost
+        await this.initializeChartboost();
+        break;
+      case 'Tapjoy':
+        // Initialize Tapjoy
+        await this.initializeTapjoy();
+        break;
+      default:
+        // Simulate network initialization delay for others
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
 
