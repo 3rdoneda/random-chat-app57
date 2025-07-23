@@ -32,6 +32,8 @@ import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 import { ensureUserDocumentExists } from "./lib/firestoreUtils";
+import { unityAdsService } from "./lib/unityAdsService";
+import { adMobService } from "./lib/adMobMediationService";
 
 // Loading component
 function LoadingScreen() {
@@ -53,18 +55,45 @@ function App() {
 
   // Error boundary for the app
   const [hasError, setHasError] = useState(false);
-  
+
   if (hasError) {
     return <div className="min-h-screen flex items-center justify-center"><p>Something went wrong. Please refresh the page.</p></div>;
   }
 
-  // Initialize analytics
-  useAnalytics();
+  // Initialize analytics with error handling
+  try {
+    useAnalytics();
+  } catch (error) {
+    console.error("Analytics initialization failed:", error);
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
     }, 2000);
+
+    // Initialize ad services
+    const initializeAdServices = async () => {
+      try {
+        console.log('🎯 Initializing ad mediation services...');
+
+        // Initialize Unity Ads first (higher priority)
+        const unitySuccess = await unityAdsService.initialize();
+        console.log(`🎮 Unity Ads: ${unitySuccess ? 'Ready' : 'Failed'}`);
+
+        // Initialize AdMob mediation
+        const mediationSuccess = await adMobService.initialize();
+        console.log(`📱 AdMob Mediation: ${mediationSuccess ? 'Ready' : 'Failed'}`);
+
+        if (unitySuccess) {
+          console.log('✅ Unity Ads mediation is active - higher eCPM expected!');
+        }
+      } catch (error) {
+        console.warn('⚠️ Ad service initialization failed (non-critical):', error);
+      }
+    };
+
+    initializeAdServices();
 
     return () => clearTimeout(timer);
   }, []);

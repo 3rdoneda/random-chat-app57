@@ -12,6 +12,13 @@ const io = new Server(server, {
       "http://localhost:5000",
       "https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com",
       "https://ajnabicam.com",
+      // Add more development URLs
+      "http://172.19.7.42:5173",
+      "http://172.19.7.43:5173",
+      // Allow any localhost and webcontainer URLs for development
+      /^https?:\/\/localhost:\d+$/,
+      /^https?:\/\/.*\.webcontainer-api\.io$/,
+      /^https?:\/\/.*\.w-credentialless-staticblitz\.com$/
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -33,13 +40,16 @@ const waitingUsers: string[] = [];
 const activeConnections = new Map(); // Track active peer connections
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log(`🔗 User connected: ${socket.id}`);
+  console.log(`   - Total users now: ${connectedUsers.size + 1}`);
 
   connectedUsers.set(socket.id, {
     id: socket.id,
     isPremium: false,
     genderFilter: "any",
   });
+
+  console.log(`✅ User ${socket.id} added to connected users`);
 
   // Handle user profile updates
   socket.on("user:profile", (data) => {
@@ -51,13 +61,14 @@ io.on("connection", (socket) => {
 
   // Handle matching logic
   socket.on("find:match", () => {
-    console.log(
-      `User ${socket.id} looking for match. Waiting users: ${waitingUsers.length}`,
-    );
+    console.log(`🔍 User ${socket.id} looking for match. Current state:`);
+    console.log(`   - Waiting users: ${waitingUsers.length} [${waitingUsers.join(', ')}]`);
+    console.log(`   - Active connections: ${activeConnections.size}`);
+    console.log(`   - Total connected users: ${connectedUsers.size}`);
 
     // Don't add to waiting list if already waiting or already connected
     if (waitingUsers.includes(socket.id) || activeConnections.has(socket.id)) {
-      console.log(`User ${socket.id} already waiting or connected`);
+      console.log(`❌ User ${socket.id} already waiting or connected - skipping`);
       return;
     }
 
@@ -72,20 +83,22 @@ io.on("connection", (socket) => {
         activeConnections.set(socket.id, partnerId);
         activeConnections.set(partnerId, socket.id);
 
-        console.log(`Match found: ${socket.id} <-> ${partnerId}`);
+        console.log(`✅ Match found: ${socket.id} <-> ${partnerId}`);
 
         socket.emit("user:connect", partnerId);
         io.to(partnerId).emit("user:connect", socket.id);
+
+        console.log(`📤 Sent user:connect events to both users`);
       } else {
         // Partner disconnected, add current user to waiting list
         waitingUsers.push(socket.id);
         console.log(
-          `Partner ${partnerId} not available, added ${socket.id} to waiting list`,
+          `⚠️ Partner ${partnerId} not available, added ${socket.id} to waiting list`,
         );
       }
     } else {
       waitingUsers.push(socket.id);
-      console.log(`Added ${socket.id} to waiting list`);
+      console.log(`⏳ Added ${socket.id} to waiting list (now ${waitingUsers.length} waiting)`);
     }
   });
 
@@ -173,11 +186,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log(`❌ User disconnected: ${socket.id}`);
 
     // Clean up active connections
     const partnerId = activeConnections.get(socket.id);
     if (partnerId) {
+      console.log(`📤 Notifying partner ${partnerId} of disconnection`);
       io.to(partnerId).emit("partnerDisconnected");
       activeConnections.delete(partnerId);
     }
@@ -189,7 +203,12 @@ io.on("connection", (socket) => {
     const index = waitingUsers.indexOf(socket.id);
     if (index > -1) {
       waitingUsers.splice(index, 1);
+      console.log(`🗑️ Removed ${socket.id} from waiting list`);
     }
+
+    console.log(`   - Total users now: ${connectedUsers.size}`);
+    console.log(`   - Waiting users: ${waitingUsers.length}`);
+    console.log(`   - Active connections: ${activeConnections.size}`);
   });
 });
 

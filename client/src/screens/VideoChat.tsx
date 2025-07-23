@@ -1270,7 +1270,7 @@ export default function VideoChat() {
           {(isUltraPremium() || isProMonthly()) && remoteStream && !isFriendCall && (
             <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-lg z-30">
               <LastSeenDisplay
-                lastSeen={partnerLastSeen}
+                lastSeen={partnerLastSeen || undefined}
                 isOnline={true}
                 username={partnerName}
                 isVisible={true}

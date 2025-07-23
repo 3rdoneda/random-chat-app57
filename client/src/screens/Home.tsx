@@ -20,6 +20,7 @@ import {
   Play,
   Globe,
   User,
+  Gem,
 } from "lucide-react";
 import GenderFilter from "../components/GenderFilter";
 // import PremiumPaywall from "../components/PremiumPaywall"; // Now using separate page

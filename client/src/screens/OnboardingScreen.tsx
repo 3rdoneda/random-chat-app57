@@ -54,7 +54,7 @@ export default function OnboardingScreen() {
         if (e.target?.result) {
           setPhotos(prev => prev.map(photo => 
             photo.id === photoId 
-              ? { ...photo, file, preview: e.target.result as string }
+              ? { ...photo, file, preview: e.target?.result as string }
               : photo
           ));
         }

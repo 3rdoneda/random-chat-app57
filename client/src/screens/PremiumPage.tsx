@@ -246,7 +246,7 @@ export default function PremiumPage({ onPurchase }: PremiumPageProps) {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4">
                         <div className={`bg-gradient-to-br from-peach-100 to-coral-100 p-3 rounded-full shadow-md`}>
-                          <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                          {feature.icon && <feature.icon className={`h-6 w-6 ${feature.color}`} />}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-gray-800 text-lg">{feature.title}</h3>
