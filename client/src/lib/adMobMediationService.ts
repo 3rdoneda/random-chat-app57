@@ -388,24 +388,31 @@ class AdMobMediationService {
    */
   private async showRewardedFromNetwork(network: string): Promise<{ success: boolean; reward: number }> {
     console.log(`💰 Attempting rewarded ad from ${network}...`);
-    
-    // Simulate different reward amounts by network
-    const rewardMap: Record<string, number> = {
-      'AdSense': 10,
-      'Facebook Audience Network': 15,
-      'Unity Ads': 12,
-      'AppLovin': 14,
-      'Vungle': 13
-    };
 
-    const reward = rewardMap[network] || 10;
-    const successRate = 0.90; // 90% success rate for rewarded ads
-    
-    if (Math.random() < successRate) {
-      return { success: true, reward };
+    switch (network) {
+      case 'Unity Ads':
+        const unityResult = await unityAdsService.showRewardedAd();
+        return {
+          success: unityResult.success,
+          reward: unityResult.rewardAmount
+        };
+
+      case 'Facebook Audience Network':
+        return this.simulateRewardedAd(15, 0.92);
+
+      case 'AppLovin':
+        return this.simulateRewardedAd(14, 0.90);
+
+      case 'Vungle':
+        return this.simulateRewardedAd(13, 0.88);
+
+      case 'IronSource':
+        return this.simulateRewardedAd(11, 0.85);
+
+      case 'AdSense':
+      default:
+        return this.simulateRewardedAd(10, 0.90);
     }
-    
-    return { success: false, reward: 0 };
   }
 
   /**
