@@ -32,10 +32,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
   // Add error handling
   useEffect(() => {
-    const handleError = (error: Error) => {
-      console.error("Socket Provider Error:", error);
+    const handleError = (event: ErrorEvent) => {
+      console.error("Socket Provider Error:", event.error);
     };
-    
+
     window.addEventListener('error', handleError);
     return () => window.removeEventListener('error', handleError);
   }, []);
