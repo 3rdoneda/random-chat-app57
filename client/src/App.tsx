@@ -72,6 +72,29 @@ function App() {
       setShowSplash(false);
     }, 2000);
 
+    // Initialize ad services
+    const initializeAdServices = async () => {
+      try {
+        console.log('🎯 Initializing ad mediation services...');
+
+        // Initialize Unity Ads first (higher priority)
+        const unitySuccess = await unityAdsService.initialize();
+        console.log(`🎮 Unity Ads: ${unitySuccess ? 'Ready' : 'Failed'}`);
+
+        // Initialize AdMob mediation
+        const mediationSuccess = await adMobService.initialize();
+        console.log(`📱 AdMob Mediation: ${mediationSuccess ? 'Ready' : 'Failed'}`);
+
+        if (unitySuccess) {
+          console.log('✅ Unity Ads mediation is active - higher eCPM expected!');
+        }
+      } catch (error) {
+        console.warn('⚠️ Ad service initialization failed (non-critical):', error);
+      }
+    };
+
+    initializeAdServices();
+
     return () => clearTimeout(timer);
   }, []);
 
