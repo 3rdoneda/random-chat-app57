@@ -177,20 +177,31 @@ export default function RewardedAdButton({
   }
 
   // Default variant
+  const isUnityReady = preferUnity && unityAdsService.isReady('rewarded');
+  const expectedReward = isUnityReady ? 15 : 10;
+
   return (
     <Button
       {...buttonProps}
-      className={`bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 ${className}`}
+      className={`${
+        isUnityReady
+          ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+          : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+      } text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 ${className}`}
     >
       {isWatching ? (
         <>
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-          Watching...
+          {adNetwork}
         </>
       ) : (
         <>
-          <Play className="w-4 h-4 mr-2" />
-          Watch Ad for 10 Coins
+          {isUnityReady ? (
+            <Gamepad2 className="w-4 h-4 mr-2" />
+          ) : (
+            <Play className="w-4 h-4 mr-2" />
+          )}
+          Watch Ad for {expectedReward} Coins
           <Coins className="w-4 h-4 ml-2" />
         </>
       )}
