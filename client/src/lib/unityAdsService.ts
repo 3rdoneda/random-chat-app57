@@ -52,7 +52,7 @@ class UnityAdsService {
 
   // Unity Ads configuration for AjnabiCam
   private defaultConfig: UnityAdsConfig = {
-    gameId: import.meta.env.VITE_UNITY_GAME_ID || '4374201', // Test Game ID
+    gameId: import.meta.env.VITE_UNITY_GAME_ID || 'a1abc147-49d0-4a59-8b35-1acba00889f6', // Your Unity Project ID
     testMode: import.meta.env.DEV || false,
     enablePerPlacementLoad: true,
     initializeInBackground: true
