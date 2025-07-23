@@ -48,33 +48,77 @@ if (!rootElement) {
 
 console.log("✅ Root element found, rendering React app...");
 
+// Test minimal rendering first
 try {
+  console.log("���� Testing minimal React render...");
   createRoot(rootElement).render(
-    <StrictMode>
-      <HelmetProvider>
-        <LanguageProvider>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <PremiumProvider>
-              <CoinProvider>
-                <FriendsProvider>
-                  <BrowserRouter>
-                    <ErrorBoundary FallbackComponent={ErrorFallback}>
-                      <SocketProvider>
-                        <ErrorBoundary FallbackComponent={ErrorFallback}>
-                          <App />
-                        </ErrorBoundary>
-                      </SocketProvider>
-                    </ErrorBoundary>
-                  </BrowserRouter>
-                </FriendsProvider>
-              </CoinProvider>
-            </PremiumProvider>
-          </ThemeProvider>
-        </LanguageProvider>
-      </HelmetProvider>
-    </StrictMode>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>🚀 AjnabiCam Loading...</h1>
+        <p>Testing React render - if you see this, React is working!</p>
+        <div style={{
+          width: '50px',
+          height: '50px',
+          border: '3px solid rgba(255,255,255,0.3)',
+          borderTop: '3px solid white',
+          borderRadius: '50%',
+          margin: '20px auto',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    </div>
   );
-  console.log("✅ React app rendered successfully");
+  console.log("✅ Minimal React app rendered successfully");
+
+  // Try to render full app after 2 seconds
+  setTimeout(() => {
+    console.log("🔄 Now attempting full app render...");
+    try {
+      createRoot(rootElement).render(
+        <StrictMode>
+          <HelmetProvider>
+            <LanguageProvider>
+              <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                <PremiumProvider>
+                  <CoinProvider>
+                    <FriendsProvider>
+                      <BrowserRouter>
+                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                          <SocketProvider>
+                            <ErrorBoundary FallbackComponent={ErrorFallback}>
+                              <App />
+                            </ErrorBoundary>
+                          </SocketProvider>
+                        </ErrorBoundary>
+                      </BrowserRouter>
+                    </FriendsProvider>
+                  </CoinProvider>
+                </PremiumProvider>
+              </ThemeProvider>
+            </LanguageProvider>
+          </HelmetProvider>
+        </StrictMode>
+      );
+      console.log("✅ Full React app rendered successfully");
+    } catch (fullAppError) {
+      console.error("❌ Failed to render full app:", fullAppError);
+    }
+  }, 2000);
+
 } catch (error) {
-  console.error("❌ Failed to render React app:", error);
+  console.error("❌ Failed to render minimal React app:", error);
 }
