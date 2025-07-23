@@ -8,6 +8,7 @@ import { unityAdsService } from '../lib/unityAdsService';
 export default function AdMobRevenueDashboard() {
   const [metrics, setMetrics] = useState<any>(null);
   const [insights, setInsights] = useState<any>(null);
+  const [unityStatus, setUnityStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
@@ -15,9 +16,11 @@ export default function AdMobRevenueDashboard() {
     try {
       const metricsData = adMobService.getMediationMetrics();
       const insightsData = adMobService.getRevenueInsights();
-      
+      const unityData = adMobService.getUnityAdsStatus();
+
       setMetrics(metricsData);
       setInsights(insightsData);
+      setUnityStatus(unityData);
     } catch (error) {
       console.error('Failed to load AdMob data:', error);
     } finally {
