@@ -70,7 +70,7 @@ export default function RewardedAdButton({
       }
 
       if (result.success) {
-        const rewardAmount = result.reward || result.rewardAmount || 10;
+        const rewardAmount = (result as any).reward || (result as any).rewardAmount || 10;
 
         // Add coins to user's balance
         await addCoins(rewardAmount);
