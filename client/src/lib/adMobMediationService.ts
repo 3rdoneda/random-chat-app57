@@ -1,7 +1,9 @@
 /**
  * AdMob Mediation Service for Maximum Revenue
- * Supports multiple ad networks through AdMob mediation
+ * Supports multiple ad networks through AdMob mediation including Unity Ads
  */
+
+import { unityAdsService } from './unityAdsService';
 
 export interface AdMobConfig {
   publisherId: string;
