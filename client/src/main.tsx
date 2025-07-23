@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { ErrorBoundary } from "react-error-boundary";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
@@ -16,6 +17,21 @@ import { preloadSounds } from "./lib/audio.ts";
 // Preload sounds on app start
 preloadSounds();
 
+// Error fallback component
+function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
+        <h2 className="text-xl font-bold text-red-600 mb-4">Something went wrong</h2>
+        <p className="text-gray-600 mb-4">{error.message}</p>
+        <button onClick={resetErrorBoundary} className="bg-blue-500 text-white px-4 py-2 rounded">
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HelmetProvider>
@@ -25,9 +41,13 @@ createRoot(document.getElementById("root")!).render(
             <CoinProvider>
               <FriendsProvider>
                 <BrowserRouter>
-                  <SocketProvider>
-                    <App />
-                  </SocketProvider>
+                  <ErrorBoundary FallbackComponent={ErrorFallback}>
+                    <SocketProvider>
+                      <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        <App />
+                      </ErrorBoundary>
+                    </SocketProvider>
+                  </ErrorBoundary>
                 </BrowserRouter>
               </FriendsProvider>
             </CoinProvider>

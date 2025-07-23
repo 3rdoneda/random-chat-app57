@@ -30,6 +30,16 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isUsingMockMode, setIsUsingMockMode] = useState(false);
   const mockMatching = MockMatchingService.getInstance();
 
+  // Add error handling
+  useEffect(() => {
+    const handleError = (error: Error) => {
+      console.error("Socket Provider Error:", error);
+    };
+    
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
   useEffect(() => {
     if (!socket) {
       // Determine socket URL based on environment
@@ -60,6 +70,8 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         withCredentials: false, // Disable credentials for WebContainer
       });
 
+      console.log("Attempting socket connection to:", socketUrl);
+
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
         setIsUsingMockMode(false);
@@ -70,6 +82,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       });
 
       newSocket.on("connect_error", (error) => {
+        console.log("Socket connection failed, falling back to mock mode");
         console.error("Socket connection error:", error);
         
         // Try alternative port based on environment

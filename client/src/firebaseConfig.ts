@@ -1,4 +1,5 @@
 // src/firebaseConfig.ts
+import { getApps } from "firebase/app";
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
@@ -20,6 +21,14 @@ const firebaseConfig = {
 const firebaseApp = getApps().length === 0
   ? initializeApp(firebaseConfig)
   : getApp();
+
+// Add error handling for Firebase initialization
+if (!firebaseApp) {
+  console.error("Failed to initialize Firebase app");
+  throw new Error("Firebase initialization failed");
+}
+
+console.log("✅ Firebase app initialized successfully");
 
 // ✅ Core exports
 export const auth = getAuth(firebaseApp);
