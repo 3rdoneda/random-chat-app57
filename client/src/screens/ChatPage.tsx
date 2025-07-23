@@ -17,6 +17,7 @@ interface Message {
   isOwnMessage: boolean;
 }
 
+// Chat page component for text messaging
 export default function ChatPage() {
   const navigate = useNavigate();
   const { isUltraPremium } = usePremium();
