@@ -47,17 +47,21 @@ function LoadingScreen() {
 
 
 function App() {
+  console.log("🏁 App component rendering...");
+
   const [showSplash, setShowSplash] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
   const navigate = useNavigate();
 
   // Error boundary for the app
   const [hasError, setHasError] = useState(false);
-  
+
   if (hasError) {
+    console.log("❌ App has error state");
     return <div className="min-h-screen flex items-center justify-center"><p>Something went wrong. Please refresh the page.</p></div>;
   }
 
+  console.log("📊 Initializing analytics...");
   // Initialize analytics
   useAnalytics();
 
