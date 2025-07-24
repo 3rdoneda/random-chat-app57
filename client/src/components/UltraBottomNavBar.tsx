@@ -28,35 +28,35 @@ export default function UltraBottomNavBar() {
       path: '/',
       icon: Home,
       label: 'Home',
-      color: 'from-rose-500 to-pink-500'
+      color: 'from-rose-400 to-pink-400'
     },
     {
       id: 'chat',
       path: '/video-chat',
       icon: MessageCircle,
       label: 'Chat',
-      color: 'from-pink-500 to-rose-500'
+      color: 'from-pink-400 to-rose-400'
     },
     {
       id: 'ai',
       path: '/ai-chatbot',
       icon: Bot,
       label: 'AI Chat',
-      color: 'from-amber-500 to-orange-500'
+      color: 'from-amber-400 to-orange-400'
     },
     {
       id: 'friends',
       path: '/friends',
       icon: Users,
       label: 'Friends',
-      color: 'from-orange-500 to-red-500'
+      color: 'from-orange-400 to-amber-400'
     },
     {
       id: 'profile',
       path: '/profile',
       icon: User,
       label: 'Profile',
-      color: 'from-red-500 to-rose-500'
+      color: 'from-rose-400 to-pink-400'
     }
   ];
 
@@ -120,7 +120,7 @@ export default function UltraBottomNavBar() {
                   }`}>
                     <IconComponent
                       className={`h-5 w-5 transition-all duration-200 ${
-                        isActive ? 'text-white' : 'text-rose-400'
+                        isActive ? 'text-white' : 'text-amber-600'
                       }`}
                     />
                     
