@@ -208,6 +208,7 @@ function App() {
 
           <PWAInstallPrompt />
           <CookieConsent />
+          <LegalFooter />
         </div>
         </Suspense>
       </UltraAppWrapper>
