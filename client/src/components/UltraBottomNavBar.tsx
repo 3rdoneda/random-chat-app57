@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { 
-  Home, 
-  MessageCircle, 
-  Bot, 
-  Users, 
+import {
+  Home,
+  MessageCircle,
+  Bot,
+  Users,
   User,
   Gem,
   Crown,
@@ -13,11 +13,13 @@ import {
   Heart
 } from "lucide-react";
 import { usePremium } from "../context/PremiumProvider";
+import { useHaptics } from "../lib/haptics";
 
 export default function UltraBottomNavBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isUltraPremium } = usePremium();
+  const { buttonTap, selectionChange, premiumAction } = useHaptics();
   const [activeTab, setActiveTab] = useState('');
 
   const tabs = [
@@ -67,6 +69,8 @@ export default function UltraBottomNavBar() {
   }, [location.pathname]);
 
   const handleTabClick = (tab: typeof tabs[0]) => {
+    // Haptic feedback for tab selection
+    selectionChange();
     setActiveTab(tab.id);
     navigate(tab.path);
   };
@@ -171,13 +175,31 @@ export default function UltraBottomNavBar() {
         <div className="flex justify-center mt-3">
           <div className="flex items-center gap-3">
             {/* Quick Premium Actions */}
-            <button className="p-2 bg-gradient-to-r from-purple-500/25 to-pink-500/25 rounded-full hover:from-purple-500/40 hover:to-pink-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-purple-200/30 shadow-lg">
+            <button
+              onClick={() => {
+                premiumAction();
+                console.log('Crown premium action');
+              }}
+              className="p-2 bg-gradient-to-r from-purple-500/25 to-pink-500/25 rounded-full hover:from-purple-500/40 hover:to-pink-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-purple-200/30 shadow-lg"
+            >
               <Crown className="h-3.5 w-3.5 text-purple-600" />
             </button>
-            <button className="p-2 bg-gradient-to-r from-pink-500/25 to-purple-500/25 rounded-full hover:from-pink-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-pink-200/30 shadow-lg">
+            <button
+              onClick={() => {
+                premiumAction();
+                console.log('Heart premium action');
+              }}
+              className="p-2 bg-gradient-to-r from-pink-500/25 to-purple-500/25 rounded-full hover:from-pink-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-pink-200/30 shadow-lg"
+            >
               <Heart className="h-3.5 w-3.5 text-pink-600" />
             </button>
-            <button className="p-2 bg-gradient-to-r from-blue-500/25 to-purple-500/25 rounded-full hover:from-blue-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-blue-200/30 shadow-lg">
+            <button
+              onClick={() => {
+                premiumAction();
+                console.log('Zap premium action');
+              }}
+              className="p-2 bg-gradient-to-r from-blue-500/25 to-purple-500/25 rounded-full hover:from-blue-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-blue-200/30 shadow-lg"
+            >
               <Zap className="h-3.5 w-3.5 text-blue-600" />
             </button>
           </div>
