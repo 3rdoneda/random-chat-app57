@@ -70,7 +70,7 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
   return (
     <div className="ultra-app-container relative min-h-screen bg-gray-50 safe-area-inset flex flex-col">
       {/* Mobile App Status Bar */}
-      <div className="fixed top-0 left-0 right-0 h-6 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs safe-area-top">
+      <div className="fixed top-0 left-0 right-0 h-6 bg-gradient-to-r from-rose-500 to-pink-500 z-[100] flex items-center justify-between px-4 text-white text-xs safe-area-top">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
           <span className="font-semibold tracking-wide">ULTRA+</span>
@@ -91,29 +91,29 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
       </div>
 
       {/* Mobile App Header */}
-      <div className="fixed top-6 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+      <div className="fixed top-6 left-0 right-0 z-50 bg-rose-50/95 backdrop-blur-lg border-b border-rose-200/50 shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
           {/* App Title */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-pink-500 rounded-lg flex items-center justify-center">
               <Gem className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">AjnabiCam</h1>
+              <h1 className="text-lg font-bold text-rose-900">AjnabiCam</h1>
               <div className="flex items-center gap-1">
-                <span className="text-xs font-medium text-purple-600">ULTRA+</span>
-                <Crown className="h-3 w-3 text-purple-600" />
+                <span className="text-xs font-medium text-rose-600">ULTRA+</span>
+                <Crown className="h-3 w-3 text-rose-600" />
               </div>
             </div>
           </div>
 
           {/* Header Actions */}
           <div className="flex items-center gap-2">
-            <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-              <Bell className="h-5 w-5 text-gray-600" />
+            <button className="p-2 bg-rose-100 rounded-lg hover:bg-rose-200 transition-colors">
+              <Bell className="h-5 w-5 text-rose-600" />
             </button>
-            <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-              <Settings className="h-5 w-5 text-gray-600" />
+            <button className="p-2 bg-rose-100 rounded-lg hover:bg-rose-200 transition-colors">
+              <Settings className="h-5 w-5 text-rose-600" />
             </button>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
 
       {/* Subtle Background Effects */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-pink-50/20 to-purple-50/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-50/40 via-pink-50/30 to-rose-50/40" />
         {/* Floating Premium Elements - Subtle */}
         {floatingElements.slice(0, 3).map((element) => (
           <div
@@ -141,7 +141,7 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
 
       {/* Mobile App Content */}
       <div className="flex-1 flex flex-col pt-20 pb-safe relative z-10">
-        <div className="flex-1 bg-gray-50 overflow-y-auto">
+        <div className="flex-1 bg-rose-50/30 overflow-y-auto">
           {children}
         </div>
       </div>
