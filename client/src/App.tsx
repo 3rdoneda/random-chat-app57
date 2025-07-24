@@ -169,6 +169,11 @@ function App() {
     );
   }
 
+  // Show age verification if not verified yet
+  if (!ageVerified) {
+    return <AgeVerification onVerified={handleAgeVerification} />;
+  }
+
   return (
     <AppStartupCheck>
       <UltraAppWrapper>
