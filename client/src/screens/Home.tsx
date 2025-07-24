@@ -21,6 +21,8 @@ import {
   Globe,
   User,
   Gem,
+  Settings,
+  Bot,
 } from "lucide-react";
 import GenderFilter from "../components/GenderFilter";
 // import PremiumPaywall from "../components/PremiumPaywall"; // Now using separate page
