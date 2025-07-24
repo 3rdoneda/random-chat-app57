@@ -167,6 +167,7 @@ function App() {
             <Route path="/premium" element={<PremiumPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+            <Route path="/admin" element={<AdminPanelPage />} />
             <Route path="/spin-wheel" element={<SpinWheel />} />
             <Route path="/storage-debug" element={<StorageDebugPage />} />
             <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
