@@ -120,7 +120,7 @@ export default function UltraBottomNavBar() {
                   }`}>
                     <IconComponent
                       className={`h-5 w-5 transition-all duration-200 ${
-                        isActive ? 'text-white' : 'text-gray-500'
+                        isActive ? 'text-white' : 'text-rose-400'
                       }`}
                     />
                     
