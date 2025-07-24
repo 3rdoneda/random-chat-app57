@@ -174,6 +174,7 @@ function App() {
           </Routes>
 
           <PWAInstallPrompt />
+          <CookieConsent />
         </div>
         </Suspense>
       </UltraAppWrapper>
