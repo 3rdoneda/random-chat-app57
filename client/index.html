@@ -5,7 +5,8 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Native Mobile App Viewport Configuration -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
 
     <!-- Title Tag -->
     <title>AjnabiCam - Random Video Chat</title>
@@ -58,18 +59,48 @@
     <meta property="og:site_name" content="AjnabiCam - Random Video Chat" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Enhanced Viewport Configuration for App Store Ready Mobile Experience -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    <!-- Enhanced Native Mobile App Meta Tags -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="MobileOptimized" content="320" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- PWA Theme Color -->
+    <!-- Enhanced PWA and Native App Theme Colors -->
     <meta name="theme-color" content="#ec4899" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ec4899" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#be185d" />
     <meta name="msapplication-TileColor" content="#ec4899" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="AjnabiCam" />
+    <meta name="msapplication-navbutton-color" content="#ec4899" />
+    <meta name="apple-mobile-web-app-title" content="AjnabiCam ULTRA+" />
+
+    <!-- Native App Status Bar Styling -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="msapplication-starturl" content="/" />
+
+    <!-- Disable tap highlighting on mobile -->
+    <style>
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      html, body {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+        touch-action: manipulation;
+      }
+
+      /* Safe area support for notched devices */
+      body {
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+    </style>
 
     <!-- Favicons and PWA Icons -->
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
