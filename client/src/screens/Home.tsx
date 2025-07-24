@@ -205,30 +205,52 @@ export default function Home() {
         </title>
       </Helmet>
       <UltraPageTransition>
-        <main className="flex flex-col min-h-screen w-full bg-gray-50 relative">
+        <main className={`flex flex-col min-h-screen w-full relative ${
+          isUltraPremium()
+            ? 'bg-rose-50/30'
+            : 'bg-gray-50'
+        }`}>
         {/* Mobile App Content Container */}
         <div className="flex-1 px-4 py-6 space-y-6">
 
           {/* User Status Card */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className={`rounded-2xl p-4 shadow-sm border ${
+            isUltraPremium()
+              ? 'bg-gradient-to-br from-amber-100 to-orange-100 border-amber-200/50'
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  isUltraPremium()
+                    ? 'bg-gradient-to-r from-rose-500 to-pink-500'
+                    : 'bg-gradient-to-r from-purple-600 to-pink-600'
+                }`}>
                   <User className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">Welcome back!</span>
+                    <span className={`font-semibold ${
+                      isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
+                    }`}>Welcome back!</span>
                     {isPremium && (
-                      <div className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 rounded-full">
+                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                        isUltraPremium()
+                          ? 'bg-gradient-to-r from-rose-500 to-pink-500'
+                          : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                      }`}>
                         <Crown className="h-3 w-3 text-white" />
                         <span className="text-white text-xs font-bold">ULTRA+</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className={`flex items-center gap-4 text-sm ${
+                    isUltraPremium() ? 'text-amber-700' : 'text-gray-600'
+                  }`}>
                     <div className="flex items-center gap-1">
-                      <Coins className="h-4 w-4 text-yellow-500" />
+                      <Coins className={`h-4 w-4 ${
+                        isUltraPremium() ? 'text-amber-600' : 'text-yellow-500'
+                      }`} />
                       <span className="font-medium">{coinsLoading ? "..." : coins}</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -243,15 +265,23 @@ export default function Home() {
                   buttonTap();
                   navigate("/profile");
                 }}
-                className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className={`p-2 rounded-lg transition-colors ${
+                  isUltraPremium()
+                    ? 'bg-amber-200/50 hover:bg-amber-200 text-amber-700'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                }`}
               >
-                <Settings className="h-5 w-5 text-gray-600" />
+                <Settings className="h-5 w-5" />
               </button>
             </div>
           </div>
 
           {/* Main Action Card */}
-          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-lg">
+          <div className={`rounded-2xl p-6 text-white shadow-lg ${
+            isUltraPremium()
+              ? 'bg-gradient-to-br from-amber-700 via-orange-600 to-red-500'
+              : 'bg-gradient-to-br from-purple-600 to-pink-600'
+          }`}>
             <div className="text-center space-y-4">
               <div className="flex justify-center">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -263,13 +293,19 @@ export default function Home() {
                 <p className="text-white/90 text-sm">Connect with amazing people worldwide</p>
               </div>
               <Button
-                className="w-full bg-white text-purple-600 hover:bg-gray-100 py-4 rounded-xl font-semibold text-lg shadow-lg touch-action-manipulation transition-all duration-200 active:scale-95"
+                className={`w-full py-4 rounded-xl font-semibold text-lg shadow-lg touch-action-manipulation transition-all duration-200 active:scale-95 ${
+                  isUltraPremium()
+                    ? 'bg-white text-amber-700 hover:bg-amber-50'
+                    : 'bg-white text-purple-600 hover:bg-gray-100'
+                }`}
                 onClick={handleStartCall}
                 disabled={isConnecting}
               >
                 {isConnecting ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className={`w-5 h-5 border-2 border-t-transparent rounded-full animate-spin ${
+                      isUltraPremium() ? 'border-amber-700' : 'border-purple-600'
+                    }`}></div>
                     <span>Finding match...</span>
                   </div>
                 ) : (
@@ -284,8 +320,14 @@ export default function Home() {
           </div>
 
           {/* Preferences Card */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-gray-900 mb-3">Chat Preferences</h3>
+          <div className={`rounded-2xl p-4 shadow-sm border ${
+            isUltraPremium()
+              ? 'bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200/50'
+              : 'bg-white border-gray-100'
+          }`}>
+            <h3 className={`font-semibold mb-3 ${
+              isUltraPremium() ? 'text-rose-900' : 'text-gray-900'
+            }`}>Chat Preferences</h3>
             <GenderFilter
               isPremium={isPremium}
               onGenderSelect={(gender: string) => {
@@ -302,15 +344,27 @@ export default function Home() {
                 buttonTap();
                 navigate("/friends");
               }}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+              className={`rounded-xl p-4 shadow-sm border hover:shadow-md transition-all active:scale-95 cursor-pointer ${
+                isUltraPremium()
+                  ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50'
+                  : 'bg-white border-gray-100'
+              }`}
             >
               <div className="text-center space-y-2">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Users className="h-6 w-6 text-blue-600" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
+                  isUltraPremium()
+                    ? 'bg-rose-100 text-rose-600'
+                    : 'bg-blue-100 text-blue-600'
+                }`}>
+                  <Users className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Friends</h4>
-                  <p className="text-xs text-gray-600">Connect with buddies</p>
+                  <h4 className={`font-semibold ${
+                    isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
+                  }`}>Friends</h4>
+                  <p className={`text-xs ${
+                    isUltraPremium() ? 'text-amber-700' : 'text-gray-600'
+                  }`}>Connect with buddies</p>
                 </div>
               </div>
             </div>
@@ -320,30 +374,54 @@ export default function Home() {
                 buttonTap();
                 navigate("/ai-chatbot");
               }}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+              className={`rounded-xl p-4 shadow-sm border hover:shadow-md transition-all active:scale-95 cursor-pointer ${
+                isUltraPremium()
+                  ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50'
+                  : 'bg-white border-gray-100'
+              }`}
             >
               <div className="text-center space-y-2">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Bot className="h-6 w-6 text-purple-600" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
+                  isUltraPremium()
+                    ? 'bg-pink-100 text-pink-600'
+                    : 'bg-purple-100 text-purple-600'
+                }`}>
+                  <Bot className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">AI Chat</h4>
-                  <p className="text-xs text-gray-600">Smart conversations</p>
+                  <h4 className={`font-semibold ${
+                    isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
+                  }`}>AI Chat</h4>
+                  <p className={`text-xs ${
+                    isUltraPremium() ? 'text-amber-700' : 'text-gray-600'
+                  }`}>Smart conversations</p>
                 </div>
               </div>
             </div>
 
             <div
               onClick={handleVoiceChat}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+              className={`rounded-xl p-4 shadow-sm border hover:shadow-md transition-all active:scale-95 cursor-pointer ${
+                isUltraPremium()
+                  ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50'
+                  : 'bg-white border-gray-100'
+              }`}
             >
               <div className="text-center space-y-2">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Mic className="h-6 w-6 text-green-600" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
+                  isUltraPremium()
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'bg-green-100 text-green-600'
+                }`}>
+                  <Mic className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Voice</h4>
-                  <p className="text-xs text-gray-600">Audio only chats</p>
+                  <h4 className={`font-semibold ${
+                    isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
+                  }`}>Voice</h4>
+                  <p className={`text-xs ${
+                    isUltraPremium() ? 'text-amber-700' : 'text-gray-600'
+                  }`}>Audio only chats</p>
                 </div>
               </div>
             </div>
@@ -353,15 +431,27 @@ export default function Home() {
                 buttonTap();
                 setShowTreasureChest(true);
               }}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+              className={`rounded-xl p-4 shadow-sm border hover:shadow-md transition-all active:scale-95 cursor-pointer ${
+                isUltraPremium()
+                  ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50'
+                  : 'bg-white border-gray-100'
+              }`}
             >
               <div className="text-center space-y-2">
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Coins className="h-6 w-6 text-yellow-600" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
+                  isUltraPremium()
+                    ? 'bg-amber-100 text-amber-600'
+                    : 'bg-yellow-100 text-yellow-600'
+                }`}>
+                  <Coins className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Coins</h4>
-                  <p className="text-xs text-gray-600">Earn rewards</p>
+                  <h4 className={`font-semibold ${
+                    isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
+                  }`}>Coins</h4>
+                  <p className={`text-xs ${
+                    isUltraPremium() ? 'text-amber-700' : 'text-gray-600'
+                  }`}>Earn rewards</p>
                 </div>
               </div>
             </div>
@@ -369,7 +459,11 @@ export default function Home() {
 
           {/* Premium Features */}
           {!isPremium && (
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-4 text-white">
+            <div className={`rounded-2xl p-4 text-white ${
+              isUltraPremium()
+                ? 'bg-gradient-to-r from-rose-400 to-pink-500'
+                : 'bg-gradient-to-r from-yellow-400 to-orange-500'
+            }`}>
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="font-bold mb-1">💰 Earn Free Coins!</h3>
