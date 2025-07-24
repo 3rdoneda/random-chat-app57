@@ -198,14 +198,14 @@ export default function Home() {
       </Helmet>
       <UltraPageTransition>
         <main className={`flex flex-col min-h-screen w-full ${
-          isUltraPremium() 
-            ? 'max-w-full' 
+          isUltraPremium()
+            ? 'max-w-full'
             : 'max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl'
         } mx-auto ${
-          isUltraPremium() 
-            ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90' 
+          isUltraPremium()
+            ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90'
             : 'bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50'
-        } relative pb-16 sm:pb-20 lg:pb-24 overflow-hidden`}>
+        } relative pb-safe overflow-hidden safe-area-inset`}>
         {/* Enhanced Animated Background Elements with Indian flair */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-6 sm:top-10 left-6 sm:left-10 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-sindoor-300 to-henna-400 rounded-full opacity-20 animate-pulse"></div>
@@ -247,12 +247,12 @@ export default function Home() {
 
         {/* Enhanced Two-Row Header Design */}
         <header className={`w-full ${
-          isUltraPremium() 
-            ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
+          isUltraPremium()
+            ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700'
             : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
-        } shadow-lg px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b ${
+        } shadow-2xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b ${
           isUltraPremium() ? 'border-purple-300' : 'border-peach-200'
-        } relative overflow-hidden`}>
+        } relative overflow-hidden safe-area-top`}>
           {/* Header Background Pattern with Indian touch */}
           <div className={`absolute inset-0 ${
             isUltraPremium() 
@@ -265,17 +265,17 @@ export default function Home() {
               : 'bg-gradient-to-r from-transparent via-henna-200/15 to-transparent'
           }`}></div>
 
-          <div className="relative z-10 space-y-4">
+          <div className="relative z-10 space-y-4 sm:space-y-5">
             {/* Top Row: Logo + Settings & Coins */}
             <div className="flex items-center justify-between">
               {/* Left: AjnabiCam Logo */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                  {isUltraPremium() ? <Gem className="h-5 w-5 text-white" /> : <Heart className="h-5 w-5 text-white" />}
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white/25 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl border border-white/20">
+                  {isUltraPremium() ? <Gem className="h-6 w-6 text-white" /> : <Heart className="h-6 w-6 text-white" />}
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight drop-shadow-lg">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight drop-shadow-lg">
                       {isUltraPremium() ? "AjnabiCam ULTRA+" : t("app.name")}
                     </h1>
                     {isUltraPremium() && (
@@ -295,22 +295,22 @@ export default function Home() {
               </div>
 
               {/* Right: Settings & Coins */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 sm:gap-4">
                 {/* Settings Button */}
                 <Button
                   onClick={() => navigate("/profile")}
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold p-2.5 rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 border border-white/30"
+                  className="bg-white/25 backdrop-blur-sm hover:bg-white/35 text-white font-semibold p-3 sm:p-3.5 rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 border border-white/30 touch-action-manipulation"
                 >
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
                 </Button>
 
                 {/* Coins Button */}
                 <Button
                   onClick={() => setShowTreasureChest(true)}
                   disabled={coinsLoading}
-                  className="bg-gradient-to-r from-jasmine-500 to-gulmohar-600 hover:from-jasmine-600 hover:to-gulmohar-700 text-white font-bold px-4 py-2.5 rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 text-sm"
+                  className="bg-gradient-to-r from-jasmine-500 to-gulmohar-600 hover:from-jasmine-600 hover:to-gulmohar-700 text-white font-bold px-4 sm:px-5 py-3 sm:py-3.5 rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base touch-action-manipulation"
                 >
-                  <Coins className="h-4 w-4 mr-2" />
+                  <Coins className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   {coinsLoading ? "..." : coins}
                 </Button>
               </div>
@@ -321,14 +321,14 @@ export default function Home() {
               {/* Left: Premium Badge */}
               <div className="flex items-center gap-3">
                 {isPremium ? (
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-jasmine-400 to-gulmohar-500 px-3 py-1 rounded-full shadow-md">
-                    <Crown className="h-3 w-3 text-white" />
-                    <span className="text-white text-xs font-bold">
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-jasmine-400 to-gulmohar-500 px-4 py-2 rounded-full shadow-xl border border-white/20">
+                    <Crown className="h-3.5 w-3.5 text-white" />
+                    <span className="text-white text-xs sm:text-sm font-bold tracking-wide">
                       PREMIUM
                     </span>
                   </div>
                 ) : (
-                  <div className="text-white/80 text-xs font-medium">
+                  <div className="text-white/90 text-xs sm:text-sm font-medium">
                     ✨ Upgrade for premium features
                   </div>
                 )}
@@ -338,9 +338,9 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Button
                   onClick={handleVoiceChat}
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold px-3 py-1.5 rounded-full shadow-md transform hover:scale-105 transition-all duration-200 border border-white/30 text-xs"
+                  className="bg-white/25 backdrop-blur-sm hover:bg-white/35 text-white font-semibold px-4 py-2 rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 border border-white/30 text-xs sm:text-sm touch-action-manipulation"
                 >
-                  <Mic className="h-3 w-3 mr-1" />
+                  <Mic className="h-3.5 w-3.5 mr-1.5" />
                   Voice Match
                 </Button>
               </div>
@@ -378,9 +378,9 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10">
-          {/* Enhanced Gender Filter - Moved to top */}
-          <div className="w-full mb-4 sm:mb-6">
+        <div className="flex-1 flex flex-col px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 pb-safe">
+          {/* Enhanced Gender Filter - Mobile Optimized */}
+          <div className="w-full mb-6 sm:mb-8">
             <GenderFilter
               isPremium={isPremium}
               onGenderSelect={(gender: string) => {
@@ -390,13 +390,13 @@ export default function Home() {
             />
           </div>
 
-          {/* Enhanced Main Action Button - Moved to top */}
-          <div className="w-full mb-4 sm:mb-6">
+          {/* Enhanced Main Action Button - Mobile Optimized */}
+          <div className="w-full mb-6 sm:mb-8">
             <Button
-              className={`w-full py-4 sm:py-6 lg:py-8 text-lg sm:text-xl lg:text-2xl font-bold rounded-2xl sm:rounded-3xl text-white shadow-2xl transform transition-all duration-300 relative overflow-hidden ${
+              className={`w-full py-5 sm:py-6 lg:py-8 text-lg sm:text-xl lg:text-2xl font-bold rounded-3xl text-white shadow-2xl transform transition-all duration-300 relative overflow-hidden touch-action-manipulation ${
                 isConnecting
                   ? "bg-gradient-to-r from-coral-400 to-blush-500 scale-95"
-                  : "bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 hover:scale-105 hover:shadow-3xl"
+                  : "bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 hover:scale-105 active:scale-95 hover:shadow-3xl"
               }`}
               onClick={handleStartCall}
               disabled={isConnecting}
@@ -421,35 +421,35 @@ export default function Home() {
             </Button>
           </div>
 
-                    {/* Quick Actions */}
-          <div className="w-full grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
+          {/* Quick Actions - Mobile Optimized */}
+          <div className="w-full grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <Button
               onClick={() => navigate("/friends")}
-              className="bg-white/80 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base"
+              className="bg-white/90 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-300 py-4 sm:py-5 rounded-2xl text-sm sm:text-base touch-action-manipulation shadow-lg"
             >
-              <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-blue-500" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-blue-500" />
               <span className="font-semibold">Friends</span>
             </Button>
 
             <Button
               onClick={() => navigate("/ai-chatbot")}
-              className="bg-white/80 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base"
+              className="bg-white/90 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-300 py-4 sm:py-5 rounded-2xl text-sm sm:text-base touch-action-manipulation shadow-lg"
             >
-              <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-purple-500" />
+              <Globe className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-purple-500" />
               <span className="font-semibold">AI Chat</span>
             </Button>
           </div>
 
-          {/* Rewarded Ad Section - Only for non-premium users */}
+          {/* Rewarded Ad Section - Mobile Optimized */}
           {!isPremium && (
-            <div className="w-full mb-4 sm:mb-6">
-              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 border border-purple-200">
+            <div className="w-full mb-6 sm:mb-8">
+              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5 border border-purple-200 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-purple-800 mb-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-purple-800 mb-2">
                       💰 Earn Free Coins!
                     </h3>
-                    <p className="text-xs text-purple-600">
+                    <p className="text-xs sm:text-sm text-purple-600">
                       Watch a short ad to earn 10 coins
                     </p>
                   </div>
@@ -464,41 +464,41 @@ export default function Home() {
             </div>
           )}
 
-          {/* Footer Text */}
-          <div className="text-xs sm:text-sm text-center text-gray-500 px-2 sm:px-4 leading-relaxed">
+          {/* Footer Text - Mobile Optimized */}
+          <div className="text-xs sm:text-sm text-center text-gray-500 px-3 sm:px-4 leading-relaxed mb-4">
             By using AjnabiCam, you agree to our Terms of Service and Privacy
             Policy.
             <br className="hidden sm:block" />
-            <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mt-1 sm:mt-0">
-              <span className="text-rose-600 font-medium">✓ Safe & Secure</span>
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-2 sm:mt-1">
+              <span className="text-rose-600 font-semibold">✓ Safe & Secure</span>
               <span className="text-gray-400">•</span>
-              <span className="text-pink-600 font-medium">24/7 Support</span>
+              <span className="text-pink-600 font-semibold">24/7 Support</span>
               <span className="text-gray-400">•</span>
-              <span className="text-crimson-600 font-medium">
+              <span className="text-crimson-600 font-semibold">
                 Find True Love
               </span>
             </div>
           </div>
         </div>
 
-        {/* Floating Coin Store Button with Indian colors */}
+        {/* Floating Coin Store Button - Mobile Optimized */}
         <button
           onClick={() => setShowTreasureChest(true)}
-          className="fixed bottom-20 sm:bottom-24 lg:bottom-28 right-3 sm:right-4 lg:right-6 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 text-white p-3 sm:p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-40 animate-pulse"
+          className="fixed bottom-24 sm:bottom-28 lg:bottom-32 right-4 sm:right-5 lg:right-6 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 text-white p-4 sm:p-5 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 active:scale-95 transition-all duration-300 z-40 animate-pulse touch-action-manipulation border-2 border-white/30"
         >
           <div className="relative">
-            <Coins className="h-5 w-5 sm:h-6 sm:w-6" />
+            <Coins className="h-6 w-6 sm:h-7 sm:w-7" />
             {coins > 0 && (
-              <div className="absolute -top-1.5 sm:-top-2 -right-1.5 sm:-right-2 bg-sindoor-500 text-white text-xs font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center shadow-md">
+              <div className="absolute -top-2 sm:-top-2.5 -right-2 sm:-right-2.5 bg-sindoor-500 text-white text-xs font-bold rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center shadow-xl border border-white/30">
                 {coins > 99 ? "99+" : coins}
               </div>
             )}
           </div>
         </button>
 
-        {/* Debug: Test ULTRA+ Features */}
+        {/* Debug: Test ULTRA+ Features - Mobile Optimized */}
         {!isUltraPremium() && (
-          <div className="px-4 mb-4">
+          <div className="px-4 sm:px-6 mb-6">
             <Button
               onClick={() => {
                 const expiry = new Date();
@@ -507,17 +507,17 @@ export default function Home() {
                 alert('🎉 ULTRA+ activated! Experience the luxury!');
                 window.location.reload();
               }}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-lg shadow-md transition-colors text-center"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 active:scale-95 text-white py-4 px-5 rounded-2xl shadow-xl transition-all duration-200 text-center touch-action-manipulation"
             >
-              <Crown className="h-4 w-4 mr-2" />
+              <Crown className="h-5 w-5 mr-2" />
               🧪 Try ULTRA+ Experience (Test Mode)
             </Button>
           </div>
         )}
 
-        {/* ULTRA+ Home Enhancements */}
+        {/* ULTRA+ Home Enhancements - Mobile Optimized */}
         {isUltraPremium() && (
-          <div className="px-4 mb-6">
+          <div className="px-4 sm:px-6 mb-8">
             <UltraHomeEnhancements
               isUltraPremium={true}
               onQuickMatch={() => {
