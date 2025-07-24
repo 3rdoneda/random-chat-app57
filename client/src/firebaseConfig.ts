@@ -1,19 +1,23 @@
-// src/firebaseConfig.ts
+// src/firebaseConfig.ts - DEPRECATED: Use config/firebase.config.ts instead
+// This file is kept for backwards compatibility but should use environment variables
+
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
-// ✅ Your actual Firebase project config
+// ⚠️ WARNING: This configuration should be moved to environment variables
+// Use the secure configuration from config/firebase.config.ts instead
+
 const firebaseConfig = {
-  apiKey: "AIzaSyB3wZTanCdGxG6jpo39CkqUcM9LhK17BME",
-  authDomain: "ajnabicam.firebaseapp.com",
-  projectId: "ajnabicam",
-  storageBucket: "ajnabicam.appspot.com",
-  messagingSenderId: "558188110620",
-  appId: "1:558188110620:web:500cdf55801d5b00e9d0d9",
-  measurementId: "G-XM2WK7W95Q",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB3wZTanCdGxG6jpo39CkqUcM9LhK17BME",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ajnabicam.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ajnabicam",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ajnabicam.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "558188110620",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:558188110620:web:500cdf55801d5b00e9d0d9",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-XM2WK7W95Q",
 };
 
 // ✅ Prevent duplicate initialization
