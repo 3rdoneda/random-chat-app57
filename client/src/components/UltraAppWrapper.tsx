@@ -68,9 +68,9 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
   }
 
   return (
-    <div className="ultra-app-container relative min-h-screen overflow-hidden safe-area-inset">
-      {/* Native App Status Bar */}
-      <div className="fixed top-0 left-0 right-0 h-6 sm:h-8 md:h-10 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs sm:text-sm safe-area-top">
+    <div className="ultra-app-container relative min-h-screen bg-gray-50 safe-area-inset flex flex-col">
+      {/* Mobile App Status Bar */}
+      <div className="fixed top-0 left-0 right-0 h-6 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs safe-area-top">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
           <span className="font-semibold tracking-wide">ULTRA+</span>
@@ -90,78 +90,59 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
         </div>
       </div>
 
-      {/* Global ULTRA+ Background Effects */}
+      {/* Mobile App Header */}
+      <div className="fixed top-6 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* App Title */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <Gem className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">AjnabiCam</h1>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-medium text-purple-600">ULTRA+</span>
+                <Crown className="h-3 w-3 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Header Actions */}
+          <div className="flex items-center gap-2">
+            <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+              <Bell className="h-5 w-5 text-gray-600" />
+            </button>
+            <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+              <Settings className="h-5 w-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Subtle Background Effects */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Native App Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/80 via-pink-50/60 to-purple-50/80 animate-gradient-shift" />
-        
-        {/* Floating Premium Elements */}
-        {floatingElements.map((element) => (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-pink-50/20 to-purple-50/30" />
+        {/* Floating Premium Elements - Subtle */}
+        {floatingElements.slice(0, 3).map((element) => (
           <div
             key={element.id}
-            className={`absolute animate-float-slow ${element.color}`}
+            className={`absolute animate-float-slow ${element.color} opacity-20`}
             style={{
               left: `${element.x}%`,
               top: `${element.y}%`,
-              animationDuration: `${3 + element.speed}s`,
-              animationDelay: `${element.speed * 0.5}s`
+              animationDuration: `${6 + element.speed}s`,
+              animationDelay: `${element.speed * 1}s`
             }}
           >
-            <element.icon size={element.size} />
+            <element.icon size={element.size * 0.8} />
           </div>
         ))}
-
-        {/* Premium Particle System */}
-        <div className="absolute inset-0">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`particle-${i}`}
-              className="absolute w-1 h-1 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full animate-premium-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 0.8}s`,
-                animationDuration: `${4 + Math.random() * 3}s`
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Native App Border Glow */}
-        <div className="absolute inset-1 sm:inset-2 border border-purple-200/30 rounded-3xl sm:rounded-3xl shadow-2xl shadow-purple-500/10 animate-premium-glow" />
       </div>
 
-      {/* ULTRA+ Status Indicator - Mobile Optimized */}
-      <div className="fixed top-8 sm:top-12 md:top-14 left-3 z-50">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 backdrop-blur-lg rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 shadow-2xl shadow-purple-500/30 animate-pulse border border-white/20">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full animate-ping" />
-            <span className="text-white text-xs sm:text-sm font-bold tracking-wide">ULTRA+</span>
-            <Gem className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-200" />
-          </div>
-        </div>
-      </div>
-
-      {/* Native App Quick Actions - Mobile Optimized */}
-      <div className="fixed top-8 sm:top-12 md:top-14 right-3 z-50">
-        <div className="bg-black/20 backdrop-blur-lg rounded-2xl p-2 border border-purple-300/30 shadow-lg">
-          <div className="flex gap-1.5">
-            <button className="p-2.5 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-xl hover:from-purple-600/80 hover:to-pink-600/80 transition-all duration-200 touch-action-manipulation active:scale-95 border border-white/20">
-              <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
-            </button>
-            <button className="p-2.5 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-xl hover:from-pink-600/80 hover:to-purple-600/80 transition-all duration-200 touch-action-manipulation active:scale-95 border border-white/20">
-              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* App Content with Native Styling */}
-      <div className="relative z-10 pt-6 sm:pt-8 md:pt-10 safe-area-inset">
-        <div className="min-h-screen bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90 backdrop-blur-sm overflow-x-hidden">
-          <div className="pb-safe">
-            {children}
-          </div>
+      {/* Mobile App Content */}
+      <div className="flex-1 flex flex-col pt-20 pb-safe relative z-10">
+        <div className="flex-1 bg-gray-50 overflow-y-auto">
+          {children}
         </div>
       </div>
 
