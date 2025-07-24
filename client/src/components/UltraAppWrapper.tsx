@@ -68,19 +68,24 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
   }
 
   return (
-    <div className="ultra-app-container relative min-h-screen overflow-hidden">
+    <div className="ultra-app-container relative min-h-screen overflow-hidden safe-area-inset">
       {/* Native App Status Bar */}
-      <div className="fixed top-0 left-0 right-0 h-6 sm:h-8 md:h-10 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs sm:text-sm">
+      <div className="fixed top-0 left-0 right-0 h-6 sm:h-8 md:h-10 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs sm:text-sm safe-area-top">
         <div className="flex items-center gap-2">
-          <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
-          <span className="font-medium">ULTRA+ MODE</span>
+          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+          <span className="font-semibold tracking-wide">ULTRA+</span>
         </div>
-        <div className="flex items-center gap-1">
-          <Bell className="w-3 h-3" />
-          <div className="flex gap-1">
-            <div className="w-1 h-3 bg-white/60 rounded-full"></div>
-            <div className="w-1 h-3 bg-white/80 rounded-full"></div>
-            <div className="w-1 h-3 bg-white rounded-full"></div>
+        <div className="flex items-center gap-2">
+          <div className="text-white/90 text-xs font-medium">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          <Bell className="w-3.5 h-3.5" />
+          <div className="flex gap-0.5">
+            <div className="w-1 h-2.5 bg-white/60 rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white/80 rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white rounded-full"></div>
+          </div>
+          <div className="w-5 h-2.5 bg-white/80 rounded-sm relative">
+            <div className="absolute top-0.5 right-0.5 bottom-0.5 w-1/2 bg-green-400 rounded-sm"></div>
           </div>
         </div>
       </div>
@@ -123,38 +128,40 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
         </div>
 
         {/* Native App Border Glow */}
-        <div className="absolute inset-2 sm:inset-4 border border-purple-200/30 rounded-2xl sm:rounded-3xl shadow-2xl shadow-purple-500/10 animate-premium-glow" />
+        <div className="absolute inset-1 sm:inset-2 border border-purple-200/30 rounded-3xl sm:rounded-3xl shadow-2xl shadow-purple-500/10 animate-premium-glow" />
       </div>
 
-      {/* ULTRA+ Status Indicator */}
-      <div className="fixed top-8 sm:top-12 md:top-14 left-4 z-50">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 backdrop-blur-lg rounded-full px-3 py-1.5 sm:px-4 sm:py-2 shadow-2xl shadow-purple-500/25 animate-pulse">
+      {/* ULTRA+ Status Indicator - Mobile Optimized */}
+      <div className="fixed top-8 sm:top-12 md:top-14 left-3 z-50">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 backdrop-blur-lg rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 shadow-2xl shadow-purple-500/30 animate-pulse border border-white/20">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
-            <span className="text-white text-xs sm:text-sm font-bold">ULTRA+</span>
-            <Gem className="h-3 w-3 sm:h-4 sm:w-4 text-purple-200" />
+            <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full animate-ping" />
+            <span className="text-white text-xs sm:text-sm font-bold tracking-wide">ULTRA+</span>
+            <Gem className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-200" />
           </div>
         </div>
       </div>
 
-      {/* Native App Quick Actions */}
-      <div className="fixed top-8 sm:top-12 md:top-14 right-4 z-50">
-        <div className="bg-black/20 backdrop-blur-lg rounded-xl sm:rounded-2xl p-2 border border-purple-300/30">
-          <div className="grid grid-cols-2 gap-2">
-            <button className="p-2 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-lg hover:from-purple-600/80 hover:to-pink-600/80 transition-all duration-200">
-              <Crown className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+      {/* Native App Quick Actions - Mobile Optimized */}
+      <div className="fixed top-8 sm:top-12 md:top-14 right-3 z-50">
+        <div className="bg-black/20 backdrop-blur-lg rounded-2xl p-2 border border-purple-300/30 shadow-lg">
+          <div className="flex gap-1.5">
+            <button className="p-2.5 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-xl hover:from-purple-600/80 hover:to-pink-600/80 transition-all duration-200 touch-action-manipulation active:scale-95 border border-white/20">
+              <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
             </button>
-            <button className="p-2 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-lg hover:from-pink-600/80 hover:to-purple-600/80 transition-all duration-200">
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+            <button className="p-2.5 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-xl hover:from-pink-600/80 hover:to-purple-600/80 transition-all duration-200 touch-action-manipulation active:scale-95 border border-white/20">
+              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
             </button>
           </div>
         </div>
       </div>
 
       {/* App Content with Native Styling */}
-      <div className="relative z-10 pt-6 sm:pt-8 md:pt-10">
-        <div className="min-h-screen bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90 backdrop-blur-sm">
-          {children}
+      <div className="relative z-10 pt-6 sm:pt-8 md:pt-10 safe-area-inset">
+        <div className="min-h-screen bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90 backdrop-blur-sm overflow-x-hidden">
+          <div className="pb-safe">
+            {children}
+          </div>
         </div>
       </div>
 
