@@ -35,6 +35,90 @@
   }
 }
 
+/* ULTRA+ Premium Animations */
+@keyframes ultra-premium-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(168, 85, 247, 0.4),
+      0 0 40px rgba(236, 72, 153, 0.3),
+      0 0 60px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(168, 85, 247, 0.6),
+      0 0 60px rgba(236, 72, 153, 0.5),
+      0 0 90px rgba(168, 85, 247, 0.3);
+  }
+}
+
+@keyframes ultra-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+}
+
+@keyframes ultra-particle {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes premium-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes sparkle-animation {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
 /* Enhanced romantic gradient backgrounds - more flirty and Indian-inspired */
 .romantic-gradient {
   background: linear-gradient(
@@ -129,6 +213,44 @@
     0 0 10px rgba(249, 145, 7, 0.5),
     0 0 20px rgba(249, 145, 7, 0.3),
     0 0 30px rgba(249, 145, 7, 0.2);
+}
+
+/* ULTRA+ Premium Animation Classes */
+.animate-ultra-glow {
+  animation: ultra-premium-glow 3s ease-in-out infinite;
+}
+
+.animate-ultra-float {
+  animation: ultra-float 4s ease-in-out infinite;
+}
+
+.animate-ultra-particle {
+  animation: ultra-particle 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.animate-premium-pulse {
+  animation: premium-pulse 2s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle-animation 2s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: ultra-float 6s ease-in-out infinite;
+}
+
+.animate-premium-glow {
+  animation: ultra-premium-glow 4s ease-in-out infinite;
+}
+
+.animate-premium-particle {
+  animation: ultra-particle 4s ease-in-out infinite;
 }
 
 /* Enhanced button styles with Indian flair - more flirty and romantic */
