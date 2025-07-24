@@ -30,7 +30,6 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import AppStartupCheck from "./components/AppStartupCheck";
 import UltraAppWrapper from "./components/UltraAppWrapper";
 import CookieConsent from "./components/CookieConsent";
-import AgeVerification from "./components/AgeVerification";
 import LegalFooter from "./components/LegalFooter";
 import { initializeErrorMonitoring } from "./lib/errorMonitoring";
 
