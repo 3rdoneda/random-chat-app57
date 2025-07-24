@@ -38,13 +38,29 @@ html, body {
   }
 }
 
-/* Safe area padding for notched devices */
+/* Enhanced Safe area padding for native mobile app experience */
 @supports (padding: max(0px)) {
   .safe-area-inset {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-    padding-top: max(1rem, env(safe-area-inset-top));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-left {
+    padding-left: max(0px, env(safe-area-inset-left));
+  }
+
+  .safe-area-right {
+    padding-right: max(0px, env(safe-area-inset-right));
   }
 }
 
@@ -72,12 +88,34 @@ html, body {
   }
 }
 
-/* App Store Ready Touch Interactions */
+/* Enhanced App Store Ready Touch Interactions */
 .touch-action-manipulation {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Native mobile app scroll behavior */
+.native-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Native mobile app viewport handling */
+.viewport-height {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.viewport-min-height {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Prevent zoom on inputs for iOS */
+/* Native mobile app input optimization */
 @media screen and (max-width: 767px) {
   input[type="text"],
   input[type="email"],
@@ -85,6 +123,17 @@ html, body {
   textarea,
   select {
     font-size: 16px !important;
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+}
+
+/* Native mobile app button optimization */
+@media screen and (max-width: 767px) {
+  button {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -311,5 +360,73 @@ html, body {
   /* Responsive container utilities */
   .container-responsive {
     @apply max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl;
+  }
+
+  /* Safe area utilities for native mobile app */
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .pl-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .pr-safe {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .mb-safe {
+    margin-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .mt-safe {
+    margin-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* Native mobile app spacing */
+  .spacing-mobile {
+    @apply p-4 sm:p-6 md:p-8;
+  }
+
+  .gap-mobile {
+    @apply gap-4 sm:gap-6 md:gap-8;
+  }
+
+  /* Native mobile app text sizing */
+  .text-mobile-xs {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-mobile-sm {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-mobile-base {
+    @apply text-base sm:text-lg;
+  }
+
+  .text-mobile-lg {
+    @apply text-lg sm:text-xl;
+  }
+
+  .text-mobile-xl {
+    @apply text-xl sm:text-2xl;
+  }
+
+  /* Native mobile app button sizing */
+  .btn-mobile {
+    @apply px-6 py-3 text-base font-semibold rounded-2xl min-h-[44px] touch-action-manipulation;
+  }
+
+  .btn-mobile-lg {
+    @apply px-8 py-4 text-lg font-bold rounded-3xl min-h-[52px] touch-action-manipulation;
+  }
+
+  .btn-mobile-sm {
+    @apply px-4 py-2 text-sm font-medium rounded-xl min-h-[36px] touch-action-manipulation;
   }
 }
