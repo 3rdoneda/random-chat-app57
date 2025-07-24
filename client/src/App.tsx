@@ -58,6 +58,8 @@ function LoadingScreen() {
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
+  const [ageVerified, setAgeVerified] = useState(false);
+  const [userAge, setUserAge] = useState(0);
   const navigate = useNavigate();
 
   // Error boundary for the app
