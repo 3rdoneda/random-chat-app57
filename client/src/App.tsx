@@ -164,6 +164,8 @@ function App() {
             <Route path="/referral-code" element={<ReferralCodeScreen />} />
             <Route path="/ai-chatbot" element={<AIChatbotPage />} />
             <Route path="/premium" element={<PremiumPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
             <Route path="/spin-wheel" element={<SpinWheel />} />
             <Route path="/storage-debug" element={<StorageDebugPage />} />
             <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
