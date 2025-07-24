@@ -76,27 +76,27 @@ export default function UltraBottomNavBar() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40">
+    <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
       {/* Native App Style Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white/98 via-white/95 to-transparent backdrop-blur-xl border-t border-purple-200/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/98 via-white/95 to-transparent backdrop-blur-xl border-t border-purple-200/50 shadow-2xl" />
       
       {/* ULTRA+ Glow Effect */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-gradient-shift" />
       
-      <div className="relative px-2 sm:px-4 py-2 sm:py-3">
-        {/* Premium Floating Indicator */}
-        <div className="flex justify-center mb-2">
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full px-3 py-1 shadow-lg">
+      <div className="relative px-3 sm:px-4 py-3 sm:py-4 pb-safe">
+        {/* Premium Floating Indicator - Mobile Optimized */}
+        <div className="flex justify-center mb-3">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full px-4 py-1.5 shadow-2xl border border-white/20">
             <div className="flex items-center gap-2">
               <Gem className="h-3 w-3 text-white" />
-              <span className="text-white text-xs font-bold">ULTRA+ Navigation</span>
+              <span className="text-white text-xs font-bold tracking-wide">ULTRA+ Navigation</span>
               <Sparkles className="h-3 w-3 text-purple-200 animate-pulse" />
             </div>
           </div>
         </div>
 
         {/* Navigation Tabs - Native App Style */}
-        <div className="flex items-center justify-around bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-xl border border-purple-100/50 px-2 py-3">
+        <div className="flex items-center justify-around bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-purple-100/60 px-2 py-4 mx-1 border-b border-purple-200/30">
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const IconComponent = tab.icon;
@@ -105,42 +105,42 @@ export default function UltraBottomNavBar() {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
-                className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl sm:rounded-2xl transition-all duration-300 transform ${
-                  isActive 
-                    ? 'scale-110 -translate-y-1' 
-                    : 'scale-100 hover:scale-105'
+                className={`relative flex flex-col items-center gap-1.5 py-3 px-4 rounded-2xl transition-all duration-300 transform touch-action-manipulation min-w-[60px] ${
+                  isActive
+                    ? 'scale-110 -translate-y-2'
+                    : 'scale-100 hover:scale-105 active:scale-95'
                 }`}
               >
                 {/* Active Tab Background */}
                 {isActive && (
-                  <div className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-xl sm:rounded-2xl shadow-lg opacity-90`} />
+                  <div className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-2xl shadow-2xl opacity-95 border border-white/30`} />
                 )}
 
                 {/* Tab Content */}
                 <div className="relative z-10 flex flex-col items-center gap-1">
                   {/* Icon with Premium Effects */}
-                  <div className={`relative p-2 rounded-full transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-white/20 backdrop-blur-sm' 
-                      : 'hover:bg-gray-100'
+                  <div className={`relative p-2.5 rounded-full transition-all duration-200 ${
+                    isActive
+                      ? 'bg-white/25 backdrop-blur-sm shadow-lg'
+                      : 'hover:bg-gray-100 active:bg-gray-200'
                   }`}>
-                    <IconComponent 
-                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-200 ${
-                        isActive ? 'text-white' : 'text-gray-600'
-                      }`} 
+                    <IconComponent
+                      className={`h-5 w-5 sm:h-5 sm:w-5 transition-all duration-200 ${
+                        isActive ? 'text-white drop-shadow-sm' : 'text-gray-600'
+                      }`}
                     />
                     
                     {/* Premium Sparkle Effect */}
                     {isActive && (
                       <div className="absolute -top-1 -right-1">
-                        <Sparkles className="h-3 w-3 text-yellow-300 animate-ping" />
+                        <Sparkles className="h-3.5 w-3.5 text-yellow-300 animate-ping drop-shadow-sm" />
                       </div>
                     )}
                   </div>
 
                   {/* Label */}
-                  <span className={`text-xs font-medium transition-all duration-200 ${
-                    isActive ? 'text-white' : 'text-gray-600'
+                  <span className={`text-xs font-semibold transition-all duration-200 tracking-wide ${
+                    isActive ? 'text-white drop-shadow-sm' : 'text-gray-600'
                   }`}>
                     {tab.label}
                   </span>
@@ -148,17 +148,17 @@ export default function UltraBottomNavBar() {
 
                 {/* Premium Tab Indicator */}
                 {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-2 h-2 bg-white rounded-full shadow-lg animate-pulse" />
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                    <div className="w-2.5 h-2.5 bg-white rounded-full shadow-xl animate-pulse border border-purple-200/30" />
                   </div>
                 )}
 
                 {/* Floating Particles for Active Tab */}
                 {isActive && (
                   <>
-                    <div className="absolute -top-2 left-0 w-1 h-1 bg-white/60 rounded-full animate-float-slow" 
+                    <div className="absolute -top-2 left-1 w-1.5 h-1.5 bg-white/70 rounded-full animate-float-slow drop-shadow-sm"
                          style={{ animationDelay: '0s' }} />
-                    <div className="absolute -top-1 right-1 w-0.5 h-0.5 bg-yellow-300/80 rounded-full animate-float-slow" 
+                    <div className="absolute -top-1 right-1 w-1 h-1 bg-yellow-300/90 rounded-full animate-float-slow drop-shadow-sm"
                          style={{ animationDelay: '0.5s' }} />
                   </>
                 )}
@@ -168,24 +168,24 @@ export default function UltraBottomNavBar() {
         </div>
 
         {/* ULTRA+ Premium Actions */}
-        <div className="flex justify-center mt-2">
-          <div className="flex items-center gap-2">
+        <div className="flex justify-center mt-3">
+          <div className="flex items-center gap-3">
             {/* Quick Premium Actions */}
-            <button className="p-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-200">
-              <Crown className="h-3 w-3 text-purple-600" />
+            <button className="p-2 bg-gradient-to-r from-purple-500/25 to-pink-500/25 rounded-full hover:from-purple-500/40 hover:to-pink-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-purple-200/30 shadow-lg">
+              <Crown className="h-3.5 w-3.5 text-purple-600" />
             </button>
-            <button className="p-1.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full hover:from-pink-500/30 hover:to-purple-500/30 transition-all duration-200">
-              <Heart className="h-3 w-3 text-pink-600" />
+            <button className="p-2 bg-gradient-to-r from-pink-500/25 to-purple-500/25 rounded-full hover:from-pink-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-pink-200/30 shadow-lg">
+              <Heart className="h-3.5 w-3.5 text-pink-600" />
             </button>
-            <button className="p-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200">
-              <Zap className="h-3 w-3 text-blue-600" />
+            <button className="p-2 bg-gradient-to-r from-blue-500/25 to-purple-500/25 rounded-full hover:from-blue-500/40 hover:to-purple-500/40 transition-all duration-200 touch-action-manipulation active:scale-90 border border-blue-200/30 shadow-lg">
+              <Zap className="h-3.5 w-3.5 text-blue-600" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Premium Bottom Shadow */}
-      <div className="absolute -bottom-2 left-0 right-0 h-2 bg-gradient-to-b from-purple-500/10 to-transparent" />
+      <div className="absolute -bottom-2 left-0 right-0 h-3 bg-gradient-to-b from-purple-500/15 to-transparent" />
     </div>
   );
 }
