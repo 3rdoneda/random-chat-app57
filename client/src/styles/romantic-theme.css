@@ -35,6 +35,134 @@
   }
 }
 
+/* ULTRA+ Premium Animations */
+@keyframes ultra-premium-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(168, 85, 247, 0.4),
+      0 0 40px rgba(236, 72, 153, 0.3),
+      0 0 60px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(168, 85, 247, 0.6),
+      0 0 60px rgba(236, 72, 153, 0.5),
+      0 0 90px rgba(168, 85, 247, 0.3);
+  }
+}
+
+@keyframes ultra-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+}
+
+@keyframes ultra-particle {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Mobile app specific animations */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+@keyframes premium-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes sparkle-animation {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
 /* Enhanced romantic gradient backgrounds - more flirty and Indian-inspired */
 .romantic-gradient {
   background: linear-gradient(
@@ -129,6 +257,44 @@
     0 0 10px rgba(249, 145, 7, 0.5),
     0 0 20px rgba(249, 145, 7, 0.3),
     0 0 30px rgba(249, 145, 7, 0.2);
+}
+
+/* ULTRA+ Premium Animation Classes */
+.animate-ultra-glow {
+  animation: ultra-premium-glow 3s ease-in-out infinite;
+}
+
+.animate-ultra-float {
+  animation: ultra-float 4s ease-in-out infinite;
+}
+
+.animate-ultra-particle {
+  animation: ultra-particle 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.animate-premium-pulse {
+  animation: premium-pulse 2s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle-animation 2s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: ultra-float 6s ease-in-out infinite;
+}
+
+.animate-premium-glow {
+  animation: ultra-premium-glow 4s ease-in-out infinite;
+}
+
+.animate-premium-particle {
+  animation: ultra-particle 4s ease-in-out infinite;
 }
 
 /* Enhanced button styles with Indian flair - more flirty and romantic */
@@ -382,6 +548,119 @@
   background: linear-gradient(180deg, #db2777, #be185d);
 }
 
+/* Native mobile app interaction classes */
+.mobile-button {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  background: white;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.mobile-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-input {
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.mobile-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+/* Mobile app layout classes */
+.mobile-section {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.mobile-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.mobile-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mobile-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.mobile-grid-4 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .mobile-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile app header */
+.mobile-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Mobile app status indicators */
+.status-online {
+  background: #10b981;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.status-offline {
+  background: #6b7280;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.status-busy {
+  background: #f59e0b;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
 /* Enhanced utility classes for quick application - more flirty Indian colors */
 .text-romantic {
   color: #ff3d2b;
@@ -457,8 +736,8 @@
   background-color: #22c55e;
 }
 
-/* Responsive adjustments for mobile */
-@media (max-width: 768px) {
+/* Enhanced responsive adjustments for native mobile app */
+@media (max-width: 480px) {
   .romantic-glow {
     animation-duration: 2s;
   }
@@ -469,6 +748,58 @@
 
   .floating-hearts {
     animation-duration: 5s;
+  }
+
+  /* Mobile-first button sizing */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 48px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .romantic-glow {
+    animation-duration: 2.5s;
+  }
+
+  .bollywood-shimmer {
+    animation-duration: 3.5s;
+  }
+
+  .floating-hearts {
+    animation-duration: 6s;
+  }
+
+  /* Tablet sizing */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 52px;
+    padding: 14px 28px;
+    font-size: 18px;
+    border-radius: 26px;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Desktop enhancements */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 56px;
+    padding: 16px 32px;
+    font-size: 20px;
+    border-radius: 28px;
   }
 }
 
@@ -488,6 +819,62 @@
   }
 }
 
+/* Enhanced touch interactions for native mobile app */
+.touch-optimized {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.touch-feedback {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Native mobile app ripple effect */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.ripple-effect:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Landscape mode optimizations for phones */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-compact {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .ultra-app-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .romantic-glow,
@@ -499,5 +886,13 @@
   .romantic-button:hover {
     animation: none;
     transform: none;
+  }
+
+  .touch-feedback:active {
+    transform: none;
+  }
+
+  .ripple-effect::before {
+    transition: none;
   }
 }

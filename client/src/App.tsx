@@ -22,10 +22,16 @@ import FriendsPage from "./screens/FriendsPage";
 import AIChatbotPage from "./screens/AIChatbotPage";
 import AdTestingPage from "./screens/AdTestingPage";
 import PremiumPage from "./screens/PremiumPage";
+import PrivacyPolicyPage from "./screens/PrivacyPolicyPage";
+import TermsOfServicePage from "./screens/TermsOfServicePage";
+import AdminPanelPage from "./screens/AdminPanelPage";
 import SpinWheel from "./components/SpinWheel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import AppStartupCheck from "./components/AppStartupCheck";
 import UltraAppWrapper from "./components/UltraAppWrapper";
+import CookieConsent from "./components/CookieConsent";
+import LegalFooter from "./components/LegalFooter";
+import { initializeErrorMonitoring } from "./lib/errorMonitoring";
 
 import { useNavigate } from "react-router-dom";
 
@@ -99,10 +105,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Initialize error monitoring
+    initializeErrorMonitoring();
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // ✅ Make sure Firestore doc exists for logged-in user
         await ensureUserDocumentExists(user.uid);
+        // Initialize error monitoring with user ID
+        initializeErrorMonitoring(user.uid);
       } else {
         // ✅ Auto sign-in anonymously for new users
         try {
@@ -117,6 +128,8 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+
+
 
   const handleSplashComplete = () => {
     setShowSplash(false);
@@ -161,6 +174,9 @@ function App() {
             <Route path="/referral-code" element={<ReferralCodeScreen />} />
             <Route path="/ai-chatbot" element={<AIChatbotPage />} />
             <Route path="/premium" element={<PremiumPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+            <Route path="/admin" element={<AdminPanelPage />} />
             <Route path="/spin-wheel" element={<SpinWheel />} />
             <Route path="/storage-debug" element={<StorageDebugPage />} />
             <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
@@ -169,6 +185,8 @@ function App() {
           </Routes>
 
           <PWAInstallPrompt />
+          <CookieConsent />
+          <LegalFooter />
         </div>
         </Suspense>
       </UltraAppWrapper>

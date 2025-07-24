@@ -68,92 +68,80 @@ export default function UltraAppWrapper({ children }: UltraAppWrapperProps) {
   }
 
   return (
-    <div className="ultra-app-container relative min-h-screen overflow-hidden">
-      {/* Native App Status Bar */}
-      <div className="fixed top-0 left-0 right-0 h-6 sm:h-8 md:h-10 bg-gradient-to-r from-purple-600 to-pink-600 z-[100] flex items-center justify-between px-4 text-white text-xs sm:text-sm">
+    <div className="ultra-app-container relative min-h-screen bg-gray-50 safe-area-inset flex flex-col">
+      {/* Mobile App Status Bar */}
+      <div className="fixed top-0 left-0 right-0 h-6 bg-gradient-to-r from-rose-500 to-pink-500 z-[100] flex items-center justify-between px-4 text-white text-xs safe-area-top">
         <div className="flex items-center gap-2">
-          <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
-          <span className="font-medium">ULTRA+ MODE</span>
+          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+          <span className="font-semibold tracking-wide">ULTRA+</span>
         </div>
-        <div className="flex items-center gap-1">
-          <Bell className="w-3 h-3" />
-          <div className="flex gap-1">
-            <div className="w-1 h-3 bg-white/60 rounded-full"></div>
-            <div className="w-1 h-3 bg-white/80 rounded-full"></div>
-            <div className="w-1 h-3 bg-white rounded-full"></div>
+        <div className="flex items-center gap-2">
+          <div className="text-white/90 text-xs font-medium">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          <Bell className="w-3.5 h-3.5" />
+          <div className="flex gap-0.5">
+            <div className="w-1 h-2.5 bg-white/60 rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white/80 rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white rounded-full"></div>
+            <div className="w-1 h-2.5 bg-white rounded-full"></div>
+          </div>
+          <div className="w-5 h-2.5 bg-white/80 rounded-sm relative">
+            <div className="absolute top-0.5 right-0.5 bottom-0.5 w-1/2 bg-green-400 rounded-sm"></div>
           </div>
         </div>
       </div>
 
-      {/* Global ULTRA+ Background Effects */}
+      {/* Mobile App Header */}
+      <div className="fixed top-6 left-0 right-0 z-50 bg-rose-50/95 backdrop-blur-lg border-b border-rose-200/50 shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* App Title */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <Gem className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-rose-900">AjnabiCam</h1>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-medium text-rose-600">ULTRA+</span>
+                <Crown className="h-3 w-3 text-rose-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Header Actions */}
+          <div className="flex items-center gap-2">
+            <button className="p-2 bg-rose-100 rounded-lg hover:bg-rose-200 transition-colors">
+              <Bell className="h-5 w-5 text-rose-600" />
+            </button>
+            <button className="p-2 bg-rose-100 rounded-lg hover:bg-rose-200 transition-colors">
+              <Settings className="h-5 w-5 text-rose-600" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Subtle Background Effects */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Native App Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/80 via-pink-50/60 to-purple-50/80 animate-gradient-shift" />
-        
-        {/* Floating Premium Elements */}
-        {floatingElements.map((element) => (
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-50/40 via-pink-50/30 to-rose-50/40" />
+        {/* Floating Premium Elements - Subtle */}
+        {floatingElements.slice(0, 3).map((element) => (
           <div
             key={element.id}
-            className={`absolute animate-float-slow ${element.color}`}
+            className={`absolute animate-float-slow ${element.color} opacity-20`}
             style={{
               left: `${element.x}%`,
               top: `${element.y}%`,
-              animationDuration: `${3 + element.speed}s`,
-              animationDelay: `${element.speed * 0.5}s`
+              animationDuration: `${6 + element.speed}s`,
+              animationDelay: `${element.speed * 1}s`
             }}
           >
-            <element.icon size={element.size} />
+            <element.icon size={element.size * 0.8} />
           </div>
         ))}
-
-        {/* Premium Particle System */}
-        <div className="absolute inset-0">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`particle-${i}`}
-              className="absolute w-1 h-1 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full animate-premium-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 0.8}s`,
-                animationDuration: `${4 + Math.random() * 3}s`
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Native App Border Glow */}
-        <div className="absolute inset-2 sm:inset-4 border border-purple-200/30 rounded-2xl sm:rounded-3xl shadow-2xl shadow-purple-500/10 animate-premium-glow" />
       </div>
 
-      {/* ULTRA+ Status Indicator */}
-      <div className="fixed top-8 sm:top-12 md:top-14 left-4 z-50">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 backdrop-blur-lg rounded-full px-3 py-1.5 sm:px-4 sm:py-2 shadow-2xl shadow-purple-500/25 animate-pulse">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
-            <span className="text-white text-xs sm:text-sm font-bold">ULTRA+</span>
-            <Gem className="h-3 w-3 sm:h-4 sm:w-4 text-purple-200" />
-          </div>
-        </div>
-      </div>
-
-      {/* Native App Quick Actions */}
-      <div className="fixed top-8 sm:top-12 md:top-14 right-4 z-50">
-        <div className="bg-black/20 backdrop-blur-lg rounded-xl sm:rounded-2xl p-2 border border-purple-300/30">
-          <div className="grid grid-cols-2 gap-2">
-            <button className="p-2 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-lg hover:from-purple-600/80 hover:to-pink-600/80 transition-all duration-200">
-              <Crown className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-            </button>
-            <button className="p-2 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-lg hover:from-pink-600/80 hover:to-purple-600/80 transition-all duration-200">
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* App Content with Native Styling */}
-      <div className="relative z-10 pt-6 sm:pt-8 md:pt-10">
-        <div className="min-h-screen bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90 backdrop-blur-sm">
+      {/* Mobile App Content */}
+      <div className="flex-1 flex flex-col pt-20 pb-safe relative z-10">
+        <div className="flex-1 bg-rose-50/30 overflow-y-auto">
           {children}
         </div>
       </div>
