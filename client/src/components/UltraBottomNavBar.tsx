@@ -82,7 +82,7 @@ export default function UltraBottomNavBar() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
       {/* Mobile App Style Background */}
-      <div className="absolute inset-0 bg-white border-t border-gray-200 shadow-2xl" />
+      <div className="absolute inset-0 bg-rose-50/95 border-t border-rose-200/50 shadow-2xl" />
       
       {/* ULTRA+ Glow Effect */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-gradient-shift" />
