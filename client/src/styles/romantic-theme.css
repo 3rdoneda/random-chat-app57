@@ -382,6 +382,45 @@
   background: linear-gradient(180deg, #db2777, #be185d);
 }
 
+/* Native mobile app interaction classes */
+.mobile-button {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 22px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.mobile-button:active {
+  transform: scale(0.95);
+}
+
+.mobile-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-input {
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.mobile-input:focus {
+  border-color: #ec4899;
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
+}
+
 /* Enhanced utility classes for quick application - more flirty Indian colors */
 .text-romantic {
   color: #ff3d2b;
@@ -457,8 +496,8 @@
   background-color: #22c55e;
 }
 
-/* Responsive adjustments for mobile */
-@media (max-width: 768px) {
+/* Enhanced responsive adjustments for native mobile app */
+@media (max-width: 480px) {
   .romantic-glow {
     animation-duration: 2s;
   }
@@ -469,6 +508,58 @@
 
   .floating-hearts {
     animation-duration: 5s;
+  }
+
+  /* Mobile-first button sizing */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 48px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .romantic-glow {
+    animation-duration: 2.5s;
+  }
+
+  .bollywood-shimmer {
+    animation-duration: 3.5s;
+  }
+
+  .floating-hearts {
+    animation-duration: 6s;
+  }
+
+  /* Tablet sizing */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 52px;
+    padding: 14px 28px;
+    font-size: 18px;
+    border-radius: 26px;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Desktop enhancements */
+  .romantic-button,
+  .bollywood-button,
+  .sindoor-button,
+  .henna-button,
+  .gulmohar-button {
+    min-height: 56px;
+    padding: 16px 32px;
+    font-size: 20px;
+    border-radius: 28px;
   }
 }
 
@@ -488,6 +579,62 @@
   }
 }
 
+/* Enhanced touch interactions for native mobile app */
+.touch-optimized {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.touch-feedback {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Native mobile app ripple effect */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.ripple-effect:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Landscape mode optimizations for phones */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-compact {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .ultra-app-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .romantic-glow,
@@ -499,5 +646,13 @@
   .romantic-button:hover {
     animation: none;
     transform: none;
+  }
+
+  .touch-feedback:active {
+    transform: none;
+  }
+
+  .ripple-effect::before {
+    transition: none;
   }
 }
