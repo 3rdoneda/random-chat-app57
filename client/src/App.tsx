@@ -24,6 +24,7 @@ import AdTestingPage from "./screens/AdTestingPage";
 import PremiumPage from "./screens/PremiumPage";
 import PrivacyPolicyPage from "./screens/PrivacyPolicyPage";
 import TermsOfServicePage from "./screens/TermsOfServicePage";
+import AdminPanelPage from "./screens/AdminPanelPage";
 import SpinWheel from "./components/SpinWheel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import AppStartupCheck from "./components/AppStartupCheck";
