@@ -134,7 +134,7 @@ export default function UltraBottomNavBar() {
 
                   {/* Label */}
                   <span className={`text-xs font-medium transition-all duration-200 ${
-                    isActive ? 'text-white' : 'text-gray-500'
+                    isActive ? 'text-white' : 'text-rose-400'
                   }`}>
                     {tab.label}
                   </span>
