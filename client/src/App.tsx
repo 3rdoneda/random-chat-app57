@@ -129,21 +129,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleAgeVerification = (isVerified: boolean, age: number) => {
-    if (!isVerified) {
-      // User is under 13 or declined verification
-      setAgeVerified(false);
-      return;
-    }
 
-    setAgeVerified(true);
-    setUserAge(age);
-
-    if (age < 18) {
-      // Show parental consent notice for users under 18
-      console.log("User under 18 - parental consent may be required");
-    }
-  };
 
   const handleSplashComplete = () => {
     setShowSplash(false);
