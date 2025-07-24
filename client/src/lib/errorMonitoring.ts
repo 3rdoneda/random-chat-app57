@@ -115,8 +115,6 @@ class ErrorMonitoring {
 
       // Send to analytics if available
       if (analytics && import.meta.env.PROD) {
-        // Log custom event for error tracking
-        // Note: You might want to use a dedicated analytics event
         console.log('Error logged to analytics');
       }
 
@@ -254,70 +252,6 @@ export function useErrorHandler() {
   };
 
   return { reportError };
-}
-
-// Error boundary component helper
-export function withErrorReporting<T extends Record<string, any>>(
-  Component: React.ComponentType<T>
-): React.ComponentType<T> {
-  return function WrappedComponent(props: T) {
-    const { reportError } = useErrorHandler();
-
-    const handleError = (error: Error, errorInfo: any) => {
-      reportError(error, errorInfo);
-    };
-
-    return (
-      <ErrorBoundary onError={handleError}>
-        <Component {...props} />
-      </ErrorBoundary>
-    );
-  };
-}
-
-// Simple Error Boundary component
-function ErrorBoundary({ 
-  children, 
-  onError 
-}: { 
-  children: React.ReactNode; 
-  onError: (error: Error, errorInfo: any) => void;
-}) {
-  const [hasError, setHasError] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleError = (error: ErrorEvent) => {
-      setHasError(true);
-      onError(error.error, { message: error.message });
-    };
-
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
-  }, [onError]);
-
-  if (hasError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Something went wrong</h2>
-          <p className="text-gray-600 mb-4">
-            We've been notified about this error and will fix it soon.
-          </p>
-          <button
-            onClick={() => {
-              setHasError(false);
-              window.location.reload();
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Reload Page
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
 }
 
 // Performance monitoring
