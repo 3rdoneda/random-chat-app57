@@ -36,6 +36,7 @@ import { OnlineNotificationManager } from "../components/OnlineNotification";
 import UltraHomeEnhancements from "../components/UltraHomeEnhancements";
 import UltraBottomNavBar from "../components/UltraBottomNavBar";
 import { UltraPageTransition } from "../components/UltraBottomNavBar";
+import { useHaptics } from "../lib/haptics";
 
 // Ad unit IDs for scrollable banner ads
 const adUnitIds = [
@@ -89,6 +90,7 @@ export default function Home() {
   const [onlineUsers, setOnlineUsers] = useState(12847);
   const { showBonusNotification, NotificationComponent } =
     useInAppNotification();
+  const { buttonTap, premiumAction, matchFound } = useHaptics();
 
   // Handle daily bonus notification
   useDailyBonusNotification({
@@ -135,6 +137,8 @@ export default function Home() {
       e.preventDefault();
       if (isConnecting) return;
 
+      // Haptic feedback for main action
+      matchFound();
       setIsConnecting(true);
       playSound("join");
 
@@ -147,14 +151,16 @@ export default function Home() {
 
       setIsConnecting(false);
     },
-    [navigate, isConnecting],
+    [navigate, isConnecting, matchFound],
   );
 
   const handleVoiceChat = useCallback(() => {
+    buttonTap();
     navigate("/voice");
-  }, [navigate]);
+  }, [navigate, buttonTap]);
 
   const handleUpgrade = () => {
+    premiumAction();
     navigate("/premium");
   };
 
@@ -229,7 +235,7 @@ export default function Home() {
             className="absolute bottom-64 sm:bottom-80 left-12 sm:left-16 text-henna-400 text-base sm:text-lg lg:text-xl opacity-35 animate-bounce"
             style={{ animationDelay: "1.5s" }}
           >
-            🌸
+            ��
           </div>
           <div
             className="absolute top-48 sm:top-60 left-6 sm:left-8 text-jasmine-400 text-sm sm:text-base lg:text-lg opacity-30 animate-pulse"
@@ -298,7 +304,10 @@ export default function Home() {
               <div className="flex items-center gap-3 sm:gap-4">
                 {/* Settings Button */}
                 <Button
-                  onClick={() => navigate("/profile")}
+                  onClick={() => {
+                    buttonTap();
+                    navigate("/profile");
+                  }}
                   className="bg-white/25 backdrop-blur-sm hover:bg-white/35 text-white font-semibold p-3 sm:p-3.5 rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 border border-white/30 touch-action-manipulation"
                 >
                   <User className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -306,7 +315,10 @@ export default function Home() {
 
                 {/* Coins Button */}
                 <Button
-                  onClick={() => setShowTreasureChest(true)}
+                  onClick={() => {
+                    buttonTap();
+                    setShowTreasureChest(true);
+                  }}
                   disabled={coinsLoading}
                   className="bg-gradient-to-r from-jasmine-500 to-gulmohar-600 hover:from-jasmine-600 hover:to-gulmohar-700 text-white font-bold px-4 sm:px-5 py-3 sm:py-3.5 rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base touch-action-manipulation"
                 >
@@ -424,7 +436,10 @@ export default function Home() {
           {/* Quick Actions - Mobile Optimized */}
           <div className="w-full grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <Button
-              onClick={() => navigate("/friends")}
+              onClick={() => {
+                buttonTap();
+                navigate("/friends");
+              }}
               className="bg-white/90 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-300 py-4 sm:py-5 rounded-2xl text-sm sm:text-base touch-action-manipulation shadow-lg"
             >
               <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-blue-500" />
@@ -432,7 +447,10 @@ export default function Home() {
             </Button>
 
             <Button
-              onClick={() => navigate("/ai-chatbot")}
+              onClick={() => {
+                buttonTap();
+                navigate("/ai-chatbot");
+              }}
               className="bg-white/90 backdrop-blur-sm text-gray-700 border border-gray-200 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-300 py-4 sm:py-5 rounded-2xl text-sm sm:text-base touch-action-manipulation shadow-lg"
             >
               <Globe className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-purple-500" />
@@ -483,7 +501,10 @@ export default function Home() {
 
         {/* Floating Coin Store Button - Mobile Optimized */}
         <button
-          onClick={() => setShowTreasureChest(true)}
+          onClick={() => {
+            buttonTap();
+            setShowTreasureChest(true);
+          }}
           className="fixed bottom-24 sm:bottom-28 lg:bottom-32 right-4 sm:right-5 lg:right-6 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 text-white p-4 sm:p-5 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 active:scale-95 transition-all duration-300 z-40 animate-pulse touch-action-manipulation border-2 border-white/30"
         >
           <div className="relative">
@@ -501,6 +522,7 @@ export default function Home() {
           <div className="px-4 sm:px-6 mb-6">
             <Button
               onClick={() => {
+                premiumAction();
                 const expiry = new Date();
                 expiry.setMonth(expiry.getMonth() + 3);
                 setPremium(true, expiry, 'ultra-quarterly');
