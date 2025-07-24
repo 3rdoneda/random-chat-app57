@@ -254,7 +254,7 @@ export default function Home() {
                       <span className="font-medium">{coinsLoading ? "..." : coins}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
                       <span>Online</span>
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function Home() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
                   isUltraPremium()
                     ? 'bg-rose-100 text-rose-600'
-                    : 'bg-blue-100 text-blue-600'
+                    : 'bg-rose-100 text-rose-600'
                 }`}>
                   <Users className="h-6 w-6" />
                 </div>
@@ -384,7 +384,7 @@ export default function Home() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
                   isUltraPremium()
                     ? 'bg-pink-100 text-pink-600'
-                    : 'bg-purple-100 text-purple-600'
+                    : 'bg-pink-100 text-pink-600'
                 }`}>
                   <Bot className="h-6 w-6" />
                 </div>
@@ -411,7 +411,7 @@ export default function Home() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
                   isUltraPremium()
                     ? 'bg-orange-100 text-orange-600'
-                    : 'bg-green-100 text-green-600'
+                    : 'bg-orange-100 text-orange-600'
                 }`}>
                   <Mic className="h-6 w-6" />
                 </div>
@@ -441,7 +441,7 @@ export default function Home() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
                   isUltraPremium()
                     ? 'bg-amber-100 text-amber-600'
-                    : 'bg-yellow-100 text-yellow-600'
+                    : 'bg-amber-100 text-amber-600'
                 }`}>
                   <Coins className="h-6 w-6" />
                 </div>
