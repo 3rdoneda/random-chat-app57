@@ -97,6 +97,50 @@
   }
 }
 
+/* Mobile app specific animations */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
 @keyframes premium-pulse {
   0%, 100% {
     transform: scale(1);
@@ -509,38 +553,112 @@
   min-height: 44px;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  border-radius: 22px;
+  border-radius: 12px;
   font-weight: 600;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-button:active {
   transform: scale(0.95);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  background: white;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.mobile-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-card:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-input {
-  min-height: 48px;
-  border-radius: 12px;
+  min-height: 44px;
+  border-radius: 8px;
   padding: 12px 16px;
   font-size: 16px;
-  border: 2px solid transparent;
+  border: 1px solid #e5e7eb;
   transition: all 0.2s ease;
+  background: white;
 }
 
 .mobile-input:focus {
-  border-color: #ec4899;
-  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+/* Mobile app layout classes */
+.mobile-section {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.mobile-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.mobile-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mobile-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.mobile-grid-4 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .mobile-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile app header */
+.mobile-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Mobile app status indicators */
+.status-online {
+  background: #10b981;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.status-offline {
+  background: #6b7280;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.status-busy {
+  background: #f59e0b;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid white;
 }
 
 /* Enhanced utility classes for quick application - more flirty Indian colors */
