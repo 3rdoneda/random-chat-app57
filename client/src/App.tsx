@@ -108,10 +108,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Initialize error monitoring
+    initializeErrorMonitoring();
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // ✅ Make sure Firestore doc exists for logged-in user
         await ensureUserDocumentExists(user.uid);
+        // Initialize error monitoring with user ID
+        initializeErrorMonitoring(user.uid);
       } else {
         // ✅ Auto sign-in anonymously for new users
         try {
@@ -126,6 +131,22 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+
+  const handleAgeVerification = (isVerified: boolean, age: number) => {
+    if (!isVerified) {
+      // User is under 13 or declined verification
+      setAgeVerified(false);
+      return;
+    }
+
+    setAgeVerified(true);
+    setUserAge(age);
+
+    if (age < 18) {
+      // Show parental consent notice for users under 18
+      console.log("User under 18 - parental consent may be required");
+    }
+  };
 
   const handleSplashComplete = () => {
     setShowSplash(false);
