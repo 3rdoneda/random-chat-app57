@@ -23,40 +23,40 @@ export default function UltraBottomNavBar() {
   const [activeTab, setActiveTab] = useState('');
 
   const tabs = [
-    { 
-      id: 'home', 
-      path: '/', 
-      icon: Home, 
+    {
+      id: 'home',
+      path: '/',
+      icon: Home,
       label: 'Home',
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-rose-500 to-pink-500'
     },
-    { 
-      id: 'chat', 
-      path: '/video-chat', 
-      icon: MessageCircle, 
+    {
+      id: 'chat',
+      path: '/video-chat',
+      icon: MessageCircle,
       label: 'Chat',
       color: 'from-pink-500 to-rose-500'
     },
-    { 
-      id: 'ai', 
-      path: '/ai-chatbot', 
-      icon: Bot, 
+    {
+      id: 'ai',
+      path: '/ai-chatbot',
+      icon: Bot,
       label: 'AI Chat',
-      color: 'from-blue-500 to-purple-500'
+      color: 'from-amber-500 to-orange-500'
     },
-    { 
-      id: 'friends', 
-      path: '/friends', 
-      icon: Users, 
+    {
+      id: 'friends',
+      path: '/friends',
+      icon: Users,
       label: 'Friends',
-      color: 'from-green-500 to-teal-500'
-    },
-    { 
-      id: 'profile', 
-      path: '/profile', 
-      icon: User, 
-      label: 'Profile',
       color: 'from-orange-500 to-red-500'
+    },
+    {
+      id: 'profile',
+      path: '/profile',
+      icon: User,
+      label: 'Profile',
+      color: 'from-red-500 to-rose-500'
     }
   ];
 
