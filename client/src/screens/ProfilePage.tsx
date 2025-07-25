@@ -125,6 +125,11 @@ export default function ProfilePage() {
     { id: 1, text: 'Sarah liked your profile!', time: Date.now() - 3600000, read: false },
     { id: 2, text: 'You have a new match!', time: Date.now() - 7200000, read: false },
   ]);
+  const [adStatus, setAdStatus] = useState({
+    unityReady: false,
+    admobReady: false,
+    checking: true
+  });
   const [showNotifications, setShowNotifications] = useState(false);
   const [recentActivity] = useState([
     { id: 1, type: 'match', user: 'Sarah', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
