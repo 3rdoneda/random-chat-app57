@@ -751,6 +751,35 @@ export default function ProfilePage() {
           </Card>
         </div>
 
+        {/* Ad Testing Section */}
+        <div className="space-y-4 bg-gray-50 p-4 rounded-2xl">
+          <h3 className="text-gray-800 font-bold text-center mb-4">📱 Ad Testing Zone</h3>
+
+          {/* Banner Ad Test */}
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Banner Ad Test:</p>
+            <BannerAd size="responsive" position="inline" className="border-2 border-dashed border-gray-300" />
+          </div>
+
+          {/* Rewarded Ad Test */}
+          <div>
+            <p className="text-sm text-gray-600 mb-2">Rewarded Ad Test:</p>
+            <RewardedAdButton
+              variant="premium"
+              onRewardEarned={(amount) => console.log(`Earned ${amount} coins!`)}
+              preferUnity={true}
+            />
+          </div>
+
+          {/* Ad Testing Page Link */}
+          <Button
+            onClick={() => navigate('/ad-testing')}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 rounded-xl"
+          >
+            🧪 Full Ad Testing Dashboard
+          </Button>
+        </div>
+
         {/* Enhanced Additional Actions */}
         <div className="space-y-6">
           {!isPremium && (
