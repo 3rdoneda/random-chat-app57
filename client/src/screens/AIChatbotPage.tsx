@@ -189,23 +189,64 @@ const AIChatbotPage: React.FC = () => {
 
         {/* Header */}
         <div className={`w-full flex items-center p-4 ${
-          isUltraPremium() 
-            ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
+          isUltraPremium()
+            ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700'
             : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
         } text-white font-bold text-xl rounded-t-2xl shadow-lg relative overflow-hidden`}>
           {/* Header Background Pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-cream-100/25 to-white/15 backdrop-blur-sm"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-peach-200/15 to-transparent"></div>
-          
-          <button 
-            onClick={handleBackClick} 
+
+          <button
+            onClick={handleBackClick}
             className="relative z-10 mr-3 text-white font-bold text-xl hover:scale-110 transition-transform p-2 rounded-full hover:bg-white/20"
           >
             <ArrowLeft size={24} />
           </button>
           <h1 className="relative z-10 flex-grow text-center drop-shadow-lg">AI Chat Assistant</h1>
-          <Bot className="relative z-10 h-6 w-6 drop-shadow-lg" />
+          <div className="relative z-10 flex items-center gap-2">
+            <span className="text-sm">{getPersonalityEmoji(conversationStyle)}</span>
+            <button
+              onClick={() => setShowPersonalityMenu(!showPersonalityMenu)}
+              className="p-2 rounded-full hover:bg-white/20 transition-all"
+            >
+              <Settings size={20} />
+            </button>
+          </div>
         </div>
+
+        {/* Personality Selection Menu */}
+        {showPersonalityMenu && (
+          <div className="w-full bg-white/95 backdrop-blur-sm border-x border-peach-200 shadow-lg relative z-10">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Conversation Style:</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { style: 'friendly' as const, label: 'Friendly', emoji: '😊', desc: 'Warm and welcoming' },
+                  { style: 'flirty' as const, label: 'Flirty', emoji: '😘', desc: 'Playful and charming' },
+                  { style: 'casual' as const, label: 'Casual', emoji: '😎', desc: 'Relaxed and chill' },
+                  { style: 'supportive' as const, label: 'Supportive', emoji: '🤗', desc: 'Caring and understanding' }
+                ].map((option) => (
+                  <button
+                    key={option.style}
+                    onClick={() => handlePersonalityChange(option.style)}
+                    className={`p-3 rounded-lg border transition-all text-left ${
+                      conversationStyle === option.style
+                        ? 'bg-peach-100 border-peach-400 text-peach-700'
+                        : 'bg-white border-gray-200 text-gray-600 hover:bg-peach-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span>{option.emoji}</span>
+                      <span className="text-sm font-medium">{option.label}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">{option.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="w-full flex flex-col romantic-card rounded-b-2xl border border-peach-200 shadow-xl mb-6 overflow-hidden flex-1 relative z-10">
           {/* Chat Messages */}
