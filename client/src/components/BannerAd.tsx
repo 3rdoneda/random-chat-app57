@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { adService } from '../lib/adService';
+import { usePremium } from '../context/PremiumProvider';
 
 interface BannerAdProps {
   size?: 'small' | 'medium' | 'large' | 'responsive';
