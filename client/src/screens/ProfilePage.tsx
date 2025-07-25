@@ -79,6 +79,9 @@ import BottomNavBar from "../components/BottomNavBar";
 import WhoLikedMeModal from "../components/WhoLikedMeModal";
 import BannerAd from "../components/BannerAd";
 import RewardedAdButton from "../components/RewardedAdButton";
+import { adService } from "../lib/adService";
+import { unityAdsService } from "../lib/unityAdsService";
+import { adMobService } from "../lib/adMobMediationService";
 
 // Add click outside handler
 function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
