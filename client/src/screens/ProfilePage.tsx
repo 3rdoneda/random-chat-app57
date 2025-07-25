@@ -128,6 +128,10 @@ export default function ProfilePage() {
     { id: 3, type: 'view', user: 'Anonymous', time: '8 hours ago', avatar: null },
     { id: 4, type: 'chat', user: 'Anjali', time: '1 day ago', avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
   ]);
+
+  const { isPremium, isUltraPremium, setPremium } = usePremium();
+  const { coins } = useCoin();
+
   const [achievements] = useState([
     { id: 1, title: 'First Impression', description: 'Uploaded your first photo', icon: Camera, completed: true, date: '2024-01-15' },
     { id: 2, title: 'Social Butterfly', description: 'Made 10 new friends', icon: Users, completed: true, date: '2024-01-20' },
@@ -136,9 +140,6 @@ export default function ProfilePage() {
     { id: 5, title: 'Heart Collector', description: 'Receive 25 likes', icon: Heart, completed: false, progress: 60 },
     { id: 6, title: 'Premium Explorer', description: 'Use premium features', icon: Crown, completed: isPremium, progress: isPremium ? 100 : 0 },
   ]);
-
-  const { isPremium, isUltraPremium, setPremium } = usePremium();
-  const { coins } = useCoin();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const user = auth.currentUser;
   const [showLikesModal, setShowLikesModal] = useState(false);
