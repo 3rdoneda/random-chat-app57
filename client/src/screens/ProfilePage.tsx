@@ -794,6 +794,27 @@ export default function ProfilePage() {
           </Card>
         </div>
 
+        {/* Premium Ad-Free Experience Indicator */}
+        {(isUltraPremium() || isProMonthly()) && (
+          <div className="space-y-4 bg-gradient-to-r from-green-50 to-emerald-100 p-6 rounded-2xl border border-green-200">
+            <h3 className="text-green-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
+              ✨ Premium Ad-Free Experience
+              <Crown className="w-5 h-5 text-yellow-600" />
+            </h3>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-green-700 font-semibold mb-2">
+                {isUltraPremium() ? 'ULTRA+ Member' : 'Pro Monthly Member'}
+              </p>
+              <p className="text-green-600 text-sm">
+                Enjoy an ad-free experience with no interruptions!
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Ad Testing Section - Hidden for Premium Users */}
         {!isUltraPremium() && !isProMonthly() && (
         <div className="space-y-4 bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
