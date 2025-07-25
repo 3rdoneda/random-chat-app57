@@ -80,17 +80,17 @@ export default function UltraBottomNavBar() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom h-20 sm:h-18 md:h-20 lg:h-24 flex items-center">
       {/* Mobile App Style Background */}
       <div className="absolute inset-0 bg-rose-50/95 border-t border-rose-200/50 shadow-2xl" />
       
       {/* ULTRA+ Glow Effect */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-gradient-shift" />
       
-      <div className="relative px-4 py-2 pb-safe">
+      <div className="relative px-4 py-3 sm:py-2 pb-safe">
 
         {/* Navigation Tabs - Mobile App Style */}
-        <div className="flex items-center justify-around px-2 py-3">
+        <div className="flex items-center justify-around px-2 py-4 sm:py-3">
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const IconComponent = tab.icon;
@@ -99,7 +99,7 @@ export default function UltraBottomNavBar() {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
-                className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-all duration-200 touch-action-manipulation min-w-[60px] ${
+                className={`relative flex flex-col items-center gap-2 py-3 sm:py-2 px-3 sm:px-3 rounded-xl transition-all duration-200 touch-action-manipulation min-w-[64px] sm:min-w-[60px] min-h-[60px] sm:min-h-[56px] ${
                   isActive
                     ? 'scale-105'
                     : 'scale-100 hover:scale-105 active:scale-95'
@@ -113,13 +113,13 @@ export default function UltraBottomNavBar() {
                 {/* Tab Content */}
                 <div className="relative z-10 flex flex-col items-center gap-1">
                   {/* Icon */}
-                  <div className={`relative p-2 rounded-lg transition-all duration-200 ${
+                  <div className={`relative p-2.5 sm:p-2 rounded-lg transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center ${
                     isActive
                       ? 'bg-white/20'
                       : 'hover:bg-gray-100 active:bg-gray-200'
                   }`}>
                     <IconComponent
-                      className={`h-5 w-5 transition-all duration-200 ${
+                      className={`h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-all duration-200 ${
                         isActive ? 'text-white' : 'text-amber-600'
                       }`}
                     />
@@ -133,7 +133,7 @@ export default function UltraBottomNavBar() {
                   </div>
 
                   {/* Label */}
-                  <span className={`text-xs font-medium transition-all duration-200 ${
+                  <span className={`text-xs sm:text-xs md:text-sm font-medium transition-all duration-200 leading-none ${
                     isActive ? 'text-white' : 'text-amber-600'
                   }`}>
                     {tab.label}
