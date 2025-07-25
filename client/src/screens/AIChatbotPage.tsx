@@ -13,15 +13,13 @@ import { aiChatbot } from '../lib/aiChatbot';
 const AIChatbotPage: React.FC = () => {
   const navigate = useNavigate();
   const { isUltraPremium } = usePremium();
-  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean; timestamp: Date }>>([
-    {
-      text: "Hello! I'm your AI assistant. How can I help you today? 💕",
-      isUser: false,
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean; timestamp: Date }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [conversationStyle, setConversationStyle] = useState<'casual' | 'friendly' | 'flirty' | 'supportive'>('friendly');
+  const [showPersonalityMenu, setShowPersonalityMenu] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const handleBackClick = () => {
     navigate(-1);
