@@ -5,18 +5,19 @@ import { Button } from "@/components/ui/button";
 import UltraProfileEnhancements from "../components/UltraProfileEnhancements";
 import UltraBottomNavBar from "../components/UltraBottomNavBar";
 import { UltraPageTransition } from "../components/UltraBottomNavBar";
-import { 
-  Camera, 
-  ArrowLeft, 
-  MapPin, 
-  Briefcase, 
-  Eye, 
-  Star, 
-  Edit3, 
+import {
+  Camera,
+  ArrowLeft,
+  MapPin,
+  Briefcase,
+  Eye,
+  Star,
+  Edit3,
   Settings,
   Crown,
   Heart,
   Users,
+  User,
   MessageCircle,
   Calendar,
   Coffee,
@@ -24,7 +25,43 @@ import {
   Book,
   Plane,
   Camera as CameraIcon,
-  Plus
+  Plus,
+  Sparkles,
+  Zap,
+  Trophy,
+  Award,
+  Target,
+  TrendingUp,
+  Clock,
+  MapPin as LocationIcon,
+  Phone,
+  Mail,
+  Instagram,
+  Twitter,
+  Share2,
+  MoreHorizontal,
+  Verified,
+  Shield,
+  Gift,
+  Flame,
+  Activity,
+  Bell,
+  Download,
+  Upload,
+  Link,
+  Copy,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Image as ImageIcon,
+  Video,
+  Mic,
+  HeartHandshake,
+  Smile,
+  ThumbsUp,
+  Send,
+  Bookmark,
+  Bot
 } from "lucide-react";
 import {
   doc,
@@ -40,8 +77,34 @@ import { usePremium } from "../context/PremiumProvider";
 import { useCoin } from "../context/CoinProvider";
 import BottomNavBar from "../components/BottomNavBar";
 import WhoLikedMeModal from "../components/WhoLikedMeModal";
+import BannerAd from "../components/BannerAd";
+import RewardedAdButton from "../components/RewardedAdButton";
+import ModeTestingPanel from "../components/ModeTestingPanel";
+import { adService } from "../lib/adService";
+import { unityAdsService } from "../lib/unityAdsService";
+import { adMobService } from "../lib/adMobMediationService";
+
+// Add click outside handler
+function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
+  useEffect(() => {
+    const listener = (event: any) => {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+      handler();
+    };
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+}
 
 export default function ProfilePage() {
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(shareMenuRef, () => setShowShareMenu(false));
   const navigate = useNavigate();
   const [name, setName] = useState("Love");
   const [age, setAge] = useState(25);
@@ -54,9 +117,42 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('overview');
+  const [animationKey, setAnimationKey] = useState(0);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  const [currentMood, setCurrentMood] = useState('great');
+  const [showMoodSelector, setShowMoodSelector] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: 'Sarah liked your profile!', time: Date.now() - 3600000, read: false },
+    { id: 2, text: 'You have a new match!', time: Date.now() - 7200000, read: false },
+  ]);
+  const [adStatus, setAdStatus] = useState({
+    unityReady: false,
+    admobReady: false,
+    checking: true
+  });
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [recentActivity] = useState([
+    { id: 1, type: 'match', user: 'Sarah', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 2, type: 'like', user: 'Priya', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 3, type: 'view', user: 'Anonymous', time: '8 hours ago', avatar: null },
+    { id: 4, type: 'chat', user: 'Anjali', time: '1 day ago', avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+  ]);
 
-  const { isPremium, isUltraPremium, setPremium } = usePremium();
+  const { isPremium, isUltraPremium, isProMonthly, setPremium } = usePremium();
   const { coins } = useCoin();
+
+  const [achievements] = useState([
+    { id: 1, title: 'First Impression', description: 'Uploaded your first photo', icon: Camera, completed: true, date: '2024-01-15' },
+    { id: 2, title: 'Social Butterfly', description: 'Made 10 new friends', icon: Users, completed: true, date: '2024-01-20' },
+    { id: 3, title: 'Conversation Starter', description: 'Sent 50 messages', icon: MessageCircle, completed: true, date: '2024-01-25' },
+    { id: 4, title: 'Popular Profile', description: 'Get 100 profile views', icon: Eye, completed: false, progress: 85 },
+    { id: 5, title: 'Heart Collector', description: 'Receive 25 likes', icon: Heart, completed: false, progress: 60 },
+    { id: 6, title: 'Premium Explorer', description: 'Use premium features', icon: Crown, completed: isPremium, progress: isPremium ? 100 : 0 },
+  ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const user = auth.currentUser;
   const [showLikesModal, setShowLikesModal] = useState(false);
@@ -131,6 +227,41 @@ export default function ProfilePage() {
       return () => clearTimeout(timer);
     }
   }, [user]);
+
+  // Check ad services status
+  useEffect(() => {
+    const checkAdStatus = async () => {
+      try {
+        // Check Unity Ads
+        const unityReady = unityAdsService.isReady('rewarded');
+
+        // Check AdMob
+        const admobReady = adMobService.isInitialized();
+
+        setAdStatus({
+          unityReady,
+          admobReady,
+          checking: false
+        });
+
+        console.log('🎯 Ad Status Check:', {
+          unityReady,
+          admobReady,
+          unityInitialized: await unityAdsService.initialize(),
+          admobInitialized: await adMobService.initialize()
+        });
+      } catch (error) {
+        console.error('Ad status check failed:', error);
+        setAdStatus({
+          unityReady: false,
+          admobReady: false,
+          checking: false
+        });
+      }
+    };
+
+    checkAdStatus();
+  }, []);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -209,98 +340,257 @@ export default function ProfilePage() {
         isUltraPremium() 
           ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90' 
           : 'bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50'
-      } pb-20 relative overflow-hidden`}>
-      {/* Animated Background Elements */}
+      } pb-24 relative overflow-hidden`}>
+      {/* Enhanced Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-6 left-6 w-12 h-12 bg-gradient-to-br from-sindoor-300 to-henna-400 opacity-20 animate-pulse"></div>
-        <div className="absolute top-20 right-4 w-10 h-10 bg-gradient-to-br from-royal-300 to-gulmohar-400 opacity-30 animate-bounce"></div>
-        <div className="absolute bottom-32 left-4 w-8 h-8 bg-gradient-to-br from-jasmine-300 to-sindoor-400 opacity-25 animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-48 right-8 w-6 h-6 bg-gradient-to-br from-passion-400 to-royal-400 opacity-20 animate-bounce" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-6 left-6 w-16 h-16 bg-gradient-to-br from-sindoor-300 to-henna-400 opacity-15 animate-float rounded-full blur-sm"></div>
+        <div className="absolute top-32 right-8 w-12 h-12 bg-gradient-to-br from-royal-300 to-gulmohar-400 opacity-25 animate-pulse rounded-full"></div>
+        <div className="absolute bottom-40 left-8 w-10 h-10 bg-gradient-to-br from-jasmine-300 to-sindoor-400 opacity-20 animate-bounce rounded-full" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-64 right-12 w-8 h-8 bg-gradient-to-br from-passion-400 to-royal-400 opacity-15 animate-float rounded-full" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-48 left-12 w-6 h-6 bg-gradient-to-br from-coral-400 to-blush-400 opacity-30 animate-pulse rounded-full" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute top-72 right-16 w-14 h-14 bg-gradient-to-br from-peach-300 to-coral-400 opacity-10 animate-bounce rounded-full blur-sm" style={{ animationDelay: '1.5s' }}></div>
       </div>
 
-      {/* Header */}
+      {/* Enhanced Header with floating elements */}
       <div className={`${
-        isUltraPremium() 
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
+        isUltraPremium()
+          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700'
           : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
-      } px-4 py-3 flex items-center justify-between border-b ${
+      } px-6 py-4 flex items-center justify-between border-b ${
         isUltraPremium() ? 'border-purple-300' : 'border-peach-200'
-      } sticky top-0 z-10 shadow-lg relative overflow-hidden`}>
+      } sticky top-0 z-50 shadow-xl relative overflow-hidden backdrop-blur-md`}>
+        {/* Floating header particles */}
+        <div className="absolute top-2 left-20 w-1 h-1 bg-white/60 rounded-full animate-pulse"></div>
+        <div className="absolute top-6 right-32 w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-2 left-1/3 w-1 h-1 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-jasmine-100/25 to-white/15 backdrop-blur-sm"></div>
-        <button
-          onClick={() => navigate(-1)}
-          className="relative z-10 p-2 hover:bg-white/20 transition-colors"
-        >
-          <ArrowLeft size={24} className="text-white" />
-        </button>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
+        
+{isUltraPremium() ? (
+          <div className="relative z-10 flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+            >
+              <ArrowLeft size={20} className="text-white group-hover:scale-110 transition-transform" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
+                <Crown size={16} className="text-white" />
+              </div>
+              <span className="text-lg font-bold text-white drop-shadow-lg tracking-wide">AjnabiCam</span>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate(-1)}
+            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+          >
+            <ArrowLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
+          </button>
+        )}
 
-        <h1 className="relative z-10 text-lg font-semibold text-white drop-shadow-lg">Profile</h1>
+        <h1 className="relative z-10 text-xl font-bold text-white drop-shadow-lg tracking-wide">My Profile</h1>
 
-        <button
-          onClick={() => navigate('/premium')}
-          className="relative z-10 p-2 hover:bg-white/20 transition-colors"
-        >
-          <Settings size={24} className="text-white" />
-        </button>
+        <div className="relative" ref={shareMenuRef}>
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+          >
+            <MoreHorizontal size={22} className="text-white group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Share Menu Dropdown */}
+          {showShareMenu && (
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 min-w-[200px] z-50 animate-slideDown">
+              <button
+                onClick={() => {
+                  navigate('/premium');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Settings className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Settings</span>
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Profile link copied!');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Copy className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Copy Link</span>
+              </button>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'My Profile',
+                      text: `Check out my profile on AjnabiCam!`,
+                      url: window.location.href
+                    });
+                  }
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Share2 className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Share Profile</span>
+              </button>
+              <button
+                onClick={() => {
+                  alert('Profile saved!');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Bookmark className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Save Profile</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={`${
         isUltraPremium() ? 'max-w-2xl' : 'max-w-sm'
-      } mx-auto px-4 py-6`}>
-        {/* Profile Image Section */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-0 overflow-hidden mb-6 relative">
-          <div className="relative h-[50vh] overflow-hidden">
+      } mx-auto px-6 py-8 space-y-8`}>
+        {/* Enhanced Profile Image Section */}
+        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 overflow-hidden relative group hover:shadow-3xl transition-all duration-500">
+          <div className="relative h-[55vh] overflow-hidden">
+            {/* Gradient overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
+            
             {profileImage ? (
               <img
                 src={profileImage}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-romance-200 via-passion-200 to-royal-200 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl font-bold">{name.charAt(0)}</span>
+              <div className="w-full h-full bg-gradient-to-br from-romance-300 via-passion-300 to-royal-300 flex items-center justify-center">
+                <div className="text-center text-white z-20 relative">
+                  <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30">
+                    <span className="text-4xl font-bold">{name.charAt(0)}</span>
                   </div>
-                  <p className="text-white/80">Tap to add photo</p>
+                  <p className="text-white/90 font-medium">Tap to add photo</p>
+                  <p className="text-white/70 text-sm mt-1">Show your best self!</p>
                 </div>
               </div>
             )}
 
-            {/* Upload overlay */}
+            {/* Enhanced Upload overlay */}
             {uploadingImage && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-                  <p className="text-sm">Uploading... {uploadProgress}%</p>
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-30">
+                <div className="text-center text-white bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/30 border-t-white mx-auto mb-4"></div>
+                  <p className="text-lg font-semibold mb-2">Uploading...</p>
+                  <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-peach-400 to-coral-500 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-white/80 mt-2">{uploadProgress}% complete</p>
                 </div>
               </div>
             )}
 
-            {/* Camera button */}
+            {/* Enhanced Camera button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm p-2 rounded-full hover:bg-black/30 transition-colors"
+              className="absolute top-6 right-6 bg-black/30 backdrop-blur-md p-3 rounded-full hover:bg-black/50 transition-all duration-200 border border-white/20 z-20 group/camera shadow-lg"
               disabled={uploadingImage}
             >
-              <Camera size={18} className="text-white" />
+              <Camera size={20} className="text-white group-hover/camera:scale-110 transition-transform" />
             </button>
-
-            {/* Profile Views Badge - Only for Premium Users */}
-            {isPremium && (
-              <div className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm px-3 py-1 flex items-center gap-2">
-                <Eye size={14} className="text-white" />
-                <span className="text-white text-sm font-medium">{profileViews.toLocaleString()}</span>
+            
+            {/* Add Photo hint for empty profile */}
+            {!profileImage && (
+              <div className="absolute bottom-6 left-6 right-6 z-20">
+                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Plus size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold">Add your first photo</p>
+                      <p className="text-white/80 text-sm">Stand out with a great profile picture</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Premium Badge */}
+            {/* Enhanced Profile Views Badge */}
             {isPremium && (
-              <div className="absolute top-14 left-4 bg-gradient-to-r from-yellow-400 to-yellow-500 px-2 py-1 rounded-full flex items-center gap-1">
-                <Crown className="w-3 h-3 text-yellow-800" />
-                <span className="text-yellow-800 text-xs font-bold">PREMIUM</span>
+              <div className="absolute top-6 left-6 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 z-20">
+                <Eye size={16} className="text-white" />
+                <span className="text-white text-sm font-bold">{profileViews.toLocaleString()}</span>
+                <span className="text-white/80 text-xs">views</span>
               </div>
             )}
+
+            {/* Enhanced Premium Badge */}
+            {isPremium && (
+              <div className="absolute top-20 left-6 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg z-20">
+                <Crown className="w-4 h-4 text-yellow-900 animate-bounce" />
+                <span className="text-yellow-900 text-xs font-bold tracking-wide">PREMIUM</span>
+              </div>
+            )}
+
+            {/* Mood Indicator */}
+            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 z-20">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white text-sm font-medium">Feeling Great</span>
+                <Smile className="w-4 h-4 text-white" />
+              </div>
+            </div>
+
+            {/* Streak Counter */}
+            <div className="absolute bottom-6 left-6 bg-orange-500/20 backdrop-blur-md px-3 py-2 rounded-full border border-orange-300/30 z-20">
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <span className="text-white text-sm font-bold">7 Day Streak</span>
+              </div>
+            </div>
+            
+            {/* Profile completion indicator with animation */}
+            <div className="absolute bottom-6 right-6 z-20 group cursor-pointer">
+              <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+                <div className="relative w-8 h-8">
+                  <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke="rgba(255,255,255,0.3)"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke="white"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray={`${85 * 0.85} 85`}
+                      className="transition-all duration-500 group-hover:stroke-yellow-300"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold group-hover:scale-110 transition-transform">85%</span>
+                </div>
+              </div>
+              {/* Completion tooltip */}
+              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">
+                Complete your profile
+              </div>
+            </div>
 
             <input
               ref={fileInputRef}
@@ -312,55 +602,84 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* User Information Section */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-0 mb-6 relative z-10">
-          <CardContent className="p-6">
-            {/* Name and Age */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-gray-900 text-3xl font-bold mb-1">{name}, {age}</h2>
+        {/* Enhanced User Information Section */}
+        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 relative z-10 hover:shadow-3xl transition-all duration-300">
+          <CardContent className="p-8">
+            {/* Enhanced Name and Age */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-gray-900 text-4xl font-bold tracking-tight">{name}</h2>
+                  <span className="text-gray-600 text-2xl font-light">{age}</span>
+                  {isPremium && (
+                    <div className="bg-gradient-to-r from-yellow-400 to-amber-500 p-1 rounded-full">
+                      <Crown size={16} className="text-yellow-900" />
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-gray-600 mb-3">
-                  <MapPin size={16} />
-                  <span className="text-sm">{location}</span>
+                  <MapPin size={18} className="text-coral-500" />
+                  <span className="text-base font-medium">{location}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-green-600 font-medium">Online now</span>
                 </div>
               </div>
 
-              <button className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors">
-                <Edit3 size={16} className="text-gray-600" />
+              <button className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 p-3 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                <Edit3 size={18} className="text-gray-600" />
               </button>
             </div>
 
-            {/* Bio */}
-            <p className="text-gray-700 text-sm leading-relaxed mb-4">{bio}</p>
-
-            {/* Profession */}
-            <div className="flex items-center gap-2 text-gray-600 mb-4">
-              <Briefcase size={16} />
-              <span className="text-sm font-medium">{profession}</span>
+            {/* Enhanced Bio */}
+            <div className="bg-gradient-to-r from-peach-50 to-coral-50 p-4 rounded-2xl mb-6 border border-peach-100">
+              <p className="text-gray-800 text-base leading-relaxed italic">"{bio}"</p>
             </div>
 
-            {/* Interest Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {interests.map((interest, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-100 px-3 py-1 text-gray-700 text-xs font-medium"
-                >
-                  {interest}
-                </span>
-              ))}
+            {/* Enhanced Profession */}
+            <div className="flex items-center gap-3 text-gray-700 mb-6 bg-gray-50 p-3 rounded-xl">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Briefcase size={18} className="text-blue-600" />
+              </div>
+              <div>
+                <span className="text-base font-semibold">{profession}</span>
+                <p className="text-sm text-gray-500">Professional</p>
+              </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
+            {/* Enhanced Interest Tags */}
+            <div className="mb-6">
+              <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                <Heart size={16} className="text-coral-500" />
+                Interests
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {interests.map((interest, index) => (
+                  <span
+                    key={index}
+                    className="bg-gradient-to-r from-peach-100 to-coral-100 px-4 py-2 text-coral-700 text-sm font-semibold rounded-full border border-coral-200 hover:shadow-md transition-all duration-200 cursor-default"
+                  >
+                    {interest}
+                  </span>
+                ))}
+                <button className="bg-gray-100 hover:bg-gray-200 px-4 py-2 text-gray-500 text-sm font-medium rounded-full border-2 border-dashed border-gray-300 transition-all duration-200">
+                  <Plus size={14} className="inline mr-1" />
+                  Add more
+                </button>
+              </div>
+            </div>
+
+            {/* Enhanced Action Buttons */}
+            <div className="flex gap-4">
               <Button
                 onClick={() => {
                   // Edit profile functionality
                   alert('Edit profile feature coming soon!');
                 }}
-                className="flex-1 bg-gradient-to-r from-romance-500 to-passion-500 hover:from-romance-600 hover:to-passion-600 text-white font-semibold py-3 border-0"
+                className="flex-1 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 hover:from-peach-600 hover:via-coral-600 hover:to-blush-700 text-white font-bold py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                <Edit3 className="w-4 h-4 mr-2" />
+                <Edit3 className="w-5 h-5 mr-2" />
                 Edit Profile
               </Button>
 
@@ -377,121 +696,507 @@ export default function ProfilePage() {
                     alert('Profile link copied to clipboard!');
                   }
                 }}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-3 border-0"
+                className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-bold px-6 py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                <Users className="w-4 h-4" />
+                <Users className="w-5 h-5" />
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Stats Cards */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
+        {/* Enhanced Profile Stats Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
               {isPremium ? (
                 <>
-                  <div className="w-10 h-10 bg-blue-100 flex items-center justify-center mx-auto mb-2">
-                    <Eye className="w-5 h-5 text-blue-600" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                    <Eye className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="text-lg font-bold text-blue-700">{profileViews}</div>
-                  <div className="text-xs text-blue-600">Views</div>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">{profileViews.toLocaleString()}</div>
+                  <div className="text-sm text-blue-600 font-medium">Profile Views</div>
+                  <div className="text-xs text-blue-500 mt-1">+12 today</div>
                 </>
               ) : (
                 <>
-                  <div className="w-10 h-10 bg-gray-200 flex items-center justify-center mx-auto mb-2 relative">
-                    <Eye className="w-5 h-5 text-gray-400" />
-                    <Crown className="w-3 h-3 text-yellow-500 absolute -top-1 -right-1" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative">
+                    <Eye className="w-6 h-6 text-gray-400" />
+                    <Crown className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-bounce" />
                   </div>
-                  <div className="text-lg font-bold text-gray-400">***</div>
-                  <div className="text-xs text-gray-400">Premium</div>
+                  <div className="text-2xl font-bold text-gray-400 mb-1">***</div>
+                  <div className="text-sm text-gray-400 font-medium">Premium Only</div>
+                  <div className="text-xs text-yellow-600 mt-1">Upgrade to see</div>
                 </>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-green-100 flex items-center justify-center mx-auto mb-2">
-                <Users className="w-5 h-5 text-green-600" />
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                <Users className="w-6 h-6 text-green-600" />
               </div>
-              <div className="text-lg font-bold text-gray-800">23</div>
-              <div className="text-xs text-gray-500">Friends</div>
+              <div className="text-2xl font-bold text-green-700 mb-1">23</div>
+              <div className="text-sm text-green-600 font-medium">Friends</div>
+              <div className="text-xs text-green-500 mt-1">+2 this week</div>
             </CardContent>
           </Card>
 
           <Card
-            className="bg-white/80 backdrop-blur-sm shadow-sm border-0 cursor-pointer hover:shadow-md transition-shadow"
+            className="bg-white/95 backdrop-blur-md shadow-lg border-0 cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
             onClick={handleShowLikes}
           >
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-pink-100 flex items-center justify-center mx-auto mb-2 relative">
-                <Heart className="w-5 h-5 text-pink-600" />
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-rose-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative group-hover:scale-110 transition-transform">
+                <Heart className="w-6 h-6 text-pink-600 group-hover:animate-pulse" />
                 {!isPremium && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">!</span>
+                  </div>
                 )}
               </div>
-              <div className="text-lg font-bold text-pink-700">
+              <div className="text-2xl font-bold text-pink-700 mb-1">
                 {isPremium ? likesData.length : '?'}
               </div>
-              <div className="text-xs text-pink-600">
-                {isPremium ? 'Likes' : 'Tap to See'}
+              <div className="text-sm text-pink-600 font-medium">
+                {isPremium ? 'Secret Likes' : 'Tap to Reveal'}
               </div>
+              <div className="text-xs text-pink-500 mt-1">
+                {isPremium ? 'New matches!' : 'Premium feature'}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-yellow-100 to-amber-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                <Star className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="text-2xl font-bold text-yellow-700 mb-1">{coins.toLocaleString()}</div>
+              <div className="text-sm text-yellow-600 font-medium">Coins</div>
+              <div className="text-xs text-yellow-500 mt-1">Earn more!</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Secondary Stats Row */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
+        {/* Enhanced Activity Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
             <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-yellow-100 flex items-center justify-center mx-auto mb-2">
-                <Star className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="text-lg font-bold text-yellow-700">{coins}</div>
-              <div className="text-xs text-yellow-600">Coins</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-purple-100 flex items-center justify-center mx-auto mb-2">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
                 <MessageCircle className="w-5 h-5 text-purple-600" />
               </div>
               <div className="text-lg font-bold text-purple-700">156</div>
-              <div className="text-xs text-purple-600">Chats</div>
+              <div className="text-xs text-purple-600 font-medium">Chats</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
+                <Calendar className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="text-lg font-bold text-orange-700">7</div>
+              <div className="text-xs text-orange-600 font-medium">Days</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
+                <Zap className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="text-lg font-bold text-emerald-700">98%</div>
+              <div className="text-xs text-emerald-600 font-medium">Match</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Additional Actions */}
-        <div className="space-y-3">
+        {/* Premium Ad-Free Experience Indicator */}
+        {(isUltraPremium() || isProMonthly()) && (
+          <div className="space-y-4 bg-gradient-to-r from-green-50 to-emerald-100 p-6 rounded-2xl border border-green-200">
+            <h3 className="text-green-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
+              ✨ Premium Ad-Free Experience
+              <Crown className="w-5 h-5 text-yellow-600" />
+            </h3>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-green-700 font-semibold mb-2">
+                {isUltraPremium() ? 'ULTRA+ Member' : 'Pro Monthly Member'}
+              </p>
+              <p className="text-green-600 text-sm">
+                Enjoy an ad-free experience with no interruptions!
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Ad Testing Section - Hidden for Premium Users */}
+        {!isUltraPremium() && !isProMonthly() && (
+        <div className="space-y-4 bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+          <h3 className="text-gray-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
+            📱 Ad Testing Zone
+            {adStatus.checking && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>}
+          </h3>
+
+          {/* Ad Service Status */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className={`p-3 rounded-xl text-center ${adStatus.unityReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className={`w-3 h-3 rounded-full ${adStatus.unityReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                <span className="text-sm font-semibold">Unity Ads</span>
+              </div>
+              <span className="text-xs">{adStatus.unityReady ? '✅ Ready' : '❌ Not Ready'}</span>
+            </div>
+            <div className={`p-3 rounded-xl text-center ${adStatus.admobReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className={`w-3 h-3 rounded-full ${adStatus.admobReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                <span className="text-sm font-semibold">AdMob</span>
+              </div>
+              <span className="text-xs">{adStatus.admobReady ? '✅ Ready' : '❌ Not Ready'}</span>
+            </div>
+          </div>
+
+          {/* Banner Ad Test */}
+          <div>
+            <p className="text-sm text-gray-600 mb-2 font-semibold">🎯 Banner Ad Test:</p>
+            <BannerAd size="responsive" position="inline" className="border-2 border-dashed border-blue-300 bg-white rounded-xl" />
+          </div>
+
+          {/* Rewarded Ad Test */}
+          <div>
+            <p className="text-sm text-gray-600 mb-2 font-semibold">💰 Rewarded Ad Test:</p>
+            <RewardedAdButton
+              variant="premium"
+              onRewardEarned={(amount) => {
+                console.log(`Earned ${amount} coins!`);
+                alert(`🎉 Success! You earned ${amount} coins from the ad!`);
+              }}
+              preferUnity={true}
+            />
+          </div>
+
+          {/* Ad Testing Page Link */}
           <Button
-            onClick={() => navigate('/premium')}
-            className="w-full bg-gradient-to-r from-peach-400 to-coral-500 hover:from-peach-500 hover:to-coral-600 text-white font-semibold py-4 shadow-lg"
+            onClick={() => navigate('/ad-testing')}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
           >
-            <Crown className="w-5 h-5 mr-2" />
-            Upgrade to Premium
+            🧪 Full Ad Testing Dashboard
           </Button>
+
+          {/* Quick Status Info */}
+          <div className="text-center text-xs text-gray-500 mt-2">
+            {adStatus.checking ? 'Checking ad services...' :
+             adStatus.unityReady || adStatus.admobReady ? 'Ad services are working!' :
+             'Ad services need initialization'}
+          </div>
+        </div>
+        )}
+
+        {/* Mode Testing Panel - Comprehensive Subscription Testing */}
+        <ModeTestingPanel
+          onModeChange={(mode) => {
+            console.log(`🔄 Switched to ${mode} mode`);
+            // Force refresh to show changes
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }}
+        />
+
+        {/* Enhanced Additional Actions */}
+        <div className="space-y-6">
+          {!isPremium && (
+            <Button
+              onClick={() => navigate('/premium')}
+              className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-5 shadow-2xl rounded-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer"></div>
+              <Crown className="w-6 h-6 mr-3 animate-bounce" />
+              <span className="text-lg">Unlock Premium Features</span>
+              <Sparkles className="w-5 h-5 ml-3" />
+            </Button>
+          )}
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Button
               onClick={() => navigate('/chat')}
-              variant="outline"
-              className="py-3 rounded-xl border-gray-200 hover:bg-gray-50"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <MessageCircle className="w-4 h-4 mr-2" />
+              <MessageCircle className="w-5 h-5 mr-2" />
               Messages
             </Button>
             
             <Button
               onClick={() => navigate('/')}
-              variant="outline" 
-              className="py-3 rounded-xl border-gray-200 hover:bg-gray-50"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users className="w-5 h-5 mr-2" />
               Discover
             </Button>
+          </div>
+          
+          {/* Navigation Tabs */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-2">
+            <div className="flex space-x-2">
+              {[
+                { id: 'overview', label: 'Overview', icon: User },
+                { id: 'achievements', label: 'Achievements', icon: Trophy },
+                { id: 'activity', label: 'Activity', icon: Activity },
+                { id: 'social', label: 'Social', icon: Share2 }
+              ].map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setSelectedTab(tab.id);
+                      setAnimationKey(prev => prev + 1);
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                      selectedTab === tab.id
+                        ? 'bg-gradient-to-r from-coral-500 to-peach-500 text-white shadow-lg transform scale-105'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                    }`}
+                  >
+                    <IconComponent size={16} />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div key={animationKey} className="animate-fadeIn">
+            {selectedTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Quick Interest Actions */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl">
+                  <h3 className="text-gray-800 font-bold mb-4 text-center">Quick Actions</h3>
+                  <div className="grid grid-cols-4 gap-3">
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Coffee className="w-6 h-6 text-amber-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Coffee</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Music className="w-6 h-6 text-purple-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Music</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Book className="w-6 h-6 text-blue-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Books</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Plane className="w-6 h-6 text-green-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Travel</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Profile Strength */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-gray-800 font-bold flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-green-500" />
+                        Profile Strength
+                      </h3>
+                      <span className="text-2xl font-bold text-green-600">85%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Profile Photo</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Bio Added</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Interests</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                        <span className="text-gray-400">Verification</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {selectedTab === 'achievements' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-gray-800 font-bold text-lg">Achievements</h3>
+                  <span className="text-sm text-gray-600">{achievements.filter(a => a.completed).length}/{achievements.length} unlocked</span>
+                </div>
+                {achievements.map((achievement) => {
+                  const IconComponent = achievement.icon;
+                  return (
+                    <Card key={achievement.id} className={`bg-white/95 backdrop-blur-md shadow-lg border-0 transition-all duration-300 ${
+                      achievement.completed ? 'border-l-4 border-l-green-500' : 'opacity-75'
+                    }`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                            achievement.completed
+                              ? 'bg-gradient-to-br from-yellow-100 to-amber-200'
+                              : 'bg-gray-100'
+                          }`}>
+                            <IconComponent className={`w-6 h-6 ${
+                              achievement.completed ? 'text-yellow-600' : 'text-gray-400'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className={`font-semibold ${
+                              achievement.completed ? 'text-gray-800' : 'text-gray-500'
+                            }`}>{achievement.title}</h4>
+                            <p className="text-sm text-gray-600">{achievement.description}</p>
+                            {achievement.completed && achievement.date && (
+                              <p className="text-xs text-green-600 mt-1">Completed on {achievement.date}</p>
+                            )}
+                            {!achievement.completed && achievement.progress && (
+                              <div className="mt-2">
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-gradient-to-r from-coral-500 to-peach-500 h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${achievement.progress}%` }}
+                                  ></div>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">{achievement.progress}% complete</p>
+                              </div>
+                            )}
+                          </div>
+                          {achievement.completed && (
+                            <div className="text-green-500">
+                              <Verified size={20} />
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {selectedTab === 'activity' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-gray-800 font-bold text-lg">Recent Activity</h3>
+                  <button className="text-coral-500 text-sm font-medium">View All</button>
+                </div>
+                {recentActivity.map((activity) => (
+                  <Card key={activity.id} className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        {activity.avatar ? (
+                          <img src={activity.avatar} alt={activity.user} className="w-10 h-10 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <Eye className="w-5 h-5 text-gray-500" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            {activity.type === 'match' && <Heart className="w-4 h-4 text-red-500" />}
+                            {activity.type === 'like' && <ThumbsUp className="w-4 h-4 text-blue-500" />}
+                            {activity.type === 'view' && <Eye className="w-4 h-4 text-gray-500" />}
+                            {activity.type === 'chat' && <MessageCircle className="w-4 h-4 text-green-500" />}
+                            <span className="text-sm font-medium text-gray-800">
+                              {activity.type === 'match' && `New match with ${activity.user}`}
+                              {activity.type === 'like' && `${activity.user} liked your profile`}
+                              {activity.type === 'view' && 'Someone viewed your profile'}
+                              {activity.type === 'chat' && `New message from ${activity.user}`}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {selectedTab === 'social' && (
+              <div className="space-y-6">
+                {/* Social Links */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <h3 className="text-gray-800 font-bold mb-4">Connect Your Socials</h3>
+                    <div className="space-y-3">
+                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl border border-pink-200 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <Instagram className="w-5 h-5 text-pink-600" />
+                          <span className="font-medium text-gray-800">Instagram</span>
+                        </div>
+                        <Plus className="w-4 h-4 text-gray-400" />
+                      </button>
+                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <Twitter className="w-5 h-5 text-blue-600" />
+                          <span className="font-medium text-gray-800">Twitter</span>
+                        </div>
+                        <Plus className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Share Profile */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <h3 className="text-gray-800 font-bold mb-4">Share Your Profile</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
+                        <Link className="w-6 h-6 text-blue-600" />
+                        <span className="text-xs font-medium text-blue-600">Copy Link</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
+                        <Send className="w-6 h-6 text-green-600" />
+                        <span className="text-xs font-medium text-green-600">Share</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
+                        <Download className="w-6 h-6 text-purple-600" />
+                        <span className="text-xs font-medium text-purple-600">QR Code</span>
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Profile Analytics */}
+                {isPremium && (
+                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200">
+                    <CardContent className="p-6">
+                      <h3 className="text-gray-800 font-bold mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-purple-600" />
+                        Profile Analytics
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-purple-700">2.3K</div>
+                          <div className="text-sm text-purple-600">Total Reach</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-pink-700">86%</div>
+                          <div className="text-sm text-pink-600">Engagement</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -537,6 +1242,112 @@ export default function ProfilePage() {
             <Crown className="h-4 w-4 mr-2" />
             🧪 Test ULTRA+ Features (Debug)
           </Button>
+        </div>
+      )}
+
+      {/* Floating Action Menu */}
+      <div className="fixed bottom-24 right-6 z-40">
+        <div className="relative">
+          {/* Secondary Action Buttons */}
+          {showFloatingMenu && (
+            <div className="absolute bottom-16 right-0 space-y-3 animate-slideUp">
+              <button
+                onClick={() => navigate('/ai-chatbot')}
+                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
+              >
+                <Bot className="w-5 h-5 text-white group-hover:animate-bounce" />
+              </button>
+              <button
+                onClick={() => setShowNotifications(true)}
+                className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group relative"
+              >
+                <Bell className="w-5 h-5 text-white group-hover:animate-wiggle" />
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">{notifications.filter(n => !n.read).length}</span>
+                  </div>
+                )}
+              </button>
+              <button
+                onClick={() => setShowMoodSelector(true)}
+                className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
+              >
+                <Smile className="w-5 h-5 text-white group-hover:animate-heartbeat" />
+              </button>
+            </div>
+          )}
+
+          {/* Main FAB */}
+          <button
+            onClick={() => setShowFloatingMenu(!showFloatingMenu)}
+            className={`w-14 h-14 bg-gradient-to-r from-coral-500 to-peach-500 rounded-full shadow-xl flex items-center justify-center hover:shadow-2xl transform transition-all duration-300 ${
+              showFloatingMenu ? 'rotate-45 scale-110' : 'hover:scale-105'
+            } group`}
+          >
+            <Plus className="w-6 h-6 text-white group-hover:animate-spin" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mood Selector Modal */}
+      {showMoodSelector && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowMoodSelector(false)}>
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full animate-slideUp" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">How are you feeling?</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { id: 'great', emoji: '😊', label: 'Great', color: 'from-green-400 to-emerald-500' },
+                { id: 'happy', emoji: '😄', label: 'Happy', color: 'from-yellow-400 to-amber-500' },
+                { id: 'excited', emoji: '🤩', label: 'Excited', color: 'from-purple-400 to-pink-500' },
+                { id: 'chill', emoji: '😎', label: 'Chill', color: 'from-blue-400 to-cyan-500' },
+                { id: 'romantic', emoji: '��', label: 'Romantic', color: 'from-rose-400 to-pink-500' },
+                { id: 'adventurous', emoji: '🤠', label: 'Adventurous', color: 'from-orange-400 to-red-500' },
+              ].map((mood) => (
+                <button
+                  key={mood.id}
+                  onClick={() => {
+                    setCurrentMood(mood.id);
+                    setShowMoodSelector(false);
+                    alert(`Mood updated to ${mood.label}!`);
+                  }}
+                  className={`p-4 rounded-2xl bg-gradient-to-r ${mood.color} text-white font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-center`}
+                >
+                  <div className="text-2xl mb-1">{mood.emoji}</div>
+                  <div className="text-sm">{mood.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications Panel */}
+      {showNotifications && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center" onClick={() => setShowNotifications(false)}>
+          <div className="bg-white rounded-t-3xl w-full max-w-md h-96 animate-slideUp" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Notifications</h3>
+                <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
+                  <Plus className="w-5 h-5 rotate-45" />
+                </button>
+              </div>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {notifications.map((notif) => (
+                  <div key={notif.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                    <div className="w-10 h-10 bg-gradient-to-r from-coral-400 to-peach-400 rounded-full flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-800">{notif.text}</p>
+                      <p className="text-xs text-gray-500">{new Date(notif.time).toLocaleTimeString()}</p>
+                    </div>
+                    {!notif.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

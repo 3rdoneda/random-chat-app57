@@ -156,7 +156,7 @@ function App() {
     <AppStartupCheck>
       <UltraAppWrapper>
         <Suspense fallback={<LoadingScreen />}>
-        <div className="app-container">
+        <div className="app-container min-h-screen bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50 touch-manipulation native-scroll">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/onboarding" element={<OnboardingScreen />} />

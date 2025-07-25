@@ -5,6 +5,7 @@ import { adService } from '../lib/adService';
 import { adMobService } from '../lib/adMobMediationService';
 import { unityAdsService } from '../lib/unityAdsService';
 import { useCoin } from '../context/CoinProvider';
+import { usePremium } from '../context/PremiumProvider';
 
 interface RewardedAdButtonProps {
   onRewardEarned?: (amount: number) => void;
@@ -24,6 +25,12 @@ export default function RewardedAdButton({
   const [isWatching, setIsWatching] = useState(false);
   const [adNetwork, setAdNetwork] = useState<string>('checking...');
   const { addCoins } = useCoin();
+  const { isUltraPremium, isProMonthly } = usePremium();
+
+  // Hide rewarded ads for premium users
+  if (isUltraPremium() || isProMonthly()) {
+    return null;
+  }
 
   const handleWatchAd = async () => {
     if (isWatching || disabled) return;

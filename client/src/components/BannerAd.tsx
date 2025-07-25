@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { adService } from '../lib/adService';
+import { usePremium } from '../context/PremiumProvider';
 
 interface BannerAdProps {
   size?: 'small' | 'medium' | 'large' | 'responsive';
@@ -26,6 +27,12 @@ export default function BannerAd({
   const adRef = useRef<HTMLDivElement>(null);
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
+  const { isUltraPremium, isProMonthly } = usePremium();
+
+  // Hide ads for premium users
+  if (isUltraPremium() || isProMonthly()) {
+    return null;
+  }
 
   useEffect(() => {
     const loadAd = async () => {

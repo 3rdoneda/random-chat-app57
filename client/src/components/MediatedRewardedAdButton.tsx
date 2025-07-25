@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Play, Coins, Gift, TrendingUp } from 'lucide-react';
 import { adMobService } from '../lib/adMobMediationService';
 import { useCoin } from '../context/CoinProvider';
+import { usePremium } from '../context/PremiumProvider';
 
 interface MediatedRewardedAdButtonProps {
   onRewardEarned?: (amount: number, network: string) => void;
@@ -20,6 +21,12 @@ export default function MediatedRewardedAdButton({
   const [isWatching, setIsWatching] = useState(false);
   const [lastNetwork, setLastNetwork] = useState<string>('');
   const { addCoins } = useCoin();
+  const { isUltraPremium, isProMonthly } = usePremium();
+
+  // Hide rewarded ads for premium users
+  if (isUltraPremium() || isProMonthly()) {
+    return null;
+  }
 
   const handleWatchAd = async () => {
     if (isWatching || disabled) return;

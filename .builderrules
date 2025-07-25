@@ -1,0 +1,17 @@
+"Update this existing layout to follow native mobile app design principles. Make it responsive across all screen sizes (mobile, tablet, desktop). Ensure the layout:
+
+Uses mobile-first design
+
+Adapts to different screen widths with responsive flex/grid
+
+Has large touch-friendly buttons and spacing
+
+Aligns content vertically for mobile view
+
+Uses a clean, minimal, app-like visual style
+
+Moves any fixed sidebars to bottom nav if on smaller screens
+
+Ensures text and components are readable and accessible on phones
+
+Do not break existing functionality, just visually upgrade and reflow the layout like a native mobile app."
