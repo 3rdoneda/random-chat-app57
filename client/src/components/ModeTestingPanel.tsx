@@ -234,7 +234,7 @@ export default function ModeTestingPanel({ onModeChange }: ModeTestingPanelProps
                     } text-white font-semibold px-6 py-2 rounded-xl transition-all duration-200 disabled:opacity-50`}
                   >
                     {isChanging ? (
-                      <Refresh className="w-4 h-4 animate-spin" />
+                      <RotateCw className="w-4 h-4 animate-spin" />
                     ) : isActive ? (
                       <>
                         <Check className="w-4 h-4 mr-2" />
