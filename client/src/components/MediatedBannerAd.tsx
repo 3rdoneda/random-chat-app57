@@ -19,6 +19,12 @@ export default function MediatedBannerAd({
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
   const [loadingNetwork, setLoadingNetwork] = useState<string>('');
+  const { isUltraPremium, isProMonthly } = usePremium();
+
+  // Hide ads for premium users
+  if (isUltraPremium() || isProMonthly()) {
+    return null;
+  }
 
   useEffect(() => {
     const loadAd = async () => {
