@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { adMobService } from '../lib/adMobMediationService';
+import { usePremium } from '../context/PremiumProvider';
 
 interface MediatedBannerAdProps {
   size?: 'banner' | 'leaderboard' | 'rectangle';
