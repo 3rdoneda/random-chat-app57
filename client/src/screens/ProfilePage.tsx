@@ -227,6 +227,41 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  // Check ad services status
+  useEffect(() => {
+    const checkAdStatus = async () => {
+      try {
+        // Check Unity Ads
+        const unityReady = unityAdsService.isReady('rewarded');
+
+        // Check AdMob
+        const admobReady = adMobService.isInitialized();
+
+        setAdStatus({
+          unityReady,
+          admobReady,
+          checking: false
+        });
+
+        console.log('🎯 Ad Status Check:', {
+          unityReady,
+          admobReady,
+          unityInitialized: await unityAdsService.initialize(),
+          admobInitialized: await adMobService.initialize()
+        });
+      } catch (error) {
+        console.error('Ad status check failed:', error);
+        setAdStatus({
+          unityReady: false,
+          admobReady: false,
+          checking: false
+        });
+      }
+    };
+
+    checkAdStatus();
+  }, []);
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
