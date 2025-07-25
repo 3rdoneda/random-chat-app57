@@ -250,26 +250,28 @@ const AIChatbotPage: React.FC = () => {
 
         <div className="w-full flex flex-col romantic-card rounded-b-2xl border border-peach-200 shadow-xl mb-6 overflow-hidden flex-1 relative z-10">
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[60vh]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[60vh] min-h-[50vh]">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-[fadeIn_0.3s_ease-in]`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md transition-all hover:shadow-lg ${
                     message.isUser
-                      ? 'bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 text-white'
-                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300'
+                      ? 'bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 text-white transform hover:scale-105'
+                      : 'bg-gradient-to-r from-gray-50 to-white text-gray-800 border border-gray-200 hover:border-peach-300'
                   }`}
                 >
                   {!message.isUser && (
                     <div className="flex items-center gap-2 mb-2">
-                      <Bot className="h-4 w-4 text-coral-600" />
+                      <div className="flex items-center justify-center w-5 h-5 bg-coral-100 rounded-full">
+                        <Heart className="h-3 w-3 text-coral-600" />
+                      </div>
                       <span className="text-xs font-semibold text-coral-600">AI Assistant</span>
                     </div>
                   )}
-                  <div className="leading-relaxed">{message.text}</div>
+                  <div className="leading-relaxed whitespace-pre-wrap">{message.text}</div>
                   <div className={`text-xs text-right mt-2 ${
                     message.isUser ? 'text-white/90' : 'text-gray-500'
                   }`}>
@@ -278,13 +280,15 @@ const AIChatbotPage: React.FC = () => {
                 </div>
               </div>
             ))}
-            
+
             {/* Typing Indicator */}
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300 max-w-xs px-4 py-3 rounded-2xl shadow-md">
+              <div className="flex justify-start animate-[fadeIn_0.3s_ease-in]">
+                <div className="bg-gradient-to-r from-gray-50 to-white text-gray-800 border border-gray-200 max-w-xs px-4 py-3 rounded-2xl shadow-md">
                   <div className="flex items-center gap-2 mb-2">
-                    <Bot className="h-4 w-4 text-coral-600" />
+                    <div className="flex items-center justify-center w-5 h-5 bg-coral-100 rounded-full">
+                      <Heart className="h-3 w-3 text-coral-600 animate-pulse" />
+                    </div>
                     <span className="text-xs font-semibold text-coral-600">AI Assistant</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -295,17 +299,7 @@ const AIChatbotPage: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Feature Notice */}
-          <div className="p-4 bg-gradient-to-r from-peach-50 to-coral-50 border-t border-peach-100">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-coral-600" />
-              <span className="text-sm font-semibold text-coral-700">Coming Soon!</span>
-            </div>
-            <p className="text-xs text-coral-600">
-              AI Chat Assistant is currently in development. This is a placeholder interface to demonstrate the feature.
-            </p>
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
