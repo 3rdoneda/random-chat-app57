@@ -5,6 +5,7 @@ import { adService } from '../lib/adService';
 import { adMobService } from '../lib/adMobMediationService';
 import { unityAdsService } from '../lib/unityAdsService';
 import { useCoin } from '../context/CoinProvider';
+import { usePremium } from '../context/PremiumProvider';
 
 interface RewardedAdButtonProps {
   onRewardEarned?: (amount: number) => void;
