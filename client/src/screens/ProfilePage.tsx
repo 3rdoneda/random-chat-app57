@@ -79,6 +79,7 @@ import BottomNavBar from "../components/BottomNavBar";
 import WhoLikedMeModal from "../components/WhoLikedMeModal";
 import BannerAd from "../components/BannerAd";
 import RewardedAdButton from "../components/RewardedAdButton";
+import ModeTestingPanel from "../components/ModeTestingPanel";
 import { adService } from "../lib/adService";
 import { unityAdsService } from "../lib/unityAdsService";
 import { adMobService } from "../lib/adMobMediationService";
