@@ -21,6 +21,47 @@ const AIChatbotPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      // Send initial greeting
+      const initializeChat = async () => {
+        setIsTyping(true);
+        try {
+          const response = await aiChatbot.generateResponse("", {
+            messages: [],
+            userPreferences: { conversationStyle }
+          });
+          const aiMessage = {
+            text: response,
+            isUser: false,
+            timestamp: new Date()
+          };
+          setMessages([aiMessage]);
+        } catch (error) {
+          console.error('Error getting AI response:', error);
+          const fallbackMessage = {
+            text: "Hello! I'm your AI assistant. How can I help you today? 💕",
+            isUser: false,
+            timestamp: new Date()
+          };
+          setMessages([fallbackMessage]);
+        } finally {
+          setIsTyping(false);
+          setIsInitialized(true);
+        }
+      };
+      initializeChat();
+    }
+  }, [isInitialized, conversationStyle]);
+
   const handleBackClick = () => {
     navigate(-1);
   };
