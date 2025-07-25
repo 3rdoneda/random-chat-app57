@@ -67,28 +67,44 @@ const AIChatbotPage: React.FC = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isTyping) return;
 
     const userMessage = {
-      text: inputMessage,
+      text: inputMessage.trim(),
       isUser: true,
       timestamp: new Date()
     };
 
+    const currentInput = inputMessage.trim();
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI response (replace with actual AI integration later)
-    setTimeout(() => {
+    try {
+      // Get AI response with context
+      const response = await aiChatbot.generateResponse(currentInput, {
+        messages: [...messages, userMessage],
+        userPreferences: { conversationStyle }
+      });
+
       const aiResponse = {
-        text: "I'm a placeholder AI response. This feature is coming soon! Your message was: \"" + inputMessage + "\"",
+        text: response,
         isUser: false,
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorResponse = {
+        text: "Oops! I'm having a little trouble thinking right now. Can you try asking me again? 😅",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
