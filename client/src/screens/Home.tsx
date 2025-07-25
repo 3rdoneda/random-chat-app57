@@ -232,9 +232,7 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <span className={`font-semibold ${
                       isUltraPremium() ? 'text-amber-900' : 'text-gray-900'
-                    }`}>
-                      {isUltraPremium() ? 'AjnabiCam' : 'Welcome back!'}
-                    </span>
+                    }`}>AjnabiCam</span>
                     {isPremium && (
                       <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${
                         isUltraPremium()
