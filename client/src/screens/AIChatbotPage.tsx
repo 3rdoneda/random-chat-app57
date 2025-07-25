@@ -108,8 +108,32 @@ const AIChatbotPage: React.FC = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handlePersonalityChange = (style: 'casual' | 'friendly' | 'flirty' | 'supportive') => {
+    setConversationStyle(style);
+    setShowPersonalityMenu(false);
+
+    // Add a system message about personality change
+    const systemMessage = {
+      text: `I've switched to a more ${style} conversation style! Let's keep chatting! 😊`,
+      isUser: false,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, systemMessage]);
+  };
+
+  const getPersonalityEmoji = (style: string) => {
+    switch (style) {
+      case 'casual': return '😎';
+      case 'friendly': return '😊';
+      case 'flirty': return '😘';
+      case 'supportive': return '🤗';
+      default: return '😊';
     }
   };
 
