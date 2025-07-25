@@ -89,12 +89,40 @@ html, body {
 }
 
 /* Enhanced App Store Ready Touch Interactions */
-.touch-action-manipulation {
+.touch-action-manipulation,
+.touch-manipulation {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* Mobile app specific overrides */
+@media (max-width: 768px) {
+  /* Ensure all interactive elements meet accessibility guidelines */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Improve text readability on mobile */
+  body, input, textarea, select {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Native app-like scrolling */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
 
 /* Native mobile app scroll behavior */
