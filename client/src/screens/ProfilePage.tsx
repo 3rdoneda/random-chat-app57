@@ -795,21 +795,45 @@ export default function ProfilePage() {
         </div>
 
         {/* Ad Testing Section */}
-        <div className="space-y-4 bg-gray-50 p-4 rounded-2xl">
-          <h3 className="text-gray-800 font-bold text-center mb-4">📱 Ad Testing Zone</h3>
+        <div className="space-y-4 bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+          <h3 className="text-gray-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
+            📱 Ad Testing Zone
+            {adStatus.checking && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>}
+          </h3>
+
+          {/* Ad Service Status */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className={`p-3 rounded-xl text-center ${adStatus.unityReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className={`w-3 h-3 rounded-full ${adStatus.unityReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                <span className="text-sm font-semibold">Unity Ads</span>
+              </div>
+              <span className="text-xs">{adStatus.unityReady ? '✅ Ready' : '❌ Not Ready'}</span>
+            </div>
+            <div className={`p-3 rounded-xl text-center ${adStatus.admobReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className={`w-3 h-3 rounded-full ${adStatus.admobReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                <span className="text-sm font-semibold">AdMob</span>
+              </div>
+              <span className="text-xs">{adStatus.admobReady ? '✅ Ready' : '❌ Not Ready'}</span>
+            </div>
+          </div>
 
           {/* Banner Ad Test */}
           <div>
-            <p className="text-sm text-gray-600 mb-2">Banner Ad Test:</p>
-            <BannerAd size="responsive" position="inline" className="border-2 border-dashed border-gray-300" />
+            <p className="text-sm text-gray-600 mb-2 font-semibold">🎯 Banner Ad Test:</p>
+            <BannerAd size="responsive" position="inline" className="border-2 border-dashed border-blue-300 bg-white rounded-xl" />
           </div>
 
           {/* Rewarded Ad Test */}
           <div>
-            <p className="text-sm text-gray-600 mb-2">Rewarded Ad Test:</p>
+            <p className="text-sm text-gray-600 mb-2 font-semibold">💰 Rewarded Ad Test:</p>
             <RewardedAdButton
               variant="premium"
-              onRewardEarned={(amount) => console.log(`Earned ${amount} coins!`)}
+              onRewardEarned={(amount) => {
+                console.log(`Earned ${amount} coins!`);
+                alert(`🎉 Success! You earned ${amount} coins from the ad!`);
+              }}
               preferUnity={true}
             />
           </div>
@@ -817,10 +841,17 @@ export default function ProfilePage() {
           {/* Ad Testing Page Link */}
           <Button
             onClick={() => navigate('/ad-testing')}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 rounded-xl"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             🧪 Full Ad Testing Dashboard
           </Button>
+
+          {/* Quick Status Info */}
+          <div className="text-center text-xs text-gray-500 mt-2">
+            {adStatus.checking ? 'Checking ad services...' :
+             adStatus.unityReady || adStatus.admobReady ? 'Ad services are working!' :
+             'Ad services need initialization'}
+          </div>
         </div>
 
         {/* Enhanced Additional Actions */}
