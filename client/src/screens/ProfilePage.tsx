@@ -141,7 +141,7 @@ export default function ProfilePage() {
     { id: 4, type: 'chat', user: 'Anjali', time: '1 day ago', avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
   ]);
 
-  const { isPremium, isUltraPremium, setPremium } = usePremium();
+  const { isPremium, isUltraPremium, isProMonthly, setPremium } = usePremium();
   const { coins } = useCoin();
 
   const [achievements] = useState([
