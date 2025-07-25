@@ -878,6 +878,17 @@ export default function ProfilePage() {
         </div>
         )}
 
+        {/* Mode Testing Panel - Comprehensive Subscription Testing */}
+        <ModeTestingPanel
+          onModeChange={(mode) => {
+            console.log(`🔄 Switched to ${mode} mode`);
+            // Force refresh to show changes
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }}
+        />
+
         {/* Enhanced Additional Actions */}
         <div className="space-y-6">
           {!isPremium && (
