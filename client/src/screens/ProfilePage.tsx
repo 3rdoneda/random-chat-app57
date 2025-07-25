@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import UltraProfileEnhancements from "../components/UltraProfileEnhancements";
 import UltraBottomNavBar from "../components/UltraBottomNavBar";
 import { UltraPageTransition } from "../components/UltraBottomNavBar";
-import { 
-  Camera, 
-  ArrowLeft, 
-  MapPin, 
-  Briefcase, 
-  Eye, 
-  Star, 
-  Edit3, 
+import {
+  Camera,
+  ArrowLeft,
+  MapPin,
+  Briefcase,
+  Eye,
+  Star,
+  Edit3,
   Settings,
   Crown,
   Heart,
@@ -26,7 +26,40 @@ import {
   Camera as CameraIcon,
   Plus,
   Sparkles,
-  Zap
+  Zap,
+  Trophy,
+  Award,
+  Target,
+  TrendingUp,
+  Clock,
+  MapPin as LocationIcon,
+  Phone,
+  Mail,
+  Instagram,
+  Twitter,
+  Share2,
+  MoreHorizontal,
+  Verified,
+  Shield,
+  Gift,
+  Flame,
+  Activity,
+  Bell,
+  Download,
+  Upload,
+  Link,
+  Copy,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Image as ImageIcon,
+  Video,
+  Mic,
+  HeartHandshake,
+  Smile,
+  ThumbsUp,
+  Send,
+  Bookmark
 } from "lucide-react";
 import {
   doc,
@@ -43,7 +76,27 @@ import { useCoin } from "../context/CoinProvider";
 import BottomNavBar from "../components/BottomNavBar";
 import WhoLikedMeModal from "../components/WhoLikedMeModal";
 
+// Add click outside handler
+function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
+  useEffect(() => {
+    const listener = (event: any) => {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+      handler();
+    };
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+}
+
 export default function ProfilePage() {
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(shareMenuRef, () => setShowShareMenu(false));
   const navigate = useNavigate();
   const [name, setName] = useState("Love");
   const [age, setAge] = useState(25);
@@ -56,6 +109,25 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('overview');
+  const [animationKey, setAnimationKey] = useState(0);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [recentActivity] = useState([
+    { id: 1, type: 'match', user: 'Sarah', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 2, type: 'like', user: 'Priya', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 3, type: 'view', user: 'Anonymous', time: '8 hours ago', avatar: null },
+    { id: 4, type: 'chat', user: 'Anjali', time: '1 day ago', avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+  ]);
+  const [achievements] = useState([
+    { id: 1, title: 'First Impression', description: 'Uploaded your first photo', icon: Camera, completed: true, date: '2024-01-15' },
+    { id: 2, title: 'Social Butterfly', description: 'Made 10 new friends', icon: Users, completed: true, date: '2024-01-20' },
+    { id: 3, title: 'Conversation Starter', description: 'Sent 50 messages', icon: MessageCircle, completed: true, date: '2024-01-25' },
+    { id: 4, title: 'Popular Profile', description: 'Get 100 profile views', icon: Eye, completed: false, progress: 85 },
+    { id: 5, title: 'Heart Collector', description: 'Receive 25 likes', icon: Heart, completed: false, progress: 60 },
+    { id: 6, title: 'Premium Explorer', description: 'Use premium features', icon: Crown, completed: isPremium, progress: isPremium ? 100 : 0 },
+  ]);
 
   const { isPremium, isUltraPremium, setPremium } = usePremium();
   const { coins } = useCoin();
@@ -222,14 +294,18 @@ export default function ProfilePage() {
         <div className="absolute top-72 right-16 w-14 h-14 bg-gradient-to-br from-peach-300 to-coral-400 opacity-10 animate-bounce rounded-full blur-sm" style={{ animationDelay: '1.5s' }}></div>
       </div>
 
-      {/* Enhanced Header */}
+      {/* Enhanced Header with floating elements */}
       <div className={`${
-        isUltraPremium() 
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
+        isUltraPremium()
+          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700'
           : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
       } px-6 py-4 flex items-center justify-between border-b ${
         isUltraPremium() ? 'border-purple-300' : 'border-peach-200'
       } sticky top-0 z-50 shadow-xl relative overflow-hidden backdrop-blur-md`}>
+        {/* Floating header particles */}
+        <div className="absolute top-2 left-20 w-1 h-1 bg-white/60 rounded-full animate-pulse"></div>
+        <div className="absolute top-6 right-32 w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-2 left-1/3 w-1 h-1 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-jasmine-100/25 to-white/15 backdrop-blur-sm"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
         
@@ -242,12 +318,67 @@ export default function ProfilePage() {
 
         <h1 className="relative z-10 text-xl font-bold text-white drop-shadow-lg tracking-wide">My Profile</h1>
 
-        <button
-          onClick={() => navigate('/premium')}
-          className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
-        >
-          <Settings size={22} className="text-white group-hover:rotate-90 transition-transform duration-300" />
-        </button>
+        <div className="relative" ref={shareMenuRef}>
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+          >
+            <MoreHorizontal size={22} className="text-white group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Share Menu Dropdown */}
+          {showShareMenu && (
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 min-w-[200px] z-50 animate-slideDown">
+              <button
+                onClick={() => {
+                  navigate('/premium');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Settings className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Settings</span>
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Profile link copied!');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Copy className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Copy Link</span>
+              </button>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'My Profile',
+                      text: `Check out my profile on AjnabiCam!`,
+                      url: window.location.href
+                    });
+                  }
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Share2 className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Share Profile</span>
+              </button>
+              <button
+                onClick={() => {
+                  alert('Profile saved!');
+                  setShowShareMenu(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Bookmark className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-800">Save Profile</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={`${
@@ -336,10 +467,27 @@ export default function ProfilePage() {
                 <span className="text-yellow-900 text-xs font-bold tracking-wide">PREMIUM</span>
               </div>
             )}
+
+            {/* Mood Indicator */}
+            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 z-20">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white text-sm font-medium">Feeling Great</span>
+                <Smile className="w-4 h-4 text-white" />
+              </div>
+            </div>
+
+            {/* Streak Counter */}
+            <div className="absolute bottom-6 left-6 bg-orange-500/20 backdrop-blur-md px-3 py-2 rounded-full border border-orange-300/30 z-20">
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <span className="text-white text-sm font-bold">7 Day Streak</span>
+              </div>
+            </div>
             
-            {/* Profile completion indicator */}
-            <div className="absolute bottom-6 right-6 z-20">
-              <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
+            {/* Profile completion indicator with animation */}
+            <div className="absolute bottom-6 right-6 z-20 group cursor-pointer">
+              <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 group-hover:bg-white/20 transition-all duration-300">
                 <div className="relative w-8 h-8">
                   <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
                     <circle
@@ -358,11 +506,15 @@ export default function ProfilePage() {
                       strokeWidth="2"
                       fill="none"
                       strokeDasharray={`${85 * 0.85} 85`}
-                      className="transition-all duration-500"
+                      className="transition-all duration-500 group-hover:stroke-yellow-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">85%</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold group-hover:scale-110 transition-transform">85%</span>
                 </div>
+              </div>
+              {/* Completion tooltip */}
+              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">
+                Complete your profile
               </div>
             </div>
 
@@ -618,27 +770,265 @@ export default function ProfilePage() {
             </Button>
           </div>
           
-          {/* Quick Interest Actions */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl">
-            <h3 className="text-gray-800 font-bold mb-4 text-center">Quick Actions</h3>
-            <div className="grid grid-cols-4 gap-3">
-              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                <Coffee className="w-6 h-6 text-amber-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-xs text-gray-600 font-medium">Coffee</span>
-              </button>
-              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                <Music className="w-6 h-6 text-purple-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-xs text-gray-600 font-medium">Music</span>
-              </button>
-              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                <Book className="w-6 h-6 text-blue-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-xs text-gray-600 font-medium">Books</span>
-              </button>
-              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                <Plane className="w-6 h-6 text-green-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-xs text-gray-600 font-medium">Travel</span>
-              </button>
+          {/* Navigation Tabs */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-2">
+            <div className="flex space-x-2">
+              {[
+                { id: 'overview', label: 'Overview', icon: User },
+                { id: 'achievements', label: 'Achievements', icon: Trophy },
+                { id: 'activity', label: 'Activity', icon: Activity },
+                { id: 'social', label: 'Social', icon: Share2 }
+              ].map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setSelectedTab(tab.id);
+                      setAnimationKey(prev => prev + 1);
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                      selectedTab === tab.id
+                        ? 'bg-gradient-to-r from-coral-500 to-peach-500 text-white shadow-lg transform scale-105'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                    }`}
+                  >
+                    <IconComponent size={16} />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Tab Content */}
+          <div key={animationKey} className="animate-fadeIn">
+            {selectedTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Quick Interest Actions */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl">
+                  <h3 className="text-gray-800 font-bold mb-4 text-center">Quick Actions</h3>
+                  <div className="grid grid-cols-4 gap-3">
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Coffee className="w-6 h-6 text-amber-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Coffee</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Music className="w-6 h-6 text-purple-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Music</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Book className="w-6 h-6 text-blue-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Books</span>
+                    </button>
+                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                      <Plane className="w-6 h-6 text-green-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs text-gray-600 font-medium">Travel</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Profile Strength */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-gray-800 font-bold flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-green-500" />
+                        Profile Strength
+                      </h3>
+                      <span className="text-2xl font-bold text-green-600">85%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Profile Photo</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Bio Added</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-600">Interests</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                        <span className="text-gray-400">Verification</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {selectedTab === 'achievements' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-gray-800 font-bold text-lg">Achievements</h3>
+                  <span className="text-sm text-gray-600">{achievements.filter(a => a.completed).length}/{achievements.length} unlocked</span>
+                </div>
+                {achievements.map((achievement) => {
+                  const IconComponent = achievement.icon;
+                  return (
+                    <Card key={achievement.id} className={`bg-white/95 backdrop-blur-md shadow-lg border-0 transition-all duration-300 ${
+                      achievement.completed ? 'border-l-4 border-l-green-500' : 'opacity-75'
+                    }`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                            achievement.completed
+                              ? 'bg-gradient-to-br from-yellow-100 to-amber-200'
+                              : 'bg-gray-100'
+                          }`}>
+                            <IconComponent className={`w-6 h-6 ${
+                              achievement.completed ? 'text-yellow-600' : 'text-gray-400'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className={`font-semibold ${
+                              achievement.completed ? 'text-gray-800' : 'text-gray-500'
+                            }`}>{achievement.title}</h4>
+                            <p className="text-sm text-gray-600">{achievement.description}</p>
+                            {achievement.completed && achievement.date && (
+                              <p className="text-xs text-green-600 mt-1">Completed on {achievement.date}</p>
+                            )}
+                            {!achievement.completed && achievement.progress && (
+                              <div className="mt-2">
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-gradient-to-r from-coral-500 to-peach-500 h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${achievement.progress}%` }}
+                                  ></div>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">{achievement.progress}% complete</p>
+                              </div>
+                            )}
+                          </div>
+                          {achievement.completed && (
+                            <div className="text-green-500">
+                              <Verified size={20} />
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {selectedTab === 'activity' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-gray-800 font-bold text-lg">Recent Activity</h3>
+                  <button className="text-coral-500 text-sm font-medium">View All</button>
+                </div>
+                {recentActivity.map((activity) => (
+                  <Card key={activity.id} className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        {activity.avatar ? (
+                          <img src={activity.avatar} alt={activity.user} className="w-10 h-10 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <Eye className="w-5 h-5 text-gray-500" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            {activity.type === 'match' && <Heart className="w-4 h-4 text-red-500" />}
+                            {activity.type === 'like' && <ThumbsUp className="w-4 h-4 text-blue-500" />}
+                            {activity.type === 'view' && <Eye className="w-4 h-4 text-gray-500" />}
+                            {activity.type === 'chat' && <MessageCircle className="w-4 h-4 text-green-500" />}
+                            <span className="text-sm font-medium text-gray-800">
+                              {activity.type === 'match' && `New match with ${activity.user}`}
+                              {activity.type === 'like' && `${activity.user} liked your profile`}
+                              {activity.type === 'view' && 'Someone viewed your profile'}
+                              {activity.type === 'chat' && `New message from ${activity.user}`}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {selectedTab === 'social' && (
+              <div className="space-y-6">
+                {/* Social Links */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <h3 className="text-gray-800 font-bold mb-4">Connect Your Socials</h3>
+                    <div className="space-y-3">
+                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl border border-pink-200 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <Instagram className="w-5 h-5 text-pink-600" />
+                          <span className="font-medium text-gray-800">Instagram</span>
+                        </div>
+                        <Plus className="w-4 h-4 text-gray-400" />
+                      </button>
+                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <Twitter className="w-5 h-5 text-blue-600" />
+                          <span className="font-medium text-gray-800">Twitter</span>
+                        </div>
+                        <Plus className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Share Profile */}
+                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <h3 className="text-gray-800 font-bold mb-4">Share Your Profile</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
+                        <Link className="w-6 h-6 text-blue-600" />
+                        <span className="text-xs font-medium text-blue-600">Copy Link</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
+                        <Send className="w-6 h-6 text-green-600" />
+                        <span className="text-xs font-medium text-green-600">Share</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
+                        <Download className="w-6 h-6 text-purple-600" />
+                        <span className="text-xs font-medium text-purple-600">QR Code</span>
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Profile Analytics */}
+                {isPremium && (
+                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200">
+                    <CardContent className="p-6">
+                      <h3 className="text-gray-800 font-bold mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-purple-600" />
+                        Profile Analytics
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-purple-700">2.3K</div>
+                          <div className="text-sm text-purple-600">Total Reach</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-pink-700">86%</div>
+                          <div className="text-sm text-pink-600">Engagement</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
