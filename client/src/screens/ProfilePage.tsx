@@ -17,6 +17,7 @@ import {
   Crown,
   Heart,
   Users,
+  User,
   MessageCircle,
   Calendar,
   Coffee,
