@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Play, Coins, Gift, TrendingUp } from 'lucide-react';
 import { adMobService } from '../lib/adMobMediationService';
 import { useCoin } from '../context/CoinProvider';
+import { usePremium } from '../context/PremiumProvider';
 
 interface MediatedRewardedAdButtonProps {
   onRewardEarned?: (amount: number, network: string) => void;
