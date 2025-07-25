@@ -1085,6 +1085,112 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* Floating Action Menu */}
+      <div className="fixed bottom-24 right-6 z-40">
+        <div className="relative">
+          {/* Secondary Action Buttons */}
+          {showFloatingMenu && (
+            <div className="absolute bottom-16 right-0 space-y-3 animate-slideUp">
+              <button
+                onClick={() => navigate('/ai-chatbot')}
+                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
+              >
+                <Bot className="w-5 h-5 text-white group-hover:animate-bounce" />
+              </button>
+              <button
+                onClick={() => setShowNotifications(true)}
+                className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group relative"
+              >
+                <Bell className="w-5 h-5 text-white group-hover:animate-wiggle" />
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">{notifications.filter(n => !n.read).length}</span>
+                  </div>
+                )}
+              </button>
+              <button
+                onClick={() => setShowMoodSelector(true)}
+                className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
+              >
+                <Smile className="w-5 h-5 text-white group-hover:animate-heartbeat" />
+              </button>
+            </div>
+          )}
+
+          {/* Main FAB */}
+          <button
+            onClick={() => setShowFloatingMenu(!showFloatingMenu)}
+            className={`w-14 h-14 bg-gradient-to-r from-coral-500 to-peach-500 rounded-full shadow-xl flex items-center justify-center hover:shadow-2xl transform transition-all duration-300 ${
+              showFloatingMenu ? 'rotate-45 scale-110' : 'hover:scale-105'
+            } group`}
+          >
+            <Plus className="w-6 h-6 text-white group-hover:animate-spin" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mood Selector Modal */}
+      {showMoodSelector && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowMoodSelector(false)}>
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full animate-slideUp" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">How are you feeling?</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { id: 'great', emoji: '😊', label: 'Great', color: 'from-green-400 to-emerald-500' },
+                { id: 'happy', emoji: '😄', label: 'Happy', color: 'from-yellow-400 to-amber-500' },
+                { id: 'excited', emoji: '🤩', label: 'Excited', color: 'from-purple-400 to-pink-500' },
+                { id: 'chill', emoji: '😎', label: 'Chill', color: 'from-blue-400 to-cyan-500' },
+                { id: 'romantic', emoji: '��', label: 'Romantic', color: 'from-rose-400 to-pink-500' },
+                { id: 'adventurous', emoji: '🤠', label: 'Adventurous', color: 'from-orange-400 to-red-500' },
+              ].map((mood) => (
+                <button
+                  key={mood.id}
+                  onClick={() => {
+                    setCurrentMood(mood.id);
+                    setShowMoodSelector(false);
+                    alert(`Mood updated to ${mood.label}!`);
+                  }}
+                  className={`p-4 rounded-2xl bg-gradient-to-r ${mood.color} text-white font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-center`}
+                >
+                  <div className="text-2xl mb-1">{mood.emoji}</div>
+                  <div className="text-sm">{mood.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications Panel */}
+      {showNotifications && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center" onClick={() => setShowNotifications(false)}>
+          <div className="bg-white rounded-t-3xl w-full max-w-md h-96 animate-slideUp" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Notifications</h3>
+                <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
+                  <Plus className="w-5 h-5 rotate-45" />
+                </button>
+              </div>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {notifications.map((notif) => (
+                  <div key={notif.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                    <div className="w-10 h-10 bg-gradient-to-r from-coral-400 to-peach-400 rounded-full flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-800">{notif.text}</p>
+                      <p className="text-xs text-gray-500">{new Date(notif.time).toLocaleTimeString()}</p>
+                    </div>
+                    {!notif.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Use UltraBottomNavBar for ULTRA+ users, regular for others */}
       {isUltraPremium() ? <UltraBottomNavBar /> : <BottomNavBar />}
 
