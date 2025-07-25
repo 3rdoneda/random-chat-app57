@@ -13,7 +13,7 @@ import {
   Ban,
   Check,
   Settings,
-  Refresh,
+  RotateCw,
   TestTube,
   Play,
   Pause,
