@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BottomNavBar from '../components/BottomNavBar';
@@ -7,7 +7,8 @@ import { UltraPageTransition } from '../components/UltraBottomNavBar';
 import { usePremium } from '../context/PremiumProvider';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { ArrowLeft, Bot, Send, Sparkles } from 'lucide-react';
+import { ArrowLeft, Bot, Send, Sparkles, Heart, Settings } from 'lucide-react';
+import { aiChatbot } from '../lib/aiChatbot';
 
 const AIChatbotPage: React.FC = () => {
   const navigate = useNavigate();
