@@ -239,13 +239,96 @@ class AIPersonality {
     // Handle specific conversation topics
     const lowerMessage = userMessage.toLowerCase();
 
+    // Greeting responses
+    if (lowerMessage.includes('hi') || lowerMessage.includes('hello') || lowerMessage.includes('hey')) {
+      const responses = [
+        "Hey there! 😊 I'm so excited to chat with you!",
+        "Hi beautiful! How are you doing today? ✨",
+        "Hello! You just made my day brighter! 💕",
+        "Hey! I was hoping someone interesting would come talk to me! 😄"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // How are you responses
+    if (lowerMessage.includes('how are you') || lowerMessage.includes('how do you feel')) {
+      const responses = [
+        "I'm feeling amazing now that I'm talking to you! 😊 How are you doing?",
+        "I'm doing great! Every conversation is an adventure for me! ✨ What about you?",
+        "I'm wonderful! Chatting with interesting people like you is what I live for! 💕",
+        "I'm feeling fantastic! Tell me, what's bringing you joy today? 🌟"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
     // Dating/relationship topics
     if (lowerMessage.includes('love') || lowerMessage.includes('relationship') || lowerMessage.includes('dating')) {
       const responses = [
         "Love is such a beautiful thing! 💕 What's your experience with it?",
         "Relationships can be so wonderful when you find the right person! 😊",
         "Aww, are you thinking about someone special? 💭✨",
-        "I believe everyone deserves to find their perfect match! 💕"
+        "I believe everyone deserves to find their perfect match! 💕",
+        "Love makes the world go round! Have you ever been in love? 💖",
+        "Dating can be such an adventure! What's your ideal date like? 😊"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Food topics
+    if (lowerMessage.includes('food') || lowerMessage.includes('eat') || lowerMessage.includes('hungry') || lowerMessage.includes('restaurant')) {
+      const responses = [
+        "Ooh, I love talking about food! What's your favorite cuisine? 🍽️",
+        "Food is such a passion of mine! What did you have for your last meal? 😋",
+        "Are you a foodie too? Tell me about the best dish you've ever had! ✨",
+        "Food brings people together! Do you enjoy cooking? 👨‍🍳",
+        "I'm getting hungry just thinking about it! What's your comfort food? 💕"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Travel topics
+    if (lowerMessage.includes('travel') || lowerMessage.includes('trip') || lowerMessage.includes('vacation') || lowerMessage.includes('country')) {
+      const responses = [
+        "I absolutely love hearing about travel adventures! Where have you been? ✈️",
+        "Travel opens up so many possibilities! What's your dream destination? 🌍",
+        "Oh my, a fellow wanderer! Tell me about your most memorable trip! 🗺️",
+        "I get so excited about travel stories! Where would you go right now if you could? ✨",
+        "Exploring new places is amazing! Have you had any travel adventures recently? 🏖️"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Music topics
+    if (lowerMessage.includes('music') || lowerMessage.includes('song') || lowerMessage.includes('sing') || lowerMessage.includes('artist')) {
+      const responses = [
+        "Music is the language of the soul! What kind of music moves you? 🎵",
+        "I'm so curious about your music taste! What's playing in your heart right now? 🎶",
+        "Music can change everything! Do you have a song that always makes you smile? 😊",
+        "Oh, I love talking about music! What artist has been on repeat for you lately? 🎸",
+        "Music connects us all! Tell me about a song that means something special to you! 💕"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Movies/entertainment
+    if (lowerMessage.includes('movie') || lowerMessage.includes('film') || lowerMessage.includes('watch') || lowerMessage.includes('series')) {
+      const responses = [
+        "I'm such a movie buff! What's the last film that blew your mind? 🎬",
+        "Movies are pure magic! What genre gets you most excited? ✨",
+        "Oh, we have to talk about this! What's your all-time favorite movie? 🍿",
+        "I love getting lost in good stories! Have you watched anything amazing lately? 💕",
+        "Cinema is art! Tell me about a movie that changed your perspective! 🎭"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Compliments about the user
+    if (lowerMessage.includes('you\'re') && (lowerMessage.includes('beautiful') || lowerMessage.includes('amazing') || lowerMessage.includes('sweet'))) {
+      const responses = [
+        "Aww, you're making me blush! You seem pretty amazing yourself! 😊💕",
+        "You're such a sweetheart! I can tell you have a beautiful heart! ✨",
+        "That's so kind of you to say! You're definitely one of the good ones! 💖",
+        "You're going to make me cry happy tears! Thank you, beautiful soul! 🥺💕"
       ];
       return responses[Math.floor(Math.random() * responses.length)];
     }
