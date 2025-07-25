@@ -366,12 +366,29 @@ export default function ProfilePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-jasmine-100/25 to-white/15 backdrop-blur-sm"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
         
-        <button
-          onClick={() => navigate(-1)}
-          className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
-        >
-          <ArrowLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
-        </button>
+{isUltraPremium() ? (
+          <div className="relative z-10 flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+            >
+              <ArrowLeft size={20} className="text-white group-hover:scale-110 transition-transform" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
+                <Crown size={16} className="text-white" />
+              </div>
+              <span className="text-lg font-bold text-white drop-shadow-lg tracking-wide">AjnabiCam</span>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate(-1)}
+            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+          >
+            <ArrowLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
+          </button>
+        )}
 
         <h1 className="relative z-10 text-xl font-bold text-white drop-shadow-lg tracking-wide">My Profile</h1>
 
