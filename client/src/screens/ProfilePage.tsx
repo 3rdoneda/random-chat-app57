@@ -60,7 +60,8 @@ import {
   Smile,
   ThumbsUp,
   Send,
-  Bookmark
+  Bookmark,
+  Bot
 } from "lucide-react";
 import {
   doc,
