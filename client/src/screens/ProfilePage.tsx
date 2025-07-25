@@ -24,7 +24,9 @@ import {
   Book,
   Plane,
   Camera as CameraIcon,
-  Plus
+  Plus,
+  Sparkles,
+  Zap
 } from "lucide-react";
 import {
   doc,
@@ -209,98 +211,160 @@ export default function ProfilePage() {
         isUltraPremium() 
           ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90' 
           : 'bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50'
-      } pb-20 relative overflow-hidden`}>
-      {/* Animated Background Elements */}
+      } pb-24 relative overflow-hidden`}>
+      {/* Enhanced Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-6 left-6 w-12 h-12 bg-gradient-to-br from-sindoor-300 to-henna-400 opacity-20 animate-pulse"></div>
-        <div className="absolute top-20 right-4 w-10 h-10 bg-gradient-to-br from-royal-300 to-gulmohar-400 opacity-30 animate-bounce"></div>
-        <div className="absolute bottom-32 left-4 w-8 h-8 bg-gradient-to-br from-jasmine-300 to-sindoor-400 opacity-25 animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-48 right-8 w-6 h-6 bg-gradient-to-br from-passion-400 to-royal-400 opacity-20 animate-bounce" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-6 left-6 w-16 h-16 bg-gradient-to-br from-sindoor-300 to-henna-400 opacity-15 animate-float rounded-full blur-sm"></div>
+        <div className="absolute top-32 right-8 w-12 h-12 bg-gradient-to-br from-royal-300 to-gulmohar-400 opacity-25 animate-pulse rounded-full"></div>
+        <div className="absolute bottom-40 left-8 w-10 h-10 bg-gradient-to-br from-jasmine-300 to-sindoor-400 opacity-20 animate-bounce rounded-full" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-64 right-12 w-8 h-8 bg-gradient-to-br from-passion-400 to-royal-400 opacity-15 animate-float rounded-full" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-48 left-12 w-6 h-6 bg-gradient-to-br from-coral-400 to-blush-400 opacity-30 animate-pulse rounded-full" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute top-72 right-16 w-14 h-14 bg-gradient-to-br from-peach-300 to-coral-400 opacity-10 animate-bounce rounded-full blur-sm" style={{ animationDelay: '1.5s' }}></div>
       </div>
 
-      {/* Header */}
+      {/* Enhanced Header */}
       <div className={`${
         isUltraPremium() 
           ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
           : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
-      } px-4 py-3 flex items-center justify-between border-b ${
+      } px-6 py-4 flex items-center justify-between border-b ${
         isUltraPremium() ? 'border-purple-300' : 'border-peach-200'
-      } sticky top-0 z-10 shadow-lg relative overflow-hidden`}>
+      } sticky top-0 z-50 shadow-xl relative overflow-hidden backdrop-blur-md`}>
         <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-jasmine-100/25 to-white/15 backdrop-blur-sm"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
+        
         <button
           onClick={() => navigate(-1)}
-          className="relative z-10 p-2 hover:bg-white/20 transition-colors"
+          className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
         >
-          <ArrowLeft size={24} className="text-white" />
+          <ArrowLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
         </button>
 
-        <h1 className="relative z-10 text-lg font-semibold text-white drop-shadow-lg">Profile</h1>
+        <h1 className="relative z-10 text-xl font-bold text-white drop-shadow-lg tracking-wide">My Profile</h1>
 
         <button
           onClick={() => navigate('/premium')}
-          className="relative z-10 p-2 hover:bg-white/20 transition-colors"
+          className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
         >
-          <Settings size={24} className="text-white" />
+          <Settings size={22} className="text-white group-hover:rotate-90 transition-transform duration-300" />
         </button>
       </div>
 
       <div className={`${
         isUltraPremium() ? 'max-w-2xl' : 'max-w-sm'
-      } mx-auto px-4 py-6`}>
-        {/* Profile Image Section */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-0 overflow-hidden mb-6 relative">
-          <div className="relative h-[50vh] overflow-hidden">
+      } mx-auto px-6 py-8 space-y-8`}>
+        {/* Enhanced Profile Image Section */}
+        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 overflow-hidden relative group hover:shadow-3xl transition-all duration-500">
+          <div className="relative h-[55vh] overflow-hidden">
+            {/* Gradient overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
+            
             {profileImage ? (
               <img
                 src={profileImage}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-romance-200 via-passion-200 to-royal-200 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl font-bold">{name.charAt(0)}</span>
+              <div className="w-full h-full bg-gradient-to-br from-romance-300 via-passion-300 to-royal-300 flex items-center justify-center">
+                <div className="text-center text-white z-20 relative">
+                  <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30">
+                    <span className="text-4xl font-bold">{name.charAt(0)}</span>
                   </div>
-                  <p className="text-white/80">Tap to add photo</p>
+                  <p className="text-white/90 font-medium">Tap to add photo</p>
+                  <p className="text-white/70 text-sm mt-1">Show your best self!</p>
                 </div>
               </div>
             )}
 
-            {/* Upload overlay */}
+            {/* Enhanced Upload overlay */}
             {uploadingImage && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-                  <p className="text-sm">Uploading... {uploadProgress}%</p>
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-30">
+                <div className="text-center text-white bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/30 border-t-white mx-auto mb-4"></div>
+                  <p className="text-lg font-semibold mb-2">Uploading...</p>
+                  <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-peach-400 to-coral-500 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-white/80 mt-2">{uploadProgress}% complete</p>
                 </div>
               </div>
             )}
 
-            {/* Camera button */}
+            {/* Enhanced Camera button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm p-2 rounded-full hover:bg-black/30 transition-colors"
+              className="absolute top-6 right-6 bg-black/30 backdrop-blur-md p-3 rounded-full hover:bg-black/50 transition-all duration-200 border border-white/20 z-20 group/camera shadow-lg"
               disabled={uploadingImage}
             >
-              <Camera size={18} className="text-white" />
+              <Camera size={20} className="text-white group-hover/camera:scale-110 transition-transform" />
             </button>
-
-            {/* Profile Views Badge - Only for Premium Users */}
-            {isPremium && (
-              <div className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm px-3 py-1 flex items-center gap-2">
-                <Eye size={14} className="text-white" />
-                <span className="text-white text-sm font-medium">{profileViews.toLocaleString()}</span>
+            
+            {/* Add Photo hint for empty profile */}
+            {!profileImage && (
+              <div className="absolute bottom-6 left-6 right-6 z-20">
+                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Plus size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold">Add your first photo</p>
+                      <p className="text-white/80 text-sm">Stand out with a great profile picture</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Premium Badge */}
+            {/* Enhanced Profile Views Badge */}
             {isPremium && (
-              <div className="absolute top-14 left-4 bg-gradient-to-r from-yellow-400 to-yellow-500 px-2 py-1 rounded-full flex items-center gap-1">
-                <Crown className="w-3 h-3 text-yellow-800" />
-                <span className="text-yellow-800 text-xs font-bold">PREMIUM</span>
+              <div className="absolute top-6 left-6 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 z-20">
+                <Eye size={16} className="text-white" />
+                <span className="text-white text-sm font-bold">{profileViews.toLocaleString()}</span>
+                <span className="text-white/80 text-xs">views</span>
               </div>
             )}
+
+            {/* Enhanced Premium Badge */}
+            {isPremium && (
+              <div className="absolute top-20 left-6 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg z-20">
+                <Crown className="w-4 h-4 text-yellow-900 animate-bounce" />
+                <span className="text-yellow-900 text-xs font-bold tracking-wide">PREMIUM</span>
+              </div>
+            )}
+            
+            {/* Profile completion indicator */}
+            <div className="absolute bottom-6 right-6 z-20">
+              <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
+                <div className="relative w-8 h-8">
+                  <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke="rgba(255,255,255,0.3)"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke="white"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray={`${85 * 0.85} 85`}
+                      className="transition-all duration-500"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">85%</span>
+                </div>
+              </div>
+            </div>
 
             <input
               ref={fileInputRef}
@@ -312,55 +376,84 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* User Information Section */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-0 mb-6 relative z-10">
-          <CardContent className="p-6">
-            {/* Name and Age */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-gray-900 text-3xl font-bold mb-1">{name}, {age}</h2>
+        {/* Enhanced User Information Section */}
+        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 relative z-10 hover:shadow-3xl transition-all duration-300">
+          <CardContent className="p-8">
+            {/* Enhanced Name and Age */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-gray-900 text-4xl font-bold tracking-tight">{name}</h2>
+                  <span className="text-gray-600 text-2xl font-light">{age}</span>
+                  {isPremium && (
+                    <div className="bg-gradient-to-r from-yellow-400 to-amber-500 p-1 rounded-full">
+                      <Crown size={16} className="text-yellow-900" />
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-gray-600 mb-3">
-                  <MapPin size={16} />
-                  <span className="text-sm">{location}</span>
+                  <MapPin size={18} className="text-coral-500" />
+                  <span className="text-base font-medium">{location}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-green-600 font-medium">Online now</span>
                 </div>
               </div>
 
-              <button className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors">
-                <Edit3 size={16} className="text-gray-600" />
+              <button className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 p-3 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                <Edit3 size={18} className="text-gray-600" />
               </button>
             </div>
 
-            {/* Bio */}
-            <p className="text-gray-700 text-sm leading-relaxed mb-4">{bio}</p>
-
-            {/* Profession */}
-            <div className="flex items-center gap-2 text-gray-600 mb-4">
-              <Briefcase size={16} />
-              <span className="text-sm font-medium">{profession}</span>
+            {/* Enhanced Bio */}
+            <div className="bg-gradient-to-r from-peach-50 to-coral-50 p-4 rounded-2xl mb-6 border border-peach-100">
+              <p className="text-gray-800 text-base leading-relaxed italic">"{bio}"</p>
             </div>
 
-            {/* Interest Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {interests.map((interest, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-100 px-3 py-1 text-gray-700 text-xs font-medium"
-                >
-                  {interest}
-                </span>
-              ))}
+            {/* Enhanced Profession */}
+            <div className="flex items-center gap-3 text-gray-700 mb-6 bg-gray-50 p-3 rounded-xl">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Briefcase size={18} className="text-blue-600" />
+              </div>
+              <div>
+                <span className="text-base font-semibold">{profession}</span>
+                <p className="text-sm text-gray-500">Professional</p>
+              </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
+            {/* Enhanced Interest Tags */}
+            <div className="mb-6">
+              <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                <Heart size={16} className="text-coral-500" />
+                Interests
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {interests.map((interest, index) => (
+                  <span
+                    key={index}
+                    className="bg-gradient-to-r from-peach-100 to-coral-100 px-4 py-2 text-coral-700 text-sm font-semibold rounded-full border border-coral-200 hover:shadow-md transition-all duration-200 cursor-default"
+                  >
+                    {interest}
+                  </span>
+                ))}
+                <button className="bg-gray-100 hover:bg-gray-200 px-4 py-2 text-gray-500 text-sm font-medium rounded-full border-2 border-dashed border-gray-300 transition-all duration-200">
+                  <Plus size={14} className="inline mr-1" />
+                  Add more
+                </button>
+              </div>
+            </div>
+
+            {/* Enhanced Action Buttons */}
+            <div className="flex gap-4">
               <Button
                 onClick={() => {
                   // Edit profile functionality
                   alert('Edit profile feature coming soon!');
                 }}
-                className="flex-1 bg-gradient-to-r from-romance-500 to-passion-500 hover:from-romance-600 hover:to-passion-600 text-white font-semibold py-3 border-0"
+                className="flex-1 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 hover:from-peach-600 hover:via-coral-600 hover:to-blush-700 text-white font-bold py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                <Edit3 className="w-4 h-4 mr-2" />
+                <Edit3 className="w-5 h-5 mr-2" />
                 Edit Profile
               </Button>
 
@@ -377,121 +470,175 @@ export default function ProfilePage() {
                     alert('Profile link copied to clipboard!');
                   }
                 }}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-3 border-0"
+                className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-bold px-6 py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                <Users className="w-4 h-4" />
+                <Users className="w-5 h-5" />
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Stats Cards */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
+        {/* Enhanced Profile Stats Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
               {isPremium ? (
                 <>
-                  <div className="w-10 h-10 bg-blue-100 flex items-center justify-center mx-auto mb-2">
-                    <Eye className="w-5 h-5 text-blue-600" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                    <Eye className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="text-lg font-bold text-blue-700">{profileViews}</div>
-                  <div className="text-xs text-blue-600">Views</div>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">{profileViews.toLocaleString()}</div>
+                  <div className="text-sm text-blue-600 font-medium">Profile Views</div>
+                  <div className="text-xs text-blue-500 mt-1">+12 today</div>
                 </>
               ) : (
                 <>
-                  <div className="w-10 h-10 bg-gray-200 flex items-center justify-center mx-auto mb-2 relative">
-                    <Eye className="w-5 h-5 text-gray-400" />
-                    <Crown className="w-3 h-3 text-yellow-500 absolute -top-1 -right-1" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative">
+                    <Eye className="w-6 h-6 text-gray-400" />
+                    <Crown className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-bounce" />
                   </div>
-                  <div className="text-lg font-bold text-gray-400">***</div>
-                  <div className="text-xs text-gray-400">Premium</div>
+                  <div className="text-2xl font-bold text-gray-400 mb-1">***</div>
+                  <div className="text-sm text-gray-400 font-medium">Premium Only</div>
+                  <div className="text-xs text-yellow-600 mt-1">Upgrade to see</div>
                 </>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-green-100 flex items-center justify-center mx-auto mb-2">
-                <Users className="w-5 h-5 text-green-600" />
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                <Users className="w-6 h-6 text-green-600" />
               </div>
-              <div className="text-lg font-bold text-gray-800">23</div>
-              <div className="text-xs text-gray-500">Friends</div>
+              <div className="text-2xl font-bold text-green-700 mb-1">23</div>
+              <div className="text-sm text-green-600 font-medium">Friends</div>
+              <div className="text-xs text-green-500 mt-1">+2 this week</div>
             </CardContent>
           </Card>
 
           <Card
-            className="bg-white/80 backdrop-blur-sm shadow-sm border-0 cursor-pointer hover:shadow-md transition-shadow"
+            className="bg-white/95 backdrop-blur-md shadow-lg border-0 cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
             onClick={handleShowLikes}
           >
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-pink-100 flex items-center justify-center mx-auto mb-2 relative">
-                <Heart className="w-5 h-5 text-pink-600" />
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-rose-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative group-hover:scale-110 transition-transform">
+                <Heart className="w-6 h-6 text-pink-600 group-hover:animate-pulse" />
                 {!isPremium && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">!</span>
+                  </div>
                 )}
               </div>
-              <div className="text-lg font-bold text-pink-700">
+              <div className="text-2xl font-bold text-pink-700 mb-1">
                 {isPremium ? likesData.length : '?'}
               </div>
-              <div className="text-xs text-pink-600">
-                {isPremium ? 'Likes' : 'Tap to See'}
+              <div className="text-sm text-pink-600 font-medium">
+                {isPremium ? 'Secret Likes' : 'Tap to Reveal'}
               </div>
+              <div className="text-xs text-pink-500 mt-1">
+                {isPremium ? 'New matches!' : 'Premium feature'}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-yellow-100 to-amber-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
+                <Star className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="text-2xl font-bold text-yellow-700 mb-1">{coins.toLocaleString()}</div>
+              <div className="text-sm text-yellow-600 font-medium">Coins</div>
+              <div className="text-xs text-yellow-500 mt-1">Earn more!</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Secondary Stats Row */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
+        {/* Enhanced Activity Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
             <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-yellow-100 flex items-center justify-center mx-auto mb-2">
-                <Star className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="text-lg font-bold text-yellow-700">{coins}</div>
-              <div className="text-xs text-yellow-600">Coins</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
-            <CardContent className="p-4 text-center">
-              <div className="w-10 h-10 bg-purple-100 flex items-center justify-center mx-auto mb-2">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
                 <MessageCircle className="w-5 h-5 text-purple-600" />
               </div>
               <div className="text-lg font-bold text-purple-700">156</div>
-              <div className="text-xs text-purple-600">Chats</div>
+              <div className="text-xs text-purple-600 font-medium">Chats</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
+                <Calendar className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="text-lg font-bold text-orange-700">7</div>
+              <div className="text-xs text-orange-600 font-medium">Days</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
+                <Zap className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="text-lg font-bold text-emerald-700">98%</div>
+              <div className="text-xs text-emerald-600 font-medium">Match</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Additional Actions */}
-        <div className="space-y-3">
-          <Button
-            onClick={() => navigate('/premium')}
-            className="w-full bg-gradient-to-r from-peach-400 to-coral-500 hover:from-peach-500 hover:to-coral-600 text-white font-semibold py-4 shadow-lg"
-          >
-            <Crown className="w-5 h-5 mr-2" />
-            Upgrade to Premium
-          </Button>
+        {/* Enhanced Additional Actions */}
+        <div className="space-y-6">
+          {!isPremium && (
+            <Button
+              onClick={() => navigate('/premium')}
+              className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-5 shadow-2xl rounded-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer"></div>
+              <Crown className="w-6 h-6 mr-3 animate-bounce" />
+              <span className="text-lg">Unlock Premium Features</span>
+              <Sparkles className="w-5 h-5 ml-3" />
+            </Button>
+          )}
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Button
               onClick={() => navigate('/chat')}
-              variant="outline"
-              className="py-3 rounded-xl border-gray-200 hover:bg-gray-50"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <MessageCircle className="w-4 h-4 mr-2" />
+              <MessageCircle className="w-5 h-5 mr-2" />
               Messages
             </Button>
             
             <Button
               onClick={() => navigate('/')}
-              variant="outline" 
-              className="py-3 rounded-xl border-gray-200 hover:bg-gray-50"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users className="w-5 h-5 mr-2" />
               Discover
             </Button>
+          </div>
+          
+          {/* Quick Interest Actions */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl">
+            <h3 className="text-gray-800 font-bold mb-4 text-center">Quick Actions</h3>
+            <div className="grid grid-cols-4 gap-3">
+              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                <Coffee className="w-6 h-6 text-amber-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                <span className="text-xs text-gray-600 font-medium">Coffee</span>
+              </button>
+              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                <Music className="w-6 h-6 text-purple-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                <span className="text-xs text-gray-600 font-medium">Music</span>
+              </button>
+              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                <Book className="w-6 h-6 text-blue-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                <span className="text-xs text-gray-600 font-medium">Books</span>
+              </button>
+              <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
+                <Plane className="w-6 h-6 text-green-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
+                <span className="text-xs text-gray-600 font-medium">Travel</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
