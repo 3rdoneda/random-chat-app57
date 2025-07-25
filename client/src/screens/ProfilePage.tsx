@@ -77,6 +77,8 @@ import { usePremium } from "../context/PremiumProvider";
 import { useCoin } from "../context/CoinProvider";
 import BottomNavBar from "../components/BottomNavBar";
 import WhoLikedMeModal from "../components/WhoLikedMeModal";
+import BannerAd from "../components/BannerAd";
+import RewardedAdButton from "../components/RewardedAdButton";
 
 // Add click outside handler
 function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
