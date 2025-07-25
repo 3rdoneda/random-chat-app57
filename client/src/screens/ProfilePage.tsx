@@ -794,7 +794,8 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {/* Ad Testing Section */}
+        {/* Ad Testing Section - Hidden for Premium Users */}
+        {!isUltraPremium() && !isProMonthly() && (
         <div className="space-y-4 bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
           <h3 className="text-gray-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
             📱 Ad Testing Zone
@@ -853,6 +854,7 @@ export default function ProfilePage() {
              'Ad services need initialization'}
           </div>
         </div>
+        )}
 
         {/* Enhanced Additional Actions */}
         <div className="space-y-6">
