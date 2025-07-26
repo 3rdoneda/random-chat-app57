@@ -131,7 +131,9 @@ export function rateLimit(key: string, config: RateLimitConfig) {
     const method = descriptor.value;
     
     descriptor.value = function(...args: any[]) {
-      const limitKey = `${key}_${this.userId || 'anonymous'}`;
+      // Use a generic key if userId is not available on the instance
+      const userId = (this as any).userId || 'anonymous';
+      const limitKey = `${key}_${userId}`;
       
       if (rateLimiter.isLimited(limitKey, config)) {
         const remaining = rateLimiter.getTimeUntilReset(limitKey);

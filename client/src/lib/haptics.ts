@@ -9,11 +9,8 @@ interface HapticFeedback {
   vibrate?: (pattern?: number | number[]) => void;
 }
 
-declare global {
-  interface Navigator {
-    vibrate?: (pattern: number | number[]) => boolean;
-  }
-}
+// We don't need to redeclare Navigator.vibrate as it's already defined in lib.dom.d.ts
+// Just use the existing type definition
 
 class HapticsService {
   private isSupported: boolean = false;
