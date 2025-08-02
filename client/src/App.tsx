@@ -27,6 +27,7 @@ import TermsOfServicePage from "./screens/TermsOfServicePage";
 import AdminPanelPage from "./screens/AdminPanelPage";
 import SpinWheel from "./components/SpinWheel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PostCallProfile from "./screens/PostCallProfile";
 import AppStartupCheck from "./components/AppStartupCheck";
 import UltraAppWrapper from "./components/UltraAppWrapper";
 import CookieConsent from "./components/CookieConsent";
@@ -179,6 +180,7 @@ function App() {
             <Route path="/admin" element={<AdminPanelPage />} />
             <Route path="/spin-wheel" element={<SpinWheel />} />
             <Route path="/storage-debug" element={<StorageDebugPage />} />
+            <Route path="/post-profile" element={<PostCallProfile />} />
             <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
             <Route path="/ad-testing" element={<AdTestingPage />} />
             <Route path="*" element={<HomePage />} />

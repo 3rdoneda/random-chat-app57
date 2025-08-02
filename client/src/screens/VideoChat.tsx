@@ -269,6 +269,11 @@ export default function VideoChat() {
     setRemoteChatToken(null);
 
     socket?.emit("skip");
+    
+    // Navigate to post-call profile after skipping
+    setTimeout(() => {
+      navigate("/post-profile");
+    }, 1000);
   }, [socket, isFriendCall, remoteChatToken, handleChatComplete]);
 
   const handleTimeUp = useCallback(() => {
@@ -831,6 +836,11 @@ export default function VideoChat() {
     return () => {
       socket?.off("ice-candidate");
     };
+    
+    // Navigate to post-call profile after ending call
+    setTimeout(() => {
+      navigate("/post-profile");
+    }, 1000);
   }, [socket]);
 
   // Handle stay connected responses
