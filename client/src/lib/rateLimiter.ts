@@ -105,7 +105,7 @@ const rateLimiter = new RateLimiter();
 // Rate limit configurations
 export const RATE_LIMITS = {
   // Chat related
-  SEND_MESSAGE: { maxRequests: 10, windowMs: 60000 }, // 10 messages per minute
+  SEND_MESSAGE: { maxRequests: 30, windowMs: 60000 }, // 30 messages per minute (increased for better UX)
   START_CHAT: { maxRequests: 5, windowMs: 300000 }, // 5 chats per 5 minutes
   UPLOAD_IMAGE: { maxRequests: 3, windowMs: 60000 }, // 3 images per minute
   
@@ -121,6 +121,11 @@ export const RATE_LIMITS = {
   // API calls
   API_CALL: { maxRequests: 100, windowMs: 60000 }, // 100 API calls per minute
   SEARCH_USERS: { maxRequests: 20, windowMs: 60000 }, // 20 searches per minute
+  
+  // New rate limits for better security
+  LOGIN_ATTEMPT: { maxRequests: 5, windowMs: 900000, blockDurationMs: 900000 }, // 5 login attempts per 15 minutes
+  PASSWORD_RESET: { maxRequests: 3, windowMs: 3600000 }, // 3 password resets per hour
+  FRIEND_REQUEST: { maxRequests: 10, windowMs: 3600000 }, // 10 friend requests per hour
 } as const;
 
 /**

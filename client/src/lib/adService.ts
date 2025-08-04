@@ -92,7 +92,7 @@ testMode: import.meta.env.DEV
         await this.loadAdSenseScript();
 
         // Initialize AdSense
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && window.adsbygoogle) {
           window.adsbygoogle = window.adsbygoogle || [];
           this.isInitialized = true;
           console.log('✅ Ad Service initialized successfully');

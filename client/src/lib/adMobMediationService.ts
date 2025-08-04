@@ -172,7 +172,25 @@ class AdMobMediationService {
       // Simulate ad success
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      return { success: true, reward: 10, network: 'AdSense' };
+      // Simulate different networks with different rewards
+      const networks = [
+        { name: 'Unity Ads', reward: 15, probability: 0.3 },
+        { name: 'Facebook Audience Network', reward: 12, probability: 0.25 },
+        { name: 'AppLovin MAX', reward: 10, probability: 0.2 },
+        { name: 'AdMob', reward: 8, probability: 0.25 }
+      ];
+      
+      const random = Math.random();
+      let cumulativeProbability = 0;
+      
+      for (const network of networks) {
+        cumulativeProbability += network.probability;
+        if (random <= cumulativeProbability) {
+          return { success: true, reward: network.reward, network: network.name };
+        }
+      }
+      
+      return { success: true, reward: 10, network: 'AdMob' };
     } catch (error) {
       console.error('❌ Mediated rewarded ad failed:', error);
       return { success: false, reward: 0, network: 'none' };

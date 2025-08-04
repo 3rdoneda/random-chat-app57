@@ -142,6 +142,10 @@ export async function getCoins(userId: string): Promise<number> {
  */
 export async function addCoins(userId: string, amount: number): Promise<void> {
   try {
+    if (!userId || amount <= 0) {
+      throw new Error('Invalid userId or amount');
+    }
+    
     const userDocRef = doc(db, "users", userId);
     
     // Ensure user document exists first
@@ -150,6 +154,7 @@ export async function addCoins(userId: string, amount: number): Promise<void> {
     // Add coins using Firestore increment
     await updateDoc(userDocRef, {
       coins: increment(amount),
+      totalCoinsEarned: increment(amount),
       updatedAt: new Date()
     });
 
@@ -165,6 +170,10 @@ export async function addCoins(userId: string, amount: number): Promise<void> {
  */
 export async function spendCoins(userId: string, amount: number): Promise<{ success: boolean; message: string }> {
   try {
+    if (!userId || amount <= 0) {
+      return { success: false, message: "Invalid userId or amount" };
+    }
+    
     const userDocRef = doc(db, "users", userId);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -182,6 +191,7 @@ export async function spendCoins(userId: string, amount: number): Promise<{ succ
     // Deduct coins
     await updateDoc(userDocRef, {
       coins: increment(-amount),
+      totalCoinsSpent: increment(amount),
       updatedAt: new Date()
     });
 

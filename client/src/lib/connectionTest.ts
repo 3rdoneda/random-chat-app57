@@ -26,6 +26,11 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
   try {
     console.log("🔍 Testing Firebase Storage connection...");
 
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Connection test timeout')), 30000);
+    });
+
     // Test 1: Basic connection (try to create a reference)
     const testRef = ref(storage, "connection-test/test.txt");
 
@@ -33,15 +38,15 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
     const testData = new Blob(["Firebase Storage connection test"], {
       type: "text/plain",
     });
-    await uploadBytes(testRef, testData);
+    await Promise.race([uploadBytes(testRef, testData), timeoutPromise]);
     console.log("✅ Write operation successful");
 
     // Test 3: Read operation (get download URL)
-    const downloadURL = await getDownloadURL(testRef);
+    const downloadURL = await Promise.race([getDownloadURL(testRef), timeoutPromise]);
     console.log("✅ Read operation successful", downloadURL);
 
     // Test 4: Delete operation (cleanup test file)
-    await deleteObject(testRef);
+    await Promise.race([deleteObject(testRef), timeoutPromise]);
     console.log("✅ Delete operation successful");
 
     return {
@@ -64,6 +69,11 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
       canDelete: false,
       error: error.message,
     };
+
+    // Handle timeout specifically
+    if (error.message === 'Connection test timeout') {
+      message = "Connection test timed out - check network connectivity";
+    }
 
     // Analyze specific error types
     switch (error.code) {

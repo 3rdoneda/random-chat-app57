@@ -152,6 +152,11 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
       return false;
     }
 
+    if (amount <= 0) {
+      console.error("Invalid coin amount");
+      return false;
+    }
+
     try {
       await firestoreAddCoins(currentUser, amount);
       return true;
@@ -164,6 +169,11 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
   const deductCoins = async (amount: number): Promise<boolean> => {
     if (!currentUser) {
       console.error("No authenticated user");
+      return false;
+    }
+
+    if (amount <= 0) {
+      console.error("Invalid coin amount");
       return false;
     }
 

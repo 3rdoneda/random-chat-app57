@@ -42,6 +42,13 @@ class ErrorMonitoring {
   private setupGlobalErrorHandlers() {
     // Global JavaScript error handler
     window.addEventListener('error', (event) => {
+      // Ignore certain non-critical errors
+      if (event.message.includes('ResizeObserver loop limit exceeded') ||
+          event.message.includes('Non-Error promise rejection captured') ||
+          event.filename?.includes('extension')) {
+        return;
+      }
+      
       this.reportError({
         message: event.message,
         stack: event.error?.stack,
@@ -61,6 +68,13 @@ class ErrorMonitoring {
 
     // Global unhandled promise rejection handler
     window.addEventListener('unhandledrejection', (event) => {
+      // Ignore certain non-critical promise rejections
+      if (event.reason?.message?.includes('The user aborted a request') ||
+          event.reason?.message?.includes('Load failed') ||
+          event.reason?.name === 'AbortError') {
+        return;
+      }
+      
       this.reportError({
         message: `Unhandled Promise Rejection: ${event.reason}`,
         stack: event.reason?.stack,

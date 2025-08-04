@@ -82,6 +82,10 @@ export async function uploadProfileImage(
   userId: string,
   onProgress?: (progress: number) => void,
 ): Promise<{ url: string; path: string }> {
+  if (!file || !userId) {
+    throw new Error('File and userId are required');
+  }
+  
   // Validate file
   const validation = validateImageFile(file, FILE_SIZE_LIMITS.PROFILE_IMAGE);
   if (!validation.isValid) {
@@ -98,6 +102,11 @@ export async function uploadProfileImage(
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          uploadTask.cancel();
+          reject(new Error('Upload timeout after 60 seconds'));
+        }, 60000);
+        
         uploadTask.on(
           "state_changed",
           (snapshot) => {
@@ -105,12 +114,17 @@ export async function uploadProfileImage(
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             onProgress(progress);
           },
-          (error) => reject(error),
+          (error) => {
+            clearTimeout(timeout);
+            reject(error);
+          },
           async () => {
             try {
+              clearTimeout(timeout);
               const url = await getDownloadURL(uploadTask.snapshot.ref);
               resolve({ url, path: filePath });
             } catch (error) {
+              clearTimeout(timeout);
               reject(error);
             }
           },
@@ -124,7 +138,7 @@ export async function uploadProfileImage(
     }
   } catch (error) {
     console.error("Error uploading profile image:", error);
-    throw new Error("Failed to upload profile image");
+    throw new Error(getStorageErrorMessage(error));
   }
 }
 

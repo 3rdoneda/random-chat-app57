@@ -31,7 +31,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         showConnectionTest: true,
       }));
 
-      testFirebaseStorageConnection()
+      // Add timeout and error handling for connection test
+      Promise.race([
+        testFirebaseStorageConnection(),
+        new Promise<ConnectionTestResult>((_, reject) => 
+          setTimeout(() => reject(new Error('Connection test timeout')), 15000)
+        )
+      ])
         .then((result) => {
           setConnectionStatus((prev) => ({
             ...prev,
@@ -46,7 +52,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             connectionResult: {
               isConnected: false,
               status: "error",
-              message: "Connection test failed",
+              message: error.message === 'Connection test timeout' 
+                ? "Connection test timed out" 
+                : "Connection test failed",
               details: {
                 canRead: false,
                 canWrite: false,
@@ -66,7 +74,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         console.log("SplashScreen: calling onComplete");
         onComplete();
       }, 300); // Smooth transition
-    }, 2000); // Show splash for 2 seconds
+    }, 4000); // Show splash for 4 seconds to allow connection test
 
     return () => {
       clearTimeout(timer);

@@ -13,9 +13,13 @@ import { CoinProvider } from "./context/CoinProvider.tsx";
 import { FriendsProvider } from "./context/FriendsProvider.tsx";
 import { HelmetProvider } from "react-helmet-async";
 import { preloadSounds } from "./lib/audio.ts";
+import { initializeSecurity } from "./lib/securityUtils.ts";
 
 // Preload sounds on app start
 preloadSounds();
+
+// Initialize security measures
+initializeSecurity();
 
 // Error fallback component
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
@@ -23,7 +27,9 @@ function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBou
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
         <h2 className="text-xl font-bold text-red-600 mb-4">Something went wrong</h2>
-        <p className="text-gray-600 mb-4">{error.message}</p>
+        <p className="text-gray-600 mb-4">
+          {import.meta.env.DEV ? error.message : 'An unexpected error occurred'}
+        </p>
         <button onClick={resetErrorBoundary} className="bg-blue-500 text-white px-4 py-2 rounded">
           Try again
         </button>

@@ -8,9 +8,14 @@ export class MockWebRTC {
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d")!;
+    
+    if (!ctx) {
+      throw new Error('Unable to get canvas context');
+    }
 
     // Create animated mock video
     const drawFrame = () => {
+      try {
       // Gradient background
       const gradient = ctx.createLinearGradient(
         0,
@@ -60,6 +65,9 @@ export class MockWebRTC {
         canvas.width / 2,
         canvas.height - 20,
       );
+      } catch (error) {
+        console.error('Error drawing mock video frame:', error);
+      }
     };
 
     // Start animation loop
@@ -70,8 +78,14 @@ export class MockWebRTC {
     animate();
 
     // Create stream from canvas
-    // @ts-ignore - captureStream is supported in modern browsers
-    const stream = canvas.captureStream(30) as MediaStream;
+    let stream: MediaStream;
+    try {
+      // @ts-ignore - captureStream is supported in modern browsers
+      stream = canvas.captureStream(30) as MediaStream;
+    } catch (error) {
+      console.error('Error creating canvas stream:', error);
+      throw new Error('Unable to create mock video stream');
+    }
 
     // Add mock audio track
     try {

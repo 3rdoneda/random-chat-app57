@@ -32,26 +32,34 @@ export function useAnalytics(): UseAnalyticsReturn {
         currentUserId = user.uid;
         sessionStarted = true;
         
-        // Start analytics session
-        await startUserSession(user.uid);
-        
-        // Set user properties
-        setAnalyticsUserProperties(user.uid, {
-          user_id: user.uid,
-          sign_up_method: user.providerData[0]?.providerId || 'anonymous'
-        });
+        try {
+          // Start analytics session
+          await startUserSession(user.uid);
+          
+          // Set user properties
+          setAnalyticsUserProperties(user.uid, {
+            user_id: user.uid,
+            sign_up_method: user.providerData[0]?.providerId || 'anonymous'
+          });
 
-        // Update daily metrics
-        await updateDailyMetrics(user.uid, {
-          totalSessions: 1
-        });
+          // Update daily metrics
+          await updateDailyMetrics(user.uid, {
+            totalSessions: 1
+          });
+        } catch (error) {
+          console.error('Analytics initialization error:', error);
+        }
       }
     });
 
     // End session on page unload
     const handleBeforeUnload = () => {
       if (sessionStarted) {
-        endUserSession();
+        try {
+          endUserSession();
+        } catch (error) {
+          console.error('Error ending analytics session:', error);
+        }
       }
     };
 
@@ -61,7 +69,11 @@ export function useAnalytics(): UseAnalyticsReturn {
       unsubscribe();
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (sessionStarted) {
-        endUserSession();
+        try {
+          endUserSession();
+        } catch (error) {
+          console.error('Error ending analytics session:', error);
+        }
       }
     };
   }, []);

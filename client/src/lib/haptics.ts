@@ -47,7 +47,7 @@ class HapticsService {
 
       const pattern = patterns[type] || patterns.medium;
       
-      if (navigator.vibrate) {
+      if (navigator.vibrate && typeof navigator.vibrate === 'function') {
         navigator.vibrate(pattern);
       }
     } catch (error) {
@@ -69,7 +69,7 @@ class HapticsService {
     if (!this.isSupported) return;
     
     try {
-      if (navigator.vibrate) {
+      if (navigator.vibrate && typeof navigator.vibrate === 'function') {
         navigator.vibrate([100, 50, 100]);
       }
     } catch (error) {
@@ -112,7 +112,7 @@ class HapticsService {
     if (!this.isSupported) return;
     
     try {
-      if (navigator.vibrate) {
+      if (navigator.vibrate && typeof navigator.vibrate === 'function') {
         navigator.vibrate([5, 10, 5, 10, 15]);
       }
     } catch (error) {
@@ -127,7 +127,7 @@ class HapticsService {
     if (!this.isSupported) return;
     
     try {
-      if (navigator.vibrate) {
+      if (navigator.vibrate && typeof navigator.vibrate === 'function') {
         navigator.vibrate([20, 30, 20, 30, 50]);
       }
     } catch (error) {

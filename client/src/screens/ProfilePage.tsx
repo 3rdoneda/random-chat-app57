@@ -1,1367 +1,753 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import UltraProfileEnhancements from "../components/UltraProfileEnhancements";
+import { Helmet } from "react-helmet-async";
+import BottomNavBar from "../components/BottomNavBar";
 import UltraBottomNavBar from "../components/UltraBottomNavBar";
+import UltraProfileEnhancements from "../components/UltraProfileEnhancements";
 import { UltraPageTransition } from "../components/UltraBottomNavBar";
-import {
-  Camera,
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  Eye,
-  Star,
-  Edit3,
-  Settings,
-  Crown,
-  Heart,
-  Users,
-  User,
-  MessageCircle,
-  Calendar,
-  Coffee,
-  Music,
-  Book,
-  Plane,
-  Camera as CameraIcon,
-  Plus,
-  Sparkles,
-  Zap,
-  Trophy,
-  Award,
-  Target,
-  TrendingUp,
-  Clock,
-  MapPin as LocationIcon,
-  Phone,
-  Mail,
-  Instagram,
-  Twitter,
-  Share2,
-  MoreHorizontal,
-  Verified,
-  Shield,
-  Gift,
-  Flame,
-  Activity,
-  Bell,
-  Download,
-  Upload,
-  Link,
-  Copy,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  Image as ImageIcon,
-  Video,
-  Mic,
-  HeartHandshake,
-  Smile,
-  ThumbsUp,
-  Send,
-  Bookmark,
-  Bot
-} from "lucide-react";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  onSnapshot,
-  increment
-} from "firebase/firestore";
-import { auth, db } from "../firebaseConfig";
-import { uploadProfileImage } from "../lib/storageUtils";
 import { usePremium } from "../context/PremiumProvider";
 import { useCoin } from "../context/CoinProvider";
-import BottomNavBar from "../components/BottomNavBar";
-import WhoLikedMeModal from "../components/WhoLikedMeModal";
-import BannerAd from "../components/BannerAd";
-import RewardedAdButton from "../components/RewardedAdButton";
-import ModeTestingPanel from "../components/ModeTestingPanel";
-import { adService } from "../lib/adService";
-import { unityAdsService } from "../lib/unityAdsService";
-import { adMobService } from "../lib/adMobMediationService";
+import { useLanguage } from "../context/LanguageProvider";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import SettingsModal from "../components/SettingsModal";
+import LanguageSelector from "../components/LanguageSelector";
+import HelpSupportModal from "../components/HelpSupportModal";
+import {
+  ArrowLeft,
+  Camera,
+  Crown,
+  Coins,
+  Settings,
+  Globe,
+  HelpCircle,
+  Share,
+  Copy,
+  Database,
+  Shield,
+  Bell,
+  User,
+  Edit3,
+  Star,
+  Heart,
+  Users,
+  Zap,
+  Gift,
+  TrendingUp,
+  Award,
+  Target,
+  Eye,
+  MessageCircle,
+  Video,
+  Clock,
+  Sparkles,
+  Gem,
+} from "lucide-react";
+import { uploadProfileImage, getStorageErrorMessage } from "../lib/storageUtils";
+import { getUserId } from "../lib/userUtils";
+import PremiumBadge from "../components/PremiumBadge";
 
-// Add click outside handler
-function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
-  useEffect(() => {
-    const listener = (event: any) => {
-      if (!ref.current || ref.current.contains(event.target)) {
-        return;
-      }
-      handler();
-    };
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
-    return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
-    };
-  }, [ref, handler]);
-}
-
-export default function ProfilePage() {
-  const shareMenuRef = useRef<HTMLDivElement>(null);
-  useClickOutside(shareMenuRef, () => setShowShareMenu(false));
+const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState("Love");
-  const [age, setAge] = useState(25);
-  const [location, setLocation] = useState("Beverly Hills, CA");
-  const [profession, setProfession] = useState("Model & Influencer");
-  const [bio, setBio] = useState("Life is an adventure, let's explore it together! ✨");
-  const [interests, setInterests] = useState(["Often", "Sociale drinker", "Never", "Pisces"]);
-  const [profileImage, setProfileImage] = useState<string | null>("https://cdn.builder.io/api/v1/image/assets%2Fe142673ab78f4d70a642f0b5825a4793%2F9ca3a7221ed04dfaaa8b4de10c2f495e?format=webp&width=800");
-  const [profileViews, setProfileViews] = useState(247);
-  const [loading, setLoading] = useState(true);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [showAchievements, setShowAchievements] = useState(false);
-  const [showActivity, setShowActivity] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('overview');
-  const [animationKey, setAnimationKey] = useState(0);
-  const [showShareMenu, setShowShareMenu] = useState(false);
-  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
-  const [currentMood, setCurrentMood] = useState('great');
-  const [showMoodSelector, setShowMoodSelector] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Sarah liked your profile!', time: Date.now() - 3600000, read: false },
-    { id: 2, text: 'You have a new match!', time: Date.now() - 7200000, read: false },
-  ]);
-  const [adStatus, setAdStatus] = useState({
-    unityReady: false,
-    admobReady: false,
-    checking: true
-  });
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [recentActivity] = useState([
-    { id: 1, type: 'match', user: 'Sarah', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
-    { id: 2, type: 'like', user: 'Priya', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
-    { id: 3, type: 'view', user: 'Anonymous', time: '8 hours ago', avatar: null },
-    { id: 4, type: 'chat', user: 'Anjali', time: '1 day ago', avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
-  ]);
-
-  const { isPremium, isUltraPremium, isProMonthly, setPremium } = usePremium();
+  const { isPremium, isUltraPremium, isProMonthly, premiumPlan } = usePremium();
   const { coins } = useCoin();
-
-  const [achievements] = useState([
-    { id: 1, title: 'First Impression', description: 'Uploaded your first photo', icon: Camera, completed: true, date: '2024-01-15' },
-    { id: 2, title: 'Social Butterfly', description: 'Made 10 new friends', icon: Users, completed: true, date: '2024-01-20' },
-    { id: 3, title: 'Conversation Starter', description: 'Sent 50 messages', icon: MessageCircle, completed: true, date: '2024-01-25' },
-    { id: 4, title: 'Popular Profile', description: 'Get 100 profile views', icon: Eye, completed: false, progress: 85 },
-    { id: 5, title: 'Heart Collector', description: 'Receive 25 likes', icon: Heart, completed: false, progress: 60 },
-    { id: 6, title: 'Premium Explorer', description: 'Use premium features', icon: Crown, completed: isPremium, progress: isPremium ? 100 : 0 },
-  ]);
+  const { t } = useLanguage();
+  const [profileImage, setProfileImage] = useState<string>("");
+  const [username, setUsername] = useState<string>("User");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string>("");
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [settingType, setSettingType] = useState<'privacy' | 'notifications' | 'account' | 'general' | null>(null);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const user = auth.currentUser;
-  const [showLikesModal, setShowLikesModal] = useState(false);
-  const [likesData, setLikesData] = useState([
-    {
-      id: '1',
-      name: 'Sarah',
-      age: 24,
-      location: 'Mumbai, India',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      timeAgo: '2 hours ago',
-      isRevealed: false
-    },
-    {
-      id: '2',
-      name: 'Priya',
-      age: 22,
-      location: 'Delhi, India',
-      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      timeAgo: '1 day ago',
-      isRevealed: false
-    },
-    {
-      id: '3',
-      name: 'Anjali',
-      age: 26,
-      location: 'Bangalore, India',
-      avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      timeAgo: '3 days ago',
-      isRevealed: false
-    }
-  ]);
+
+  // Enhanced user stats for ULTRA+ users
+  const [userStats, setUserStats] = useState({
+    totalChats: 0,
+    totalFriends: 0,
+    premiumSince: new Date(),
+    totalReactions: 0,
+    avgChatDuration: 0,
+    favoriteFeatures: ['Face Filters', 'Premium Reactions', 'Unlimited Time']
+  });
 
   useEffect(() => {
-    if (!user) return;
+    // Load user data from localStorage
+    const savedUsername = localStorage.getItem("ajnabicam_username");
+    const savedProfileImage = localStorage.getItem("ajnabicam_profile_image");
+    const savedReferralCode = localStorage.getItem("ajnabicam_referral_code");
 
-    const userRef = doc(db, "users", user.uid);
+    if (savedUsername) setUsername(savedUsername);
+    if (savedProfileImage) setProfileImage(savedProfileImage);
+    if (savedReferralCode) {
+      setReferralCode(savedReferralCode);
+    } else {
+      // Generate referral code if not exists
+      const newCode = generateReferralCode();
+      setReferralCode(newCode);
+      localStorage.setItem("ajnabicam_referral_code", newCode);
+    }
 
-    // Real-time listener
-    const unsubscribe = onSnapshot(userRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setName(data.username || data.name || "Love");
-        setAge(data.age || 25);
-        setLocation(data.location || "Beverly Hills, CA");
-        setProfession(data.profession || "Model & Influencer");
-        setBio(data.bio || "Life is an adventure, let's explore it together! ✨");
-        setInterests(data.interests || ["Often", "Sociale drinker", "Never", "Pisces"]);
-        if (data.profileImage) {
-          setProfileImage(data.profileImage);
-        }
-        setProfileViews(data.profileViews || Math.floor(Math.random() * 300) + 100);
-      }
-      setLoading(false);
+    // Load user stats for ULTRA+ users
+    if (isUltraPremium()) {
+      loadUserStats();
+    }
+  }, [isUltraPremium]);
+
+  const generateReferralCode = (): string => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase() + Math.floor(Math.random() * 1000);
+  };
+
+  const loadUserStats = () => {
+    // In a real app, this would load from Firestore
+    setUserStats({
+      totalChats: Math.floor(Math.random() * 100) + 50,
+      totalFriends: Math.floor(Math.random() * 30) + 10,
+      premiumSince: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000), // Random date within 90 days
+      totalReactions: Math.floor(Math.random() * 200) + 50,
+      avgChatDuration: Math.floor(Math.random() * 20) + 5,
+      favoriteFeatures: ['Face Filters', 'Premium Reactions', 'Unlimited Time']
     });
+  };
 
-    return () => unsubscribe();
-  }, [user]);
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
-  // Increment profile views for the current user (simulate views)
-  useEffect(() => {
-    if (user) {
-      const timer = setTimeout(() => {
-        const userRef = doc(db, "users", user.uid);
-        updateDoc(userRef, {
-          profileViews: increment(1)
-        }).catch(() => {
-          // Silently fail if document doesn't exist
-        });
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [user]);
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  // Check ad services status
-  useEffect(() => {
-    const checkAdStatus = async () => {
-      try {
-        // Check Unity Ads
-        const unityReady = unityAdsService.isReady('rewarded');
-
-        // Check AdMob
-        const admobReady = adMobService.isInitialized();
-
-        setAdStatus({
-          unityReady,
-          admobReady,
-          checking: false
-        });
-
-        console.log('🎯 Ad Status Check:', {
-          unityReady,
-          admobReady,
-          unityInitialized: await unityAdsService.initialize(),
-          admobInitialized: await adMobService.initialize()
-        });
-      } catch (error) {
-        console.error('Ad status check failed:', error);
-        setAdStatus({
-          unityReady: false,
-          admobReady: false,
-          checking: false
-        });
-      }
-    };
-
-    checkAdStatus();
-  }, []);
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    setUploadingImage(true);
+    setIsUploading(true);
     setUploadProgress(0);
+    setUploadError("");
 
     try {
-      const result = await uploadProfileImage(
-        file,
-        user.uid,
-        (progress) => setUploadProgress(progress)
-      );
-
-      setProfileImage(result.url);
-
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        profileImage: result.url,
-        profileImagePath: result.path,
-        updatedAt: new Date()
+      const userId = getUserId();
+      const result = await uploadProfileImage(file, userId, (progress) => {
+        setUploadProgress(progress);
       });
 
-      console.log("Profile image uploaded successfully!");
-    } catch (error) {
+      setProfileImage(result.url);
+      localStorage.setItem("ajnabicam_profile_image", result.url);
+      localStorage.setItem("ajnabicam_profile_path", result.path);
+
+      console.log("Profile image uploaded successfully:", result.url);
+    } catch (error: any) {
       console.error("Error uploading profile image:", error);
-      alert("Failed to upload image. Please try again.");
+      const errorMessage = getStorageErrorMessage(error);
+      setUploadError(errorMessage);
     } finally {
-      setUploadingImage(false);
+      setIsUploading(false);
       setUploadProgress(0);
     }
   };
 
-  const handleRevealLike = (likeId: string) => {
-    setLikesData(prev => prev.map(like =>
-      like.id === likeId ? { ...like, isRevealed: true } : like
-    ));
+  const handleUsernameChange = (newUsername: string) => {
+    setUsername(newUsername);
+    localStorage.setItem("ajnabicam_username", newUsername);
   };
 
-  const handleShowLikes = () => {
-    if (isPremium) {
-      // Premium users can see all likes immediately
-      setLikesData(prev => prev.map(like => ({ ...like, isRevealed: true })));
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(referralCode).then(() => {
+      alert("📋 Referral code copied to clipboard!");
+    }).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = referralCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("📋 Referral code copied!");
+    });
+  };
+
+  const shareReferralCode = () => {
+    const shareText = `Join me on AjnabiCam! Use my referral code: ${referralCode} to unlock 24h Premium. https://ajnabicam.com`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: "Join AjnabiCam",
+        text: shareText,
+        url: "https://ajnabicam.com"
+      });
+    } else {
+      // Fallback to WhatsApp
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`);
     }
-    setShowLikesModal(true);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-passion-50 via-romance-25 to-bollywood-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-600 mb-4">Please log in first</h2>
-          <Button onClick={() => navigate("/onboarding")} className="bg-romance-500 text-white">
-            Go to Login
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const handleSettingsClick = (type: 'privacy' | 'notifications' | 'account' | 'general') => {
+    setSettingType(type);
+    setShowSettingsModal(true);
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-passion-50 via-romance-25 to-bollywood-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-romance-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleProfileUpdate = (updates: any) => {
+    // Handle profile updates for ULTRA+ users
+    console.log('Profile updates:', updates);
+    // In a real app, this would update Firestore
+  };
 
   return (
-    <UltraPageTransition>
-      <div className={`min-h-screen ${
-        isUltraPremium() 
-          ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90' 
-          : 'bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50'
-      } pb-24 relative overflow-hidden`}>
-      {/* Enhanced Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-6 left-6 w-16 h-16 bg-gradient-to-br from-sindoor-300 to-henna-400 opacity-15 animate-float rounded-full blur-sm"></div>
-        <div className="absolute top-32 right-8 w-12 h-12 bg-gradient-to-br from-royal-300 to-gulmohar-400 opacity-25 animate-pulse rounded-full"></div>
-        <div className="absolute bottom-40 left-8 w-10 h-10 bg-gradient-to-br from-jasmine-300 to-sindoor-400 opacity-20 animate-bounce rounded-full" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-64 right-12 w-8 h-8 bg-gradient-to-br from-passion-400 to-royal-400 opacity-15 animate-float rounded-full" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-48 left-12 w-6 h-6 bg-gradient-to-br from-coral-400 to-blush-400 opacity-30 animate-pulse rounded-full" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute top-72 right-16 w-14 h-14 bg-gradient-to-br from-peach-300 to-coral-400 opacity-10 animate-bounce rounded-full blur-sm" style={{ animationDelay: '1.5s' }}></div>
-      </div>
+    <>
+      <Helmet>
+        <title>AjnabiCam - Profile</title>
+      </Helmet>
+      <UltraPageTransition>
+        <main className={`flex flex-col min-h-screen w-full ${
+          isUltraPremium() 
+            ? 'max-w-full' 
+            : 'max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl'
+        } mx-auto ${
+          isUltraPremium() 
+            ? 'bg-gradient-to-br from-white/95 via-purple-50/90 to-pink-50/90' 
+            : 'bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50'
+        } px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 relative pb-20 sm:pb-24 lg:pb-28`}>
 
-      {/* Enhanced Header with floating elements */}
-      <div className={`${
-        isUltraPremium()
-          ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700'
-          : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
-      } px-6 py-4 flex items-center justify-between border-b ${
-        isUltraPremium() ? 'border-purple-300' : 'border-peach-200'
-      } sticky top-0 z-50 shadow-xl relative overflow-hidden backdrop-blur-md`}>
-        {/* Floating header particles */}
-        <div className="absolute top-2 left-20 w-1 h-1 bg-white/60 rounded-full animate-pulse"></div>
-        <div className="absolute top-6 right-32 w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-2 left-1/3 w-1 h-1 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-jasmine-100/25 to-white/15 backdrop-blur-sm"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
-        
-{isUltraPremium() ? (
-          <div className="relative z-10 flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
+          {/* Enhanced Animated Background Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-6 left-6 w-12 h-12 bg-gradient-to-br from-peach-300 to-coral-400 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute top-20 right-4 w-10 h-10 bg-gradient-to-br from-coral-300 to-blush-400 rounded-full opacity-30 animate-bounce"></div>
+            <div
+              className="absolute bottom-32 left-4 w-8 h-8 bg-gradient-to-br from-blush-300 to-peach-400 rounded-full opacity-25 animate-pulse"
+              style={{ animationDelay: "1s" }}
+            ></div>
+            <div
+              className="absolute bottom-48 right-8 w-6 h-6 bg-gradient-to-br from-cream-400 to-coral-400 rounded-full opacity-20 animate-bounce"
+              style={{ animationDelay: "2s" }}
+            ></div>
+            {/* Add romantic symbols */}
+            <div
+              className="absolute top-16 right-16 text-coral-400 text-lg opacity-40 animate-pulse"
+              style={{ animationDelay: "0.5s" }}
             >
-              <ArrowLeft size={20} className="text-white group-hover:scale-110 transition-transform" />
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
-                <Crown size={16} className="text-white" />
-              </div>
-              <span className="text-lg font-bold text-white drop-shadow-lg tracking-wide">AjnabiCam</span>
+              💕
+            </div>
+            <div
+              className="absolute bottom-64 left-12 text-peach-400 text-base opacity-35 animate-bounce"
+              style={{ animationDelay: "1.5s" }}
+            >
+              🌸
+            </div>
+            <div
+              className="absolute top-48 left-6 text-blush-400 text-sm opacity-30 animate-pulse"
+              style={{ animationDelay: "2.5s" }}
+            >
+              ✨
             </div>
           </div>
-        ) : (
-          <button
-            onClick={() => navigate(-1)}
-            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
-          >
-            <ArrowLeft size={22} className="text-white group-hover:scale-110 transition-transform" />
-          </button>
-        )}
 
-        <h1 className="relative z-10 text-xl font-bold text-white drop-shadow-lg tracking-wide">My Profile</h1>
+          {/* Header */}
+          <div className={`w-full flex items-center p-4 sm:p-5 md:p-6 ${
+            isUltraPremium() 
+              ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700' 
+              : 'bg-gradient-to-r from-peach-400 via-coral-400 to-blush-500'
+          } text-white font-bold text-lg sm:text-xl md:text-2xl rounded-t-3xl sm:rounded-t-2xl shadow-lg relative overflow-hidden`}>
+            {/* Header Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-cream-100/25 to-white/15 backdrop-blur-sm"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-peach-200/15 to-transparent"></div>
 
-        <div className="relative" ref={shareMenuRef}>
-          <button
-            onClick={() => setShowShareMenu(!showShareMenu)}
-            className="relative z-10 p-3 hover:bg-white/20 transition-all duration-200 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center group"
-          >
-            <MoreHorizontal size={22} className="text-white group-hover:scale-110 transition-transform" />
-          </button>
-
-          {/* Share Menu Dropdown */}
-          {showShareMenu && (
-            <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 min-w-[200px] z-50 animate-slideDown">
-              <button
-                onClick={() => {
-                  navigate('/premium');
-                  setShowShareMenu(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-              >
-                <Settings className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-800">Settings</span>
-              </button>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert('Profile link copied!');
-                  setShowShareMenu(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-              >
-                <Copy className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-800">Copy Link</span>
-              </button>
-              <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: 'My Profile',
-                      text: `Check out my profile on AjnabiCam!`,
-                      url: window.location.href
-                    });
-                  }
-                  setShowShareMenu(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-              >
-                <Share2 className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-800">Share Profile</span>
-              </button>
-              <button
-                onClick={() => {
-                  alert('Profile saved!');
-                  setShowShareMenu(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-              >
-                <Bookmark className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-800">Save Profile</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className={`${
-        isUltraPremium() ? 'max-w-2xl' : 'max-w-sm'
-      } mx-auto px-6 py-8 space-y-8`}>
-        {/* Enhanced Profile Image Section */}
-        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 overflow-hidden relative group hover:shadow-3xl transition-all duration-500">
-          <div className="relative h-[55vh] overflow-hidden">
-            {/* Gradient overlay for better text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
-            
-            {profileImage ? (
-              <img
-                src={profileImage}
-                alt="Profile"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-romance-300 via-passion-300 to-royal-300 flex items-center justify-center">
-                <div className="text-center text-white z-20 relative">
-                  <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30">
-                    <span className="text-4xl font-bold">{name.charAt(0)}</span>
-                  </div>
-                  <p className="text-white/90 font-medium">Tap to add photo</p>
-                  <p className="text-white/70 text-sm mt-1">Show your best self!</p>
-                </div>
-              </div>
-            )}
-
-            {/* Enhanced Upload overlay */}
-            {uploadingImage && (
-              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-30">
-                <div className="text-center text-white bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/30 border-t-white mx-auto mb-4"></div>
-                  <p className="text-lg font-semibold mb-2">Uploading...</p>
-                  <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-peach-400 to-coral-500 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-white/80 mt-2">{uploadProgress}% complete</p>
-                </div>
-              </div>
-            )}
-
-            {/* Enhanced Camera button */}
             <button
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute top-6 right-6 bg-black/30 backdrop-blur-md p-3 rounded-full hover:bg-black/50 transition-all duration-200 border border-white/20 z-20 group/camera shadow-lg"
-              disabled={uploadingImage}
+              onClick={handleBackClick}
+              className="relative z-10 mr-3 sm:mr-4 text-white font-bold text-xl hover:scale-110 transition-transform p-3 sm:p-2 rounded-full hover:bg-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
-              <Camera size={20} className="text-white group-hover/camera:scale-110 transition-transform" />
+              <ArrowLeft size={20} className="sm:w-6 sm:h-6" />
             </button>
-            
-            {/* Add Photo hint for empty profile */}
-            {!profileImage && (
-              <div className="absolute bottom-6 left-6 right-6 z-20">
-                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Plus size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-white font-semibold">Add your first photo</p>
-                      <p className="text-white/80 text-sm">Stand out with a great profile picture</p>
-                    </div>
-                  </div>
+            <h1 className="relative z-10 flex-grow text-center drop-shadow-lg font-semibold">{t('profile.title')}</h1>
+            <div className="relative z-10 flex items-center gap-2">
+              {isPremium && (
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${
+                  isUltraPremium() 
+                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500' 
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                }`}>
+                  <Crown className="h-3 w-3 text-white" />
+                  <span className="text-white text-xs font-bold">
+                    {isUltraPremium() ? 'ULTRA+' : 'PRO'}
+                  </span>
                 </div>
-              </div>
-            )}
-
-            {/* Enhanced Profile Views Badge */}
-            {isPremium && (
-              <div className="absolute top-6 left-6 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 z-20">
-                <Eye size={16} className="text-white" />
-                <span className="text-white text-sm font-bold">{profileViews.toLocaleString()}</span>
-                <span className="text-white/80 text-xs">views</span>
-              </div>
-            )}
-
-            {/* Enhanced Premium Badge */}
-            {isPremium && (
-              <div className="absolute top-20 left-6 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg z-20">
-                <Crown className="w-4 h-4 text-yellow-900 animate-bounce" />
-                <span className="text-yellow-900 text-xs font-bold tracking-wide">PREMIUM</span>
-              </div>
-            )}
-
-            {/* Mood Indicator */}
-            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 z-20">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-white text-sm font-medium">Feeling Great</span>
-                <Smile className="w-4 h-4 text-white" />
-              </div>
+              )}
             </div>
-
-            {/* Streak Counter */}
-            <div className="absolute bottom-6 left-6 bg-orange-500/20 backdrop-blur-md px-3 py-2 rounded-full border border-orange-300/30 z-20">
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-orange-400" />
-                <span className="text-white text-sm font-bold">7 Day Streak</span>
-              </div>
-            </div>
-            
-            {/* Profile completion indicator with animation */}
-            <div className="absolute bottom-6 right-6 z-20 group cursor-pointer">
-              <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <div className="relative w-8 h-8">
-                  <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
-                    <circle
-                      cx="16"
-                      cy="16"
-                      r="14"
-                      stroke="rgba(255,255,255,0.3)"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                    <circle
-                      cx="16"
-                      cy="16"
-                      r="14"
-                      stroke="white"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeDasharray={`${85 * 0.85} 85`}
-                      className="transition-all duration-500 group-hover:stroke-yellow-300"
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold group-hover:scale-110 transition-transform">85%</span>
-                </div>
-              </div>
-              {/* Completion tooltip */}
-              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">
-                Complete your profile
-              </div>
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
           </div>
-        </Card>
 
-        {/* Enhanced User Information Section */}
-        <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 relative z-10 hover:shadow-3xl transition-all duration-300">
-          <CardContent className="p-8">
-            {/* Enhanced Name and Age */}
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-gray-900 text-4xl font-bold tracking-tight">{name}</h2>
-                  <span className="text-gray-600 text-2xl font-light">{age}</span>
-                  {isPremium && (
-                    <div className="bg-gradient-to-r from-yellow-400 to-amber-500 p-1 rounded-full">
-                      <Crown size={16} className="text-yellow-900" />
-                    </div>
+          <div className={`w-full flex flex-col ${
+            isUltraPremium() 
+              ? 'bg-white/90 backdrop-blur-lg border border-purple-200' 
+              : 'bg-white border border-peach-200'
+          } rounded-b-3xl sm:rounded-b-2xl shadow-xl mb-4 sm:mb-6 overflow-hidden relative z-10`}>
+
+            {/* Premium Status Section */}
+            {isPremium ? (
+              <div className={`p-4 sm:p-5 md:p-6 ${
+                isUltraPremium() 
+                  ? 'bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100' 
+                  : 'bg-gradient-to-r from-green-100 via-emerald-100 to-green-100'
+              } border-b ${
+                isUltraPremium() ? 'border-purple-200' : 'border-green-200'
+              }`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-10 h-10 ${
+                    isUltraPremium() 
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                      : 'bg-gradient-to-r from-green-500 to-emerald-500'
+                  } rounded-full flex items-center justify-center shadow-lg`}>
+                    {isUltraPremium() ? (
+                      <Gem className="h-5 w-5 text-white" />
+                    ) : (
+                      <Crown className="h-5 w-5 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className={`font-bold text-lg ${
+                      isUltraPremium() ? 'text-purple-800' : 'text-green-800'
+                    }`}>
+                      {t('profile.premium.active')}
+                    </h3>
+                    <p className={`text-sm ${
+                      isUltraPremium() ? 'text-purple-600' : 'text-green-600'
+                    }`}>
+                      {t('profile.premium.enjoying')}
+                    </p>
+                  </div>
+                  {premiumPlan && (
+                    <PremiumBadge 
+                      plan={premiumPlan as 'ultra-quarterly' | 'pro-monthly' | 'weekly'} 
+                      size="md" 
+                    />
                   )}
                 </div>
-                <div className="flex items-center gap-2 text-gray-600 mb-3">
-                  <MapPin size={18} className="text-coral-500" />
-                  <span className="text-base font-medium">{location}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-green-600 font-medium">Online now</span>
-                </div>
-              </div>
-
-              <button className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 p-3 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
-                <Edit3 size={18} className="text-gray-600" />
-              </button>
-            </div>
-
-            {/* Enhanced Bio */}
-            <div className="bg-gradient-to-r from-peach-50 to-coral-50 p-4 rounded-2xl mb-6 border border-peach-100">
-              <p className="text-gray-800 text-base leading-relaxed italic">"{bio}"</p>
-            </div>
-
-            {/* Enhanced Profession */}
-            <div className="flex items-center gap-3 text-gray-700 mb-6 bg-gray-50 p-3 rounded-xl">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <Briefcase size={18} className="text-blue-600" />
-              </div>
-              <div>
-                <span className="text-base font-semibold">{profession}</span>
-                <p className="text-sm text-gray-500">Professional</p>
-              </div>
-            </div>
-
-            {/* Enhanced Interest Tags */}
-            <div className="mb-6">
-              <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
-                <Heart size={16} className="text-coral-500" />
-                Interests
-              </h3>
-              <div className="flex flex-wrap gap-3">
-                {interests.map((interest, index) => (
-                  <span
-                    key={index}
-                    className="bg-gradient-to-r from-peach-100 to-coral-100 px-4 py-2 text-coral-700 text-sm font-semibold rounded-full border border-coral-200 hover:shadow-md transition-all duration-200 cursor-default"
-                  >
-                    {interest}
-                  </span>
-                ))}
-                <button className="bg-gray-100 hover:bg-gray-200 px-4 py-2 text-gray-500 text-sm font-medium rounded-full border-2 border-dashed border-gray-300 transition-all duration-200">
-                  <Plus size={14} className="inline mr-1" />
-                  Add more
-                </button>
-              </div>
-            </div>
-
-            {/* Enhanced Action Buttons */}
-            <div className="flex gap-4">
-              <Button
-                onClick={() => {
-                  // Edit profile functionality
-                  alert('Edit profile feature coming soon!');
-                }}
-                className="flex-1 bg-gradient-to-r from-peach-500 via-coral-500 to-blush-600 hover:from-peach-600 hover:via-coral-600 hover:to-blush-700 text-white font-bold py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-              >
-                <Edit3 className="w-5 h-5 mr-2" />
-                Edit Profile
-              </Button>
-
-              <Button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: 'My Profile',
-                      text: `Check out my profile on AjnabiCam!`,
-                      url: window.location.href
-                    });
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert('Profile link copied to clipboard!');
-                  }
-                }}
-                className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-bold px-6 py-4 border-0 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-              >
-                <Users className="w-5 h-5" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Enhanced Profile Stats Cards */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              {isPremium ? (
-                <>
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
-                    <Eye className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-blue-700 mb-1">{profileViews.toLocaleString()}</div>
-                  <div className="text-sm text-blue-600 font-medium">Profile Views</div>
-                  <div className="text-xs text-blue-500 mt-1">+12 today</div>
-                </>
-              ) : (
-                <>
-                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative">
-                    <Eye className="w-6 h-6 text-gray-400" />
-                    <Crown className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-bounce" />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-400 mb-1">***</div>
-                  <div className="text-sm text-gray-400 font-medium">Premium Only</div>
-                  <div className="text-xs text-yellow-600 mt-1">Upgrade to see</div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
-                <Users className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="text-2xl font-bold text-green-700 mb-1">23</div>
-              <div className="text-sm text-green-600 font-medium">Friends</div>
-              <div className="text-xs text-green-500 mt-1">+2 this week</div>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="bg-white/95 backdrop-blur-md shadow-lg border-0 cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
-            onClick={handleShowLikes}
-          >
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-rose-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md relative group-hover:scale-110 transition-transform">
-                <Heart className="w-6 h-6 text-pink-600 group-hover:animate-pulse" />
-                {!isPremium && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">!</span>
+                
+                {isUltraPremium() && (
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="bg-white/50 rounded-lg p-2">
+                      <div className="text-lg font-bold text-purple-700">{userStats.totalChats}</div>
+                      <div className="text-xs text-purple-600">Total Chats</div>
+                    </div>
+                    <div className="bg-white/50 rounded-lg p-2">
+                      <div className="text-lg font-bold text-purple-700">{userStats.totalFriends}</div>
+                      <div className="text-xs text-purple-600">Friends</div>
+                    </div>
+                    <div className="bg-white/50 rounded-lg p-2">
+                      <div className="text-lg font-bold text-purple-700">{userStats.totalReactions}</div>
+                      <div className="text-xs text-purple-600">Reactions</div>
+                    </div>
                   </div>
                 )}
               </div>
-              <div className="text-2xl font-bold text-pink-700 mb-1">
-                {isPremium ? likesData.length : '?'}
-              </div>
-              <div className="text-sm text-pink-600 font-medium">
-                {isPremium ? 'Secret Likes' : 'Tap to Reveal'}
-              </div>
-              <div className="text-xs text-pink-500 mt-1">
-                {isPremium ? 'New matches!' : 'Premium feature'}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-yellow-100 to-amber-200 flex items-center justify-center mx-auto mb-3 rounded-2xl shadow-md">
-                <Star className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div className="text-2xl font-bold text-yellow-700 mb-1">{coins.toLocaleString()}</div>
-              <div className="text-sm text-yellow-600 font-medium">Coins</div>
-              <div className="text-xs text-yellow-500 mt-1">Earn more!</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Enhanced Activity Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
-                <MessageCircle className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="text-lg font-bold text-purple-700">156</div>
-              <div className="text-xs text-purple-600 font-medium">Chats</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
-                <Calendar className="w-5 h-5 text-orange-600" />
-              </div>
-              <div className="text-lg font-bold text-orange-700">7</div>
-              <div className="text-xs text-orange-600 font-medium">Days</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center mx-auto mb-2 rounded-xl shadow-sm">
-                <Zap className="w-5 h-5 text-emerald-600" />
-              </div>
-              <div className="text-lg font-bold text-emerald-700">98%</div>
-              <div className="text-xs text-emerald-600 font-medium">Match</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Premium Ad-Free Experience Indicator */}
-        {(isUltraPremium() || isProMonthly()) && (
-          <div className="space-y-4 bg-gradient-to-r from-green-50 to-emerald-100 p-6 rounded-2xl border border-green-200">
-            <h3 className="text-green-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
-              ✨ Premium Ad-Free Experience
-              <Crown className="w-5 h-5 text-yellow-600" />
-            </h3>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <p className="text-green-700 font-semibold mb-2">
-                {isUltraPremium() ? 'ULTRA+ Member' : 'Pro Monthly Member'}
-              </p>
-              <p className="text-green-600 text-sm">
-                Enjoy an ad-free experience with no interruptions!
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Ad Testing Section - Hidden for Premium Users */}
-        {!isUltraPremium() && !isProMonthly() && (
-        <div className="space-y-4 bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
-          <h3 className="text-gray-800 font-bold text-center mb-4 flex items-center justify-center gap-2">
-            📱 Ad Testing Zone
-            {adStatus.checking && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>}
-          </h3>
-
-          {/* Ad Service Status */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className={`p-3 rounded-xl text-center ${adStatus.unityReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <div className={`w-3 h-3 rounded-full ${adStatus.unityReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-                <span className="text-sm font-semibold">Unity Ads</span>
-              </div>
-              <span className="text-xs">{adStatus.unityReady ? '✅ Ready' : '❌ Not Ready'}</span>
-            </div>
-            <div className={`p-3 rounded-xl text-center ${adStatus.admobReady ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <div className={`w-3 h-3 rounded-full ${adStatus.admobReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-                <span className="text-sm font-semibold">AdMob</span>
-              </div>
-              <span className="text-xs">{adStatus.admobReady ? '✅ Ready' : '❌ Not Ready'}</span>
-            </div>
-          </div>
-
-          {/* Banner Ad Test */}
-          <div>
-            <p className="text-sm text-gray-600 mb-2 font-semibold">🎯 Banner Ad Test:</p>
-            <BannerAd size="responsive" position="inline" className="border-2 border-dashed border-blue-300 bg-white rounded-xl" />
-          </div>
-
-          {/* Rewarded Ad Test */}
-          <div>
-            <p className="text-sm text-gray-600 mb-2 font-semibold">💰 Rewarded Ad Test:</p>
-            <RewardedAdButton
-              variant="premium"
-              onRewardEarned={(amount) => {
-                console.log(`Earned ${amount} coins!`);
-                alert(`🎉 Success! You earned ${amount} coins from the ad!`);
-              }}
-              preferUnity={true}
-            />
-          </div>
-
-          {/* Ad Testing Page Link */}
-          <Button
-            onClick={() => navigate('/ad-testing')}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
-          >
-            🧪 Full Ad Testing Dashboard
-          </Button>
-
-          {/* Quick Status Info */}
-          <div className="text-center text-xs text-gray-500 mt-2">
-            {adStatus.checking ? 'Checking ad services...' :
-             adStatus.unityReady || adStatus.admobReady ? 'Ad services are working!' :
-             'Ad services need initialization'}
-          </div>
-        </div>
-        )}
-
-        {/* Mode Testing Panel - Comprehensive Subscription Testing */}
-        <ModeTestingPanel
-          onModeChange={(mode) => {
-            console.log(`🔄 Switched to ${mode} mode`);
-            // Force refresh to show changes
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
-          }}
-        />
-
-        {/* Enhanced Additional Actions */}
-        <div className="space-y-6">
-          {!isPremium && (
-            <Button
-              onClick={() => navigate('/premium')}
-              className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-5 shadow-2xl rounded-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer"></div>
-              <Crown className="w-6 h-6 mr-3 animate-bounce" />
-              <span className="text-lg">Unlock Premium Features</span>
-              <Sparkles className="w-5 h-5 ml-3" />
-            </Button>
-          )}
-          
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              onClick={() => navigate('/chat')}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Messages
-            </Button>
-            
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              <Users className="w-5 h-5 mr-2" />
-              Discover
-            </Button>
-          </div>
-          
-          {/* Navigation Tabs */}
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-2">
-            <div className="flex space-x-2">
-              {[
-                { id: 'overview', label: 'Overview', icon: User },
-                { id: 'achievements', label: 'Achievements', icon: Trophy },
-                { id: 'activity', label: 'Activity', icon: Activity },
-                { id: 'social', label: 'Social', icon: Share2 }
-              ].map((tab) => {
-                const IconComponent = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setSelectedTab(tab.id);
-                      setAnimationKey(prev => prev + 1);
-                    }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                      selectedTab === tab.id
-                        ? 'bg-gradient-to-r from-coral-500 to-peach-500 text-white shadow-lg transform scale-105'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
-                    }`}
-                  >
-                    <IconComponent size={16} />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <div key={animationKey} className="animate-fadeIn">
-            {selectedTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Quick Interest Actions */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl">
-                  <h3 className="text-gray-800 font-bold mb-4 text-center">Quick Actions</h3>
-                  <div className="grid grid-cols-4 gap-3">
-                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                      <Coffee className="w-6 h-6 text-amber-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600 font-medium">Coffee</span>
-                    </button>
-                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                      <Music className="w-6 h-6 text-purple-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600 font-medium">Music</span>
-                    </button>
-                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                      <Book className="w-6 h-6 text-blue-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600 font-medium">Books</span>
-                    </button>
-                    <button className="bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-center group">
-                      <Plane className="w-6 h-6 text-green-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs text-gray-600 font-medium">Travel</span>
-                    </button>
+            ) : (
+              <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 border-b border-purple-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Crown className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-purple-800">{t('profile.premium.upgrade')}</h3>
+                    <p className="text-sm text-purple-600">{t('profile.premium.unlock')}</p>
                   </div>
                 </div>
-
-                {/* Profile Strength */}
-                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-gray-800 font-bold flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-green-500" />
-                        Profile Strength
-                      </h3>
-                      <span className="text-2xl font-bold text-green-600">85%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full" style={{ width: '85%' }}></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-gray-600">Profile Photo</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-gray-600">Bio Added</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-gray-600">Interests</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                        <span className="text-gray-400">Verification</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {selectedTab === 'achievements' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-gray-800 font-bold text-lg">Achievements</h3>
-                  <span className="text-sm text-gray-600">{achievements.filter(a => a.completed).length}/{achievements.length} unlocked</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-purple-700">
+                  <div>{t('profile.premium.features.gender')}</div>
+                  <div>{t('profile.premium.features.voice')}</div>
+                  <div>{t('profile.premium.features.unlimited')}</div>
                 </div>
-                {achievements.map((achievement) => {
-                  const IconComponent = achievement.icon;
-                  return (
-                    <Card key={achievement.id} className={`bg-white/95 backdrop-blur-md shadow-lg border-0 transition-all duration-300 ${
-                      achievement.completed ? 'border-l-4 border-l-green-500' : 'opacity-75'
-                    }`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                            achievement.completed
-                              ? 'bg-gradient-to-br from-yellow-100 to-amber-200'
-                              : 'bg-gray-100'
-                          }`}>
-                            <IconComponent className={`w-6 h-6 ${
-                              achievement.completed ? 'text-yellow-600' : 'text-gray-400'
-                            }`} />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className={`font-semibold ${
-                              achievement.completed ? 'text-gray-800' : 'text-gray-500'
-                            }`}>{achievement.title}</h4>
-                            <p className="text-sm text-gray-600">{achievement.description}</p>
-                            {achievement.completed && achievement.date && (
-                              <p className="text-xs text-green-600 mt-1">Completed on {achievement.date}</p>
-                            )}
-                            {!achievement.completed && achievement.progress && (
-                              <div className="mt-2">
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div
-                                    className="bg-gradient-to-r from-coral-500 to-peach-500 h-2 rounded-full transition-all duration-500"
-                                    style={{ width: `${achievement.progress}%` }}
-                                  ></div>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">{achievement.progress}% complete</p>
-                              </div>
-                            )}
-                          </div>
-                          {achievement.completed && (
-                            <div className="text-green-500">
-                              <Verified size={20} />
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-
-            {selectedTab === 'activity' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-gray-800 font-bold text-lg">Recent Activity</h3>
-                  <button className="text-coral-500 text-sm font-medium">View All</button>
-                </div>
-                {recentActivity.map((activity) => (
-                  <Card key={activity.id} className="bg-white/95 backdrop-blur-md shadow-lg border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        {activity.avatar ? (
-                          <img src={activity.avatar} alt={activity.user} className="w-10 h-10 rounded-full object-cover" />
-                        ) : (
-                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                            <Eye className="w-5 h-5 text-gray-500" />
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            {activity.type === 'match' && <Heart className="w-4 h-4 text-red-500" />}
-                            {activity.type === 'like' && <ThumbsUp className="w-4 h-4 text-blue-500" />}
-                            {activity.type === 'view' && <Eye className="w-4 h-4 text-gray-500" />}
-                            {activity.type === 'chat' && <MessageCircle className="w-4 h-4 text-green-500" />}
-                            <span className="text-sm font-medium text-gray-800">
-                              {activity.type === 'match' && `New match with ${activity.user}`}
-                              {activity.type === 'like' && `${activity.user} liked your profile`}
-                              {activity.type === 'view' && 'Someone viewed your profile'}
-                              {activity.type === 'chat' && `New message from ${activity.user}`}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500">{activity.time}</span>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            {selectedTab === 'social' && (
-              <div className="space-y-6">
-                {/* Social Links */}
-                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
-                  <CardContent className="p-6">
-                    <h3 className="text-gray-800 font-bold mb-4">Connect Your Socials</h3>
-                    <div className="space-y-3">
-                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl border border-pink-200 hover:shadow-md transition-all duration-200">
-                        <div className="flex items-center gap-3">
-                          <Instagram className="w-5 h-5 text-pink-600" />
-                          <span className="font-medium text-gray-800">Instagram</span>
-                        </div>
-                        <Plus className="w-4 h-4 text-gray-400" />
-                      </button>
-                      <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
-                        <div className="flex items-center gap-3">
-                          <Twitter className="w-5 h-5 text-blue-600" />
-                          <span className="font-medium text-gray-800">Twitter</span>
-                        </div>
-                        <Plus className="w-4 h-4 text-gray-400" />
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Share Profile */}
-                <Card className="bg-white/95 backdrop-blur-md shadow-lg border-0">
-                  <CardContent className="p-6">
-                    <h3 className="text-gray-800 font-bold mb-4">Share Your Profile</h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      <button className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
-                        <Link className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-medium text-blue-600">Copy Link</span>
-                      </button>
-                      <button className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
-                        <Send className="w-6 h-6 text-green-600" />
-                        <span className="text-xs font-medium text-green-600">Share</span>
-                      </button>
-                      <button className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
-                        <Download className="w-6 h-6 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-600">QR Code</span>
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Profile Analytics */}
-                {isPremium && (
-                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200">
-                    <CardContent className="p-6">
-                      <h3 className="text-gray-800 font-bold mb-4 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-purple-600" />
-                        Profile Analytics
-                      </h3>
-                      <div className="grid grid-cols-2 gap-4 text-center">
-                        <div>
-                          <div className="text-2xl font-bold text-purple-700">2.3K</div>
-                          <div className="text-sm text-purple-600">Total Reach</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-pink-700">86%</div>
-                          <div className="text-sm text-pink-600">Engagement</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ULTRA+ Profile Enhancements */}
-      {isUltraPremium() && (
-        <UltraProfileEnhancements
-          isUltraPremium={true}
-          userProfile={{
-            name: name,
-            bio: bio,
-            profileImage: profileImage || undefined,
-            premiumSince: new Date('2024-01-15'), // Example date
-            totalFriends: 25,
-            totalChats: 150,
-            premiumFeatureUsage: {
-              reactionsUsed: 89,
-              filtersUsed: 15,
-              adsFree: 45,
-              unlimitedTime: 120
-            }
-          }}
-          onProfileUpdate={(updates) => {
-            console.log('Profile updates:', updates);
-            // Handle profile updates
-          }}
-        />
-      )}
-
-      {/* Debug: Test ULTRA+ Features */}
-      {!isUltraPremium() && (
-        <div className="px-4 mb-4">
-          <Button
-            onClick={() => {
-              const expiry = new Date();
-              expiry.setMonth(expiry.getMonth() + 3);
-              setPremium(true, expiry, 'ultra-quarterly');
-              alert('🎉 ULTRA+ activated for testing! Refresh to see changes.');
-              window.location.reload();
-            }}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-lg shadow-md transition-colors"
-          >
-            <Crown className="h-4 w-4 mr-2" />
-            🧪 Test ULTRA+ Features (Debug)
-          </Button>
-        </div>
-      )}
-
-      {/* Floating Action Menu */}
-      <div className="fixed bottom-24 right-6 z-40">
-        <div className="relative">
-          {/* Secondary Action Buttons */}
-          {showFloatingMenu && (
-            <div className="absolute bottom-16 right-0 space-y-3 animate-slideUp">
-              <button
-                onClick={() => navigate('/ai-chatbot')}
-                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
-              >
-                <Bot className="w-5 h-5 text-white group-hover:animate-bounce" />
-              </button>
-              <button
-                onClick={() => setShowNotifications(true)}
-                className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group relative"
-              >
-                <Bell className="w-5 h-5 text-white group-hover:animate-wiggle" />
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">{notifications.filter(n => !n.read).length}</span>
-                  </div>
-                )}
-              </button>
-              <button
-                onClick={() => setShowMoodSelector(true)}
-                className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transform hover:scale-110 transition-all duration-200 group"
-              >
-                <Smile className="w-5 h-5 text-white group-hover:animate-heartbeat" />
-              </button>
-            </div>
-          )}
-
-          {/* Main FAB */}
-          <button
-            onClick={() => setShowFloatingMenu(!showFloatingMenu)}
-            className={`w-14 h-14 bg-gradient-to-r from-coral-500 to-peach-500 rounded-full shadow-xl flex items-center justify-center hover:shadow-2xl transform transition-all duration-300 ${
-              showFloatingMenu ? 'rotate-45 scale-110' : 'hover:scale-105'
-            } group`}
-          >
-            <Plus className="w-6 h-6 text-white group-hover:animate-spin" />
-          </button>
-        </div>
-      </div>
-
-      {/* Mood Selector Modal */}
-      {showMoodSelector && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowMoodSelector(false)}>
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full animate-slideUp" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">How are you feeling?</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: 'great', emoji: '😊', label: 'Great', color: 'from-green-400 to-emerald-500' },
-                { id: 'happy', emoji: '😄', label: 'Happy', color: 'from-yellow-400 to-amber-500' },
-                { id: 'excited', emoji: '🤩', label: 'Excited', color: 'from-purple-400 to-pink-500' },
-                { id: 'chill', emoji: '😎', label: 'Chill', color: 'from-blue-400 to-cyan-500' },
-                { id: 'romantic', emoji: '��', label: 'Romantic', color: 'from-rose-400 to-pink-500' },
-                { id: 'adventurous', emoji: '🤠', label: 'Adventurous', color: 'from-orange-400 to-red-500' },
-              ].map((mood) => (
-                <button
-                  key={mood.id}
-                  onClick={() => {
-                    setCurrentMood(mood.id);
-                    setShowMoodSelector(false);
-                    alert(`Mood updated to ${mood.label}!`);
-                  }}
-                  className={`p-4 rounded-2xl bg-gradient-to-r ${mood.color} text-white font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-center`}
+                <Button
+                  onClick={() => navigate('/premium')}
+                  className="w-full mt-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 rounded-xl"
                 >
-                  <div className="text-2xl mb-1">{mood.emoji}</div>
-                  <div className="text-sm">{mood.label}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Notifications Panel */}
-      {showNotifications && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center" onClick={() => setShowNotifications(false)}>
-          <div className="bg-white rounded-t-3xl w-full max-w-md h-96 animate-slideUp" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-800">Notifications</h3>
-                <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
-                  <Plus className="w-5 h-5 rotate-45" />
-                </button>
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade Now
+                </Button>
               </div>
-              <div className="space-y-3 max-h-64 overflow-y-auto">
-                {notifications.map((notif) => (
-                  <div key={notif.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                    <div className="w-10 h-10 bg-gradient-to-r from-coral-400 to-peach-400 rounded-full flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">{notif.text}</p>
-                      <p className="text-xs text-gray-500">{new Date(notif.time).toLocaleTimeString()}</p>
-                    </div>
-                    {!notif.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+            )}
+
+            {/* Profile Section */}
+            <div className="p-4 sm:p-5 md:p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">
+                {/* Profile Image */}
+                <div className="relative">
+                  <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 ${
+                    isUltraPremium() 
+                      ? 'border-purple-300 shadow-lg shadow-purple-200/50' 
+                      : 'border-peach-300 shadow-lg shadow-peach-200/50'
+                  } relative`}>
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full ${
+                        isUltraPremium() 
+                          ? 'bg-gradient-to-br from-purple-200 to-pink-200' 
+                          : 'bg-gradient-to-br from-peach-200 to-coral-200'
+                      } flex items-center justify-center`}>
+                        <User className={`h-12 w-12 ${
+                          isUltraPremium() ? 'text-purple-400' : 'text-peach-400'
+                        }`} />
+                      </div>
+                    )}
                   </div>
-                ))}
+
+                  {/* Camera Button */}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className={`absolute -bottom-2 -right-2 w-10 h-10 ${
+                      isUltraPremium() 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                        : 'bg-gradient-to-r from-peach-500 to-coral-500'
+                    } text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] touch-manipulation`}
+                  >
+                    {isUploading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Camera className="h-5 w-5" />
+                    )}
+                  </button>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* User Info */}
+                <div className="flex-1 text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                    <h2 className={`text-xl sm:text-2xl font-bold ${
+                      isUltraPremium() ? 'text-purple-800' : 'text-gray-800'
+                    }`}>
+                      {username}
+                    </h2>
+                    <button
+                      onClick={() => {
+                        const newUsername = prompt("Enter new username:", username);
+                        if (newUsername && newUsername.trim()) {
+                          handleUsernameChange(newUsername.trim());
+                        }
+                      }}
+                      className={`p-1 rounded-full hover:bg-gray-100 transition-colors min-h-[32px] min-w-[32px] touch-manipulation ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-gray-600'
+                      }`}
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-center sm:justify-start gap-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <Coins className={`h-4 w-4 ${
+                        isUltraPremium() ? 'text-purple-500' : 'text-yellow-500'
+                      }`} />
+                      <span className={`font-medium ${
+                        isUltraPremium() ? 'text-purple-700' : 'text-gray-700'
+                      }`}>
+                        {coins} coins
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className={`${
+                        isUltraPremium() ? 'text-purple-600' : 'text-gray-600'
+                      }`}>
+                        Online
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Upload Progress */}
+              {isUploading && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Uploading profile image...</span>
+                    <span>{Math.round(uploadProgress)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        isUltraPremium() 
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                          : 'bg-gradient-to-r from-peach-500 to-coral-500'
+                      }`}
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Error */}
+              {uploadError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{uploadError}</p>
+                </div>
+              )}
+
+              {/* Referral Section */}
+              <Card className={`mb-6 ${
+                isUltraPremium() 
+                  ? 'border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50' 
+                  : 'border-peach-200 bg-gradient-to-br from-peach-50 to-coral-50'
+              }`}>
+                <CardHeader className="pb-3">
+                  <CardTitle className={`text-lg flex items-center gap-2 ${
+                    isUltraPremium() ? 'text-purple-800' : 'text-peach-800'
+                  }`}>
+                    <Gift className="h-5 w-5" />
+                    {t('profile.referral.title')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${
+                      isUltraPremium() ? 'text-purple-700' : 'text-peach-700'
+                    }`}>
+                      {t('profile.referral.id')}
+                    </label>
+                    <div className="flex gap-2">
+                      <div className={`flex-1 px-3 py-2 ${
+                        isUltraPremium() 
+                          ? 'bg-purple-100 border border-purple-200' 
+                          : 'bg-peach-100 border border-peach-200'
+                      } rounded-lg font-mono text-center font-bold text-lg`}>
+                        {referralCode}
+                      </div>
+                      <Button
+                        onClick={copyReferralCode}
+                        size="sm"
+                        className={`${
+                          isUltraPremium() 
+                            ? 'bg-purple-500 hover:bg-purple-600' 
+                            : 'bg-peach-500 hover:bg-peach-600'
+                        } text-white min-h-[44px] min-w-[44px] touch-manipulation`}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className={`p-3 ${
+                    isUltraPremium() 
+                      ? 'bg-purple-50 border border-purple-200' 
+                      : 'bg-peach-50 border border-peach-200'
+                  } rounded-lg`}>
+                    <p className={`text-sm font-medium mb-2 ${
+                      isUltraPremium() ? 'text-purple-800' : 'text-peach-800'
+                    }`}>
+                      {t('profile.referral.reward')}
+                    </p>
+                    <p className={`text-xs ${
+                      isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                    }`}>
+                      {t('profile.referral.share')}
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={shareReferralCode}
+                    className={`w-full ${
+                      isUltraPremium() 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
+                        : 'bg-gradient-to-r from-peach-500 to-coral-500 hover:from-peach-600 hover:to-coral-600'
+                    } text-white font-semibold py-3 rounded-xl min-h-[44px] touch-manipulation`}
+                  >
+                    <Share className="h-4 w-4 mr-2" />
+                    Share Referral Code
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Settings Section */}
+              <div className="space-y-3">
+                <h3 className={`font-semibold text-lg ${
+                  isUltraPremium() ? 'text-purple-800' : 'text-gray-800'
+                }`}>
+                  {t('profile.settings')}
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => handleSettingsClick('privacy')}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <Shield className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">{t('profile.settings.privacy')}</div>
+                      <div className="text-xs opacity-75">Control your privacy</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleSettingsClick('notifications')}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <Bell className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">{t('profile.settings.notifications')}</div>
+                      <div className="text-xs opacity-75">Manage notifications</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleSettingsClick('account')}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <User className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">{t('profile.settings.account')}</div>
+                      <div className="text-xs opacity-75">Account management</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => setShowLanguageSelector(true)}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <Globe className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">{t('profile.settings.language')}</div>
+                      <div className="text-xs opacity-75">Change language</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => setShowHelpModal(true)}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <HelpCircle className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">Help & Support</div>
+                      <div className="text-xs opacity-75">Get assistance</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => navigate('/storage-debug')}
+                    variant="outline"
+                    className={`flex items-center gap-3 p-4 h-auto justify-start ${
+                      isUltraPremium() 
+                        ? 'border-purple-200 text-purple-700 hover:bg-purple-50' 
+                        : 'border-peach-200 text-peach-700 hover:bg-peach-50'
+                    } min-h-[60px] touch-manipulation`}
+                  >
+                    <div className={`w-10 h-10 ${
+                      isUltraPremium() ? 'bg-purple-100' : 'bg-peach-100'
+                    } rounded-lg flex items-center justify-center`}>
+                      <Database className={`h-5 w-5 ${
+                        isUltraPremium() ? 'text-purple-600' : 'text-peach-600'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium">Storage Debug</div>
+                      <div className="text-xs opacity-75">Test Firebase Storage</div>
+                    </div>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Use UltraBottomNavBar for ULTRA+ users, regular for others */}
-      {isUltraPremium() ? <UltraBottomNavBar /> : <BottomNavBar />}
+          {/* ULTRA+ Profile Enhancements */}
+          {isUltraPremium() && (
+            <div className="w-full mb-6">
+              <UltraProfileEnhancements
+                isUltraPremium={true}
+                userProfile={userStats}
+                onProfileUpdate={handleProfileUpdate}
+              />
+            </div>
+          )}
 
-      {/* Who Liked Me Modal */}
-      <WhoLikedMeModal
-        isOpen={showLikesModal}
-        onClose={() => setShowLikesModal(false)}
-        likes={likesData}
-        onRevealLike={handleRevealLike}
+          {/* Use UltraBottomNavBar for ULTRA+ users, regular for others */}
+          {isUltraPremium() ? <UltraBottomNavBar /> : <BottomNavBar />}
+        </main>
+      </UltraPageTransition>
+
+      {/* Modals */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => {
+          setShowSettingsModal(false);
+          setSettingType(null);
+        }}
+        settingType={settingType}
       />
-      </div>
-    </UltraPageTransition>
+
+      <LanguageSelector
+        isOpen={showLanguageSelector}
+        onClose={() => setShowLanguageSelector(false)}
+      />
+
+      <HelpSupportModal
+        isOpen={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
+    </>
   );
-}
+};
+
+export default ProfilePage;

@@ -75,6 +75,18 @@ function App() {
   }
 
   useEffect(() => {
+    // Set up global error handler
+    const handleGlobalError = (event: ErrorEvent) => {
+      console.error('Global error caught:', event.error);
+      // Don't crash the app for non-critical errors
+      if (event.error?.message?.includes('ResizeObserver') ||
+          event.error?.message?.includes('Non-Error promise rejection')) {
+        event.preventDefault();
+      }
+    };
+    
+    window.addEventListener('error', handleGlobalError);
+    
     const timer = setTimeout(() => {
       setShowSplash(false);
     }, 2000);
@@ -102,7 +114,10 @@ function App() {
 
     initializeAdServices();
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('error', handleGlobalError);
+    };
   }, []);
 
   useEffect(() => {

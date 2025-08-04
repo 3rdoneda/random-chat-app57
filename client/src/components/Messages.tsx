@@ -81,6 +81,15 @@ export default function Messages({remoteChatToken, messagesArray, setMessagesArr
     const handleSendMessage = () => {
         if (!message.trim() || !remoteChatToken) return;
 
+        // Rate limiting check
+        const lastMessageTime = localStorage.getItem('last_message_time');
+        const now = Date.now();
+        if (lastMessageTime && now - parseInt(lastMessageTime) < 1000) {
+            console.warn('Message rate limited');
+            return;
+        }
+        localStorage.setItem('last_message_time', now.toString());
+
         const messageId = Date.now().toString();
         const newMessage = {
             sender: 'You',
@@ -93,12 +102,18 @@ export default function Messages({remoteChatToken, messagesArray, setMessagesArr
         setMessagesArray((prev) => [...prev, newMessage]);
         setMessage('');
         
-        socket?.emit("send:message", {
-            message: message.trim(),
-            targetChatToken: remoteChatToken,
-            isSecret: isSecretMode,
-            messageId
-        });
+        try {
+            socket?.emit("send:message", {
+                message: message.trim(),
+                targetChatToken: remoteChatToken,
+                isSecret: isSecretMode,
+                messageId
+            });
+        } catch (error) {
+            console.error('Error sending message:', error);
+            // Remove message from UI if sending failed
+            setMessagesArray((prev) => prev.filter(msg => msg.id !== messageId));
+        }
 
         // Send typing status end for premium users
         if (isUltraPremium() || isProMonthly()) {

@@ -85,6 +85,15 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         console.log("Socket connection failed, falling back to mock mode");
         console.error("Socket connection error:", error);
         
+        // Set a timeout before falling back to mock mode
+        setTimeout(() => {
+          if (!newSocket.connected) {
+            console.log("Connection timeout, enabling mock mode");
+            setIsUsingMockMode(true);
+            mockMatching.startBotSimulation();
+          }
+        }, 5000);
+        
         // Try alternative port based on environment
         if (window.location.hostname.includes('webcontainer-api.io')) {
           console.log("Trying alternative WebContainer port 81...");

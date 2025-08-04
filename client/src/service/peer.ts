@@ -1,11 +1,19 @@
 class PeerService {
     public peer!: RTCPeerConnection;
+    private isInitializing = false;
 
     constructor(){
         this.initPeer();
     }
 
     initPeer() {
+        if (this.isInitializing) {
+            console.warn('Peer connection already initializing');
+            return;
+        }
+        
+        this.isInitializing = true;
+        
         // Reinitialize peer connection
         // console.log("init peer........")
         try {
@@ -42,13 +50,22 @@ class PeerService {
             console.log('ICE connection state:', this.peer.iceConnectionState);
             if (this.peer.iceConnectionState === 'failed') {
                 console.warn('ICE connection failed, attempting restart');
-                this.peer.restartIce();
+                try {
+                    this.peer.restartIce();
+                } catch (error) {
+                    console.error('Error restarting ICE:', error);
+                }
             }
         };
 
         this.peer.onconnectionstatechange = () => {
             console.log('Connection state:', this.peer.connectionState);
+            if (this.peer.connectionState === 'failed') {
+                console.warn('Peer connection failed');
+            }
         };
+        
+        this.isInitializing = false;
     }
 
     async getOffer(){
@@ -62,6 +79,8 @@ class PeerService {
             return null;
         } catch (error) {
             console.error('Error creating offer:', error);
+            // Try to reinitialize peer connection
+            this.initPeer();
             return null;
         }
     }
@@ -78,6 +97,8 @@ class PeerService {
             return null;
         } catch (error) {
             console.error('Error creating answer:', error);
+            // Try to reinitialize peer connection
+            this.initPeer();
             return null;
         }
     }
@@ -91,6 +112,24 @@ class PeerService {
             }
         } catch (error) {
             console.error('Error setting remote description:', error);
+            // Try to reinitialize peer connection
+            this.initPeer();
+        }
+    }
+    
+    // Add method to check if peer is ready
+    isPeerReady(): boolean {
+        return this.peer && this.peer.signalingState !== 'closed' && !this.isInitializing;
+    }
+    
+    // Add method to safely close peer connection
+    closePeer(): void {
+        try {
+            if (this.peer && this.peer.signalingState !== 'closed') {
+                this.peer.close();
+            }
+        } catch (error) {
+            console.error('Error closing peer connection:', error);
         }
     }
 }
