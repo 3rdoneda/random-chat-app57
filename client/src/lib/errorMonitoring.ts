@@ -30,13 +30,44 @@ interface UserFeedback {
 class ErrorMonitoring {
   private userId?: string;
   private isInitialized = false;
+  private errorQueue: ErrorReport[] = [];
+  private isOnline = navigator.onLine;
 
   initialize(userId?: string) {
     this.userId = userId;
     this.setupGlobalErrorHandlers();
     this.setupUnhandledRejectionHandler();
+    this.setupNetworkHandlers();
     this.isInitialized = true;
     console.log('✅ Error monitoring initialized');
+  }
+
+  private setupNetworkHandlers() {
+    window.addEventListener('online', () => {
+      this.isOnline = true;
+      this.flushErrorQueue();
+    });
+
+    window.addEventListener('offline', () => {
+      this.isOnline = false;
+    });
+  }
+
+  private async flushErrorQueue() {
+    if (!this.isOnline || this.errorQueue.length === 0) return;
+
+    const errors = [...this.errorQueue];
+    this.errorQueue = [];
+
+    for (const error of errors) {
+      try {
+        await this.sendErrorToFirestore(error);
+      } catch (e) {
+        // Re-queue if still failing
+        this.errorQueue.push(error);
+        break;
+      }
+    }
   }
 
   private setupGlobalErrorHandlers() {
@@ -45,7 +76,9 @@ class ErrorMonitoring {
       // Ignore certain non-critical errors
       if (event.message.includes('ResizeObserver loop limit exceeded') ||
           event.message.includes('Non-Error promise rejection captured') ||
-          event.filename?.includes('extension')) {
+          event.filename?.includes('extension') ||
+          event.message.includes('Loading chunk') ||
+          event.message.includes('ChunkLoadError')) {
         return;
       }
       
@@ -71,7 +104,8 @@ class ErrorMonitoring {
       // Ignore certain non-critical promise rejections
       if (event.reason?.message?.includes('The user aborted a request') ||
           event.reason?.message?.includes('Load failed') ||
-          event.reason?.name === 'AbortError') {
+          event.reason?.name === 'AbortError' ||
+          event.reason?.message?.includes('Loading CSS chunk')) {
         return;
       }
       
@@ -114,6 +148,20 @@ class ErrorMonitoring {
    * Report an error to the monitoring system
    */
   async reportError(error: ErrorReport): Promise<void> {
+    if (!this.isOnline) {
+      this.errorQueue.push(error);
+      return;
+    }
+
+    try {
+      await this.sendErrorToFirestore(error);
+    } catch (reportingError) {
+      console.error('Failed to report error:', reportingError);
+      this.errorQueue.push(error);
+    }
+  }
+
+  private async sendErrorToFirestore(error: ErrorReport): Promise<void> {
     try {
       // Log to console in development
       if (import.meta.env.DEV) {
@@ -132,8 +180,9 @@ class ErrorMonitoring {
         console.log('Error logged to analytics');
       }
 
-    } catch (reportingError) {
-      console.error('Failed to report error:', reportingError);
+    } catch (error) {
+      console.error('Failed to send error to Firestore:', error);
+      throw error;
     }
   }
 

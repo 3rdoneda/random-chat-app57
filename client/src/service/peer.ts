@@ -1,6 +1,8 @@
 class PeerService {
     public peer!: RTCPeerConnection;
     private isInitializing = false;
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 3;
 
     constructor(){
         this.initPeer();
@@ -42,7 +44,10 @@ class PeerService {
                     "stun:stun.voipstunt.com",
                     "stun:stun.services.mozilla.com"
                 ]
-            }]
+            }],
+            iceCandidatePoolSize: 10,
+            bundlePolicy: 'max-bundle',
+            rtcpMuxPolicy: 'require'
         });
 
         // Add error handling for peer connection
@@ -50,11 +55,20 @@ class PeerService {
             console.log('ICE connection state:', this.peer.iceConnectionState);
             if (this.peer.iceConnectionState === 'failed') {
                 console.warn('ICE connection failed, attempting restart');
-                try {
-                    this.peer.restartIce();
-                } catch (error) {
-                    console.error('Error restarting ICE:', error);
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    try {
+                        this.peer.restartIce();
+                    } catch (error) {
+                        console.error('Error restarting ICE:', error);
+                        this.initPeer(); // Reinitialize if restart fails
+                    }
+                } else {
+                    console.error('Max reconnection attempts reached');
                 }
+            }
+            if (this.peer.iceConnectionState === 'connected') {
+                this.reconnectAttempts = 0; // Reset on successful connection
             }
         };
 
@@ -62,7 +76,14 @@ class PeerService {
             console.log('Connection state:', this.peer.connectionState);
             if (this.peer.connectionState === 'failed') {
                 console.warn('Peer connection failed');
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    setTimeout(() => this.initPeer(), 1000); // Retry after 1 second
+                }
             }
+        };
+
+        this.peer.onicegatheringstatechange = () => {
+            console.log('ICE gathering state:', this.peer.iceGatheringState);
         };
         
         this.isInitializing = false;
@@ -70,7 +91,7 @@ class PeerService {
 
     async getOffer(){
         try {
-            if(this.peer && this.peer.signalingState === 'stable'){
+            if(this.peer && (this.peer.signalingState === 'stable' || this.peer.signalingState === 'have-local-offer')){
                 const offer = await this.peer.createOffer();
                 await this.peer.setLocalDescription(new RTCSessionDescription(offer));
                 return this.peer.localDescription;
@@ -80,7 +101,10 @@ class PeerService {
         } catch (error) {
             console.error('Error creating offer:', error);
             // Try to reinitialize peer connection
-            this.initPeer();
+            if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                this.reconnectAttempts++;
+                this.initPeer();
+            }
             return null;
         }
     }
@@ -98,7 +122,10 @@ class PeerService {
         } catch (error) {
             console.error('Error creating answer:', error);
             // Try to reinitialize peer connection
-            this.initPeer();
+            if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                this.reconnectAttempts++;
+                this.initPeer();
+            }
             return null;
         }
     }
@@ -113,7 +140,10 @@ class PeerService {
         } catch (error) {
             console.error('Error setting remote description:', error);
             // Try to reinitialize peer connection
-            this.initPeer();
+            if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                this.reconnectAttempts++;
+                this.initPeer();
+            }
         }
     }
     
@@ -126,10 +156,29 @@ class PeerService {
     closePeer(): void {
         try {
             if (this.peer && this.peer.signalingState !== 'closed') {
+                // Clean up event listeners
+                this.peer.ontrack = null;
+                this.peer.onicecandidate = null;
+                this.peer.oniceconnectionstatechange = null;
+                this.peer.onconnectionstatechange = null;
+                this.peer.onicegatheringstatechange = null;
                 this.peer.close();
             }
         } catch (error) {
             console.error('Error closing peer connection:', error);
+        }
+    }
+
+    // Add method to get connection stats
+    async getConnectionStats(): Promise<RTCStatsReport | null> {
+        try {
+            if (this.peer && this.peer.signalingState !== 'closed') {
+                return await this.peer.getStats();
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting connection stats:', error);
+            return null;
         }
     }
 }

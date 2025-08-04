@@ -63,6 +63,10 @@ export interface UserProfile {
  */
 export async function ensureUserDocumentExists(userId: string, initialData?: Partial<UserProfile>): Promise<void> {
   try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
     const userDocRef = doc(db, "users", userId);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -113,7 +117,8 @@ export async function ensureUserDocumentExists(userId: string, initialData?: Par
     }
   } catch (error) {
     console.error("❌ Error ensuring user document exists:", error);
-    throw error;
+    // Don't throw error to prevent app crashes
+    console.warn("⚠️ Continuing without Firestore user document");
   }
 }
 
@@ -122,6 +127,11 @@ export async function ensureUserDocumentExists(userId: string, initialData?: Par
  */
 export async function getCoins(userId: string): Promise<number> {
   try {
+    if (!userId) {
+      console.warn('No user ID provided for getCoins');
+      return 0;
+    }
+
     const userDocRef = doc(db, "users", userId);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -155,13 +165,14 @@ export async function addCoins(userId: string, amount: number): Promise<void> {
     await updateDoc(userDocRef, {
       coins: increment(amount),
       totalCoinsEarned: increment(amount),
-      updatedAt: new Date()
+      updatedAt: serverTimestamp()
     });
 
     console.log(`✅ Added ${amount} coins to user ${userId}`);
   } catch (error) {
     console.error("❌ Error adding coins:", error);
-    throw error;
+    // Don't throw to prevent app crashes, but log the error
+    console.warn("⚠️ Continuing without coin update");
   }
 }
 

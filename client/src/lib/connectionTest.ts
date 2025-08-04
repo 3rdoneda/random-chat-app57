@@ -27,8 +27,8 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
     console.log("🔍 Testing Firebase Storage connection...");
 
     // Add timeout to prevent hanging
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Connection test timeout')), 30000);
+    const createTimeoutPromise = (ms: number) => new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Connection test timeout')), ms);
     });
 
     // Test 1: Basic connection (try to create a reference)
@@ -38,15 +38,15 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
     const testData = new Blob(["Firebase Storage connection test"], {
       type: "text/plain",
     });
-    await Promise.race([uploadBytes(testRef, testData), timeoutPromise]);
+    await Promise.race([uploadBytes(testRef, testData), createTimeoutPromise(15000)]);
     console.log("✅ Write operation successful");
 
     // Test 3: Read operation (get download URL)
-    const downloadURL = await Promise.race([getDownloadURL(testRef), timeoutPromise]);
+    const downloadURL = await Promise.race([getDownloadURL(testRef), createTimeoutPromise(10000)]);
     console.log("✅ Read operation successful", downloadURL);
 
     // Test 4: Delete operation (cleanup test file)
-    await Promise.race([deleteObject(testRef), timeoutPromise]);
+    await Promise.race([deleteObject(testRef), createTimeoutPromise(10000)]);
     console.log("✅ Delete operation successful");
 
     return {
@@ -96,11 +96,16 @@ export async function testFirebaseStorageConnection(): Promise<ConnectionTestRes
       case "storage/no-default-bucket":
         message = "No default storage bucket configured";
         break;
+      case "storage/canceled":
+        message = "Upload was cancelled";
+        break;
       default:
         if (error.message.includes("CORS")) {
           message = "CORS error: Configure CORS for your storage bucket";
         } else if (error.message.includes("network")) {
           message = "Network error: Check internet connection";
+        } else if (error.message.includes("timeout")) {
+          message = "Connection timeout: Please try again";
         }
     }
 

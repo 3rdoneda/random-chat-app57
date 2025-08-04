@@ -116,7 +116,7 @@ export async function uploadProfileImage(
           },
           (error) => {
             clearTimeout(timeout);
-            reject(error);
+            reject(new Error(getStorageErrorMessage(error)));
           },
           async () => {
             try {
@@ -125,7 +125,7 @@ export async function uploadProfileImage(
               resolve({ url, path: filePath });
             } catch (error) {
               clearTimeout(timeout);
-              reject(error);
+              reject(new Error(getStorageErrorMessage(error)));
             }
           },
         );

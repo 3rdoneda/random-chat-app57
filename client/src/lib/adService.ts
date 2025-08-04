@@ -37,6 +37,7 @@ class AdService {
   private isInitialized = false;
   private adBlockDetected = false;
   private consentGiven = false;
+  private initializationPromise: Promise<boolean> | null = null;
 
   // Default configuration for AjnabiCam
   private defaultConfig: AdConfig = {
@@ -66,6 +67,16 @@ testMode: import.meta.env.DEV
    * Initialize the ad service with Google AdSense
    */
   async initialize(customConfig?: Partial<AdConfig>): Promise<boolean> {
+    // Prevent multiple initialization attempts
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = this.doInitialize(customConfig);
+    return this.initializationPromise;
+  }
+
+  private async doInitialize(customConfig?: Partial<AdConfig>): Promise<boolean> {
     try {
       if (customConfig) {
         this.config = { ...this.config, ...customConfig };
@@ -89,7 +100,10 @@ testMode: import.meta.env.DEV
 
       // Load Google AdSense script (non-blocking)
       try {
-        await this.loadAdSenseScript();
+        await Promise.race([
+          this.loadAdSenseScript(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('AdSense load timeout')), 10000))
+        ]);
 
         // Initialize AdSense
         if (typeof window !== 'undefined' && window.adsbygoogle) {

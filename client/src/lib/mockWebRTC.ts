@@ -1,6 +1,7 @@
 // Mock WebRTC functionality for testing when real connections aren't available
 export class MockWebRTC {
   private static remoteVideoElement: HTMLVideoElement | null = null;
+  private static activeStreams: MediaStream[] = [];
 
   static async createMockRemoteStream(): Promise<MediaStream> {
     // Create a canvas element to generate a mock video stream
@@ -13,77 +14,94 @@ export class MockWebRTC {
       throw new Error('Unable to get canvas context');
     }
 
+    let animationId: number;
+    
     // Create animated mock video
     const drawFrame = () => {
       try {
-      // Gradient background
-      const gradient = ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height,
-      );
-      gradient.addColorStop(0, "#ec4899");
-      gradient.addColorStop(0.5, "#f43f5e");
-      gradient.addColorStop(1, "#a855f7");
+        // Gradient background
+        const gradient = ctx.createLinearGradient(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
+        gradient.addColorStop(0, "#ec4899");
+        gradient.addColorStop(0.5, "#f43f5e");
+        gradient.addColorStop(1, "#a855f7");
 
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Add some animation
-      const time = Date.now() * 0.001;
-      ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-      for (let i = 0; i < 5; i++) {
-        const x = ((Math.sin(time + i) + 1) * canvas.width) / 2;
-        const y = ((Math.cos(time + i * 0.5) + 1) * canvas.height) / 2;
-        ctx.beginPath();
-        ctx.arc(x, y, 20 + Math.sin(time + i) * 10, 0, Math.PI * 2);
-        ctx.fill();
-      }
+        // Add some animation
+        const time = Date.now() * 0.001;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+        for (let i = 0; i < 5; i++) {
+          const x = ((Math.sin(time + i) + 1) * canvas.width) / 2;
+          const y = ((Math.cos(time + i * 0.5) + 1) * canvas.height) / 2;
+          ctx.beginPath();
+          ctx.arc(x, y, 20 + Math.sin(time + i) * 10, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-      // Add text
-      ctx.fillStyle = "white";
-      ctx.font = "bold 24px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("Demo Partner", canvas.width / 2, canvas.height / 2 - 50);
-      ctx.font = "16px Arial";
-      ctx.fillText(
-        "This is a demo connection",
-        canvas.width / 2,
-        canvas.height / 2,
-      );
-      ctx.fillText(
-        "🎥 Mock Video Stream",
-        canvas.width / 2,
-        canvas.height / 2 + 30,
-      );
+        // Add text
+        ctx.fillStyle = "white";
+        ctx.font = "bold 24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Demo Partner", canvas.width / 2, canvas.height / 2 - 50);
+        ctx.font = "16px Arial";
+        ctx.fillText(
+          "This is a demo connection",
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        ctx.fillText(
+          "🎥 Mock Video Stream",
+          canvas.width / 2,
+          canvas.height / 2 + 30,
+        );
 
-      // Add timestamp
-      ctx.font = "12px monospace";
-      ctx.fillText(
-        new Date().toLocaleTimeString(),
-        canvas.width / 2,
-        canvas.height - 20,
-      );
+        // Add timestamp
+        ctx.font = "12px monospace";
+        ctx.fillText(
+          new Date().toLocaleTimeString(),
+          canvas.width / 2,
+          canvas.height - 20,
+        );
+        
+        animationId = requestAnimationFrame(drawFrame);
       } catch (error) {
         console.error('Error drawing mock video frame:', error);
+        // Stop animation on error
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
       }
     };
 
     // Start animation loop
-    const animate = () => {
-      drawFrame();
-      requestAnimationFrame(animate);
-    };
-    animate();
+    animationId = requestAnimationFrame(drawFrame);
 
     // Create stream from canvas
     let stream: MediaStream;
     try {
       // @ts-ignore - captureStream is supported in modern browsers
       stream = canvas.captureStream(30) as MediaStream;
+      
+      // Track the stream for cleanup
+      this.activeStreams.push(stream);
+      
+      // Clean up animation when stream ends
+      stream.addEventListener('inactive', () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+      });
     } catch (error) {
       console.error('Error creating canvas stream:', error);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
       throw new Error('Unable to create mock video stream');
     }
 
@@ -110,6 +128,16 @@ export class MockWebRTC {
       if (audioTrack) {
         stream.addTrack(audioTrack);
       }
+      
+      // Clean up audio context when stream ends
+      stream.addEventListener('inactive', () => {
+        try {
+          oscillator.stop();
+          audioContext.close();
+        } catch (error) {
+          console.warn('Error cleaning up audio context:', error);
+        }
+      });
     } catch (error) {
       console.log("Could not create mock audio track:", error);
     }
@@ -135,6 +163,16 @@ export class MockWebRTC {
       },
       2000 + Math.random() * 3000,
     ); // 2-5 second delay
+  }
+
+  // Clean up all active streams
+  static cleanup(): void {
+    this.activeStreams.forEach(stream => {
+      stream.getTracks().forEach(track => {
+        track.stop();
+      });
+    });
+    this.activeStreams = [];
   }
 }
 

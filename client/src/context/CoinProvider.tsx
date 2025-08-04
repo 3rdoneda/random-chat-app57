@@ -48,6 +48,7 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [pendingAds, setPendingAds] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const maxAdsPerDay = 3;
   const auth = getAuth(firebaseApp);
@@ -57,6 +58,7 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user.uid);
+        setError(null);
       } else {
         setCurrentUser(null);
         setCoins(0);
@@ -69,7 +71,10 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
 
   // Set up real-time listener for user's coin balance
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setIsLoading(false);
+      return;
+    }
 
     const userDocRef = doc(db, "users", currentUser);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
@@ -77,10 +82,18 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
         const userData = doc.data();
         setCoins(userData.coins || 0);
         setHasCompletedOnboarding(userData.onboardingComplete || false);
+        setError(null);
+      } else {
+        // Document doesn't exist, try to create it
+        ensureUserDocumentExists(currentUser).catch(error => {
+          console.error('Failed to create user document:', error);
+          setError('Failed to initialize user data');
+        });
       }
       setIsLoading(false);
     }, (error) => {
       console.error("Error listening to user document:", error);
+      setError('Failed to sync user data');
       setIsLoading(false);
     });
 
@@ -89,6 +102,7 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
 
   // Initialize local storage data (ads, daily bonus, streak, pending ads)
   useEffect(() => {
+    try {
     const lastDailyBonus = localStorage.getItem("ajnabicam_last_daily_bonus");
     const adsToday = localStorage.getItem("ajnabicam_ads_today");
     const adsDate = localStorage.getItem("ajnabicam_ads_date");
@@ -99,7 +113,10 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
 
     // Load pending ads
     if (storedPendingAds) {
-      setPendingAds(parseInt(storedPendingAds));
+      const parsedPendingAds = parseInt(storedPendingAds);
+      if (!isNaN(parsedPendingAds)) {
+        setPendingAds(parsedPendingAds);
+      }
     }
     
     // Check daily bonus eligibility
@@ -115,7 +132,10 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
       localStorage.setItem("ajnabicam_ads_today", "0");
       localStorage.setItem("ajnabicam_ads_date", today);
     } else if (adsToday) {
-      setAdsWatchedToday(parseInt(adsToday));
+      const parsedAdsToday = parseInt(adsToday);
+      if (!isNaN(parsedAdsToday)) {
+        setAdsWatchedToday(parsedAdsToday);
+      }
     }
 
     // Load streak data
@@ -144,11 +164,16 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
         setCurrentStreak(0);
       }
     }
+    } catch (error) {
+      console.error("Error initializing local storage data:", error);
+      setError('Failed to load user preferences');
+    }
   }, []);
 
   const addCoins = async (amount: number): Promise<boolean> => {
     if (!currentUser) {
       console.error("No authenticated user");
+      setError("Please sign in to earn coins");
       return false;
     }
 
@@ -159,9 +184,11 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
 
     try {
       await firestoreAddCoins(currentUser, amount);
+      setError(null);
       return true;
     } catch (error) {
       console.error("Error adding coins:", error);
+      setError("Failed to add coins");
       return false;
     }
   };
@@ -169,6 +196,7 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
   const deductCoins = async (amount: number): Promise<boolean> => {
     if (!currentUser) {
       console.error("No authenticated user");
+      setError("Please sign in to spend coins");
       return false;
     }
 
@@ -181,10 +209,14 @@ export const CoinProvider = ({ children }: CoinProviderProps) => {
       const result = await spendCoins(currentUser, amount);
       if (!result.success) {
         console.warn("Failed to deduct coins:", result.message);
+        setError(result.message);
+      } else {
+        setError(null);
       }
       return result.success;
     } catch (error) {
       console.error("Error deducting coins:", error);
+      setError("Failed to spend coins");
       return false;
     }
   };

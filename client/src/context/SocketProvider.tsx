@@ -28,6 +28,8 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isUsingMockMode, setIsUsingMockMode] = useState(false);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [lastConnectionAttempt, setLastConnectionAttempt] = useState<number>(0);
   const mockMatching = MockMatchingService.getInstance();
 
   // Add error handling
@@ -40,8 +42,18 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('error', handleError);
   }, []);
 
+  const shouldAttemptConnection = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastAttempt = now - lastConnectionAttempt;
+    const minInterval = Math.min(5000 * Math.pow(2, connectionAttempts), 30000); // Exponential backoff, max 30s
+    return timeSinceLastAttempt > minInterval;
+  }, [connectionAttempts, lastConnectionAttempt]);
+
   useEffect(() => {
-    if (!socket) {
+    if (!socket && shouldAttemptConnection()) {
+      setLastConnectionAttempt(Date.now());
+      setConnectionAttempts(prev => prev + 1);
+      
       // Determine socket URL based on environment
       let socketUrl: string;
 
@@ -75,6 +87,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
         setIsUsingMockMode(false);
+        setConnectionAttempts(0); // Reset on successful connection
       });
 
       newSocket.on("disconnect", () => {
@@ -84,6 +97,14 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       newSocket.on("connect_error", (error) => {
         console.log("Socket connection failed, falling back to mock mode");
         console.error("Socket connection error:", error);
+        
+        // Prevent infinite retry loops
+        if (connectionAttempts >= 5) {
+          console.log("Max connection attempts reached, enabling mock mode permanently");
+          setIsUsingMockMode(true);
+          mockMatching.startBotSimulation();
+          return;
+        }
         
         // Set a timeout before falling back to mock mode
         setTimeout(() => {
@@ -169,7 +190,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         newSocket.close();
       };
     }
-  }, [socket]);
+  }, [socket, shouldAttemptConnection, connectionAttempts]);
 
   // Cleanup on unmount
   useEffect(() => {

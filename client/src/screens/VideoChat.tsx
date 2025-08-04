@@ -74,12 +74,14 @@ const VideoChat: React.FC = () => {
   const { coins, deductCoins, pendingAds, setPendingAds } = useCoin();
   const { addFriend } = useFriends();
   const { showOnVideoCallEnd } = useInterstitialAd();
+  const [isComponentMounted, setIsComponentMounted] = useState(true);
 
   // Video and audio refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
   // Face filters
   const { currentFilter, applyFilter, removeFilter } = useFaceFilters(remoteVideoRef.current);
@@ -127,17 +129,20 @@ const VideoChat: React.FC = () => {
 
   // Initialize media stream
   useEffect(() => {
+    setIsComponentMounted(true);
     initializeMedia();
     return () => {
+      setIsComponentMounted(false);
       cleanup();
     };
   }, []);
 
   // Socket event listeners
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !isComponentMounted) return;
 
     const handleUserConnect = (partnerId: string) => {
+      if (!isComponentMounted) return;
       console.log("🔗 Connected to partner:", partnerId);
       setRemoteChatToken(partnerId);
       setIsConnected(true);
@@ -149,6 +154,7 @@ const VideoChat: React.FC = () => {
     };
 
     const handleOffer = async ({ offer, from }: { offer: RTCSessionDescriptionInit; from: string }) => {
+      if (!isComponentMounted) return;
       console.log("📨 Received offer from:", from);
       try {
         const answer = await peerService.getAnswer(offer);
@@ -162,6 +168,7 @@ const VideoChat: React.FC = () => {
     };
 
     const handleAnswer = async ({ answer }: { answer: RTCSessionDescriptionInit }) => {
+      if (!isComponentMounted) return;
       console.log("📨 Received answer");
       try {
         await peerService.setRemoteDescription(answer);
@@ -172,6 +179,7 @@ const VideoChat: React.FC = () => {
     };
 
     const handleIceCandidate = async ({ candidate }: { candidate: RTCIceCandidateInit }) => {
+      if (!isComponentMounted) return;
       try {
         await peerService.peer.addIceCandidate(new RTCIceCandidate(candidate));
       } catch (error) {
@@ -180,16 +188,19 @@ const VideoChat: React.FC = () => {
     };
 
     const handlePartnerDisconnected = () => {
+      if (!isComponentMounted) return;
       console.log("💔 Partner disconnected");
       handleCallEnd();
     };
 
     const handleSkipped = () => {
+      if (!isComponentMounted) return;
       console.log("⏭️ Partner skipped");
       handleCallEnd();
     };
 
     const handlePremiumStatus = ({ isPremium }: { isPremium: boolean }) => {
+      if (!isComponentMounted) return;
       setPartnerPremium(isPremium);
     };
 
@@ -205,6 +216,7 @@ const VideoChat: React.FC = () => {
     // Setup peer connection events
     if (peerService.peer) {
       peerService.peer.ontrack = (event) => {
+        if (!isComponentMounted) return;
         console.log("🎥 Received remote stream");
         const [remoteStream] = event.streams;
         remoteStreamRef.current = remoteStream;
@@ -232,17 +244,17 @@ const VideoChat: React.FC = () => {
       socket.off("skipped", handleSkipped);
       socket.off("partner:premium:status", handlePremiumStatus);
     };
-  }, [socket, remoteChatToken]);
+  }, [socket, remoteChatToken, isComponentMounted]);
 
   // Auto-search for match
   useEffect(() => {
-    if (isSearching && socket && !isConnected) {
+    if (isSearching && socket && !isConnected && isComponentMounted) {
       console.log("🔍 Starting search for match...");
       socket.emit("find:match");
       
       // Set timeout for search
       const searchTimeout = setTimeout(() => {
-        if (!isConnected) {
+        if (!isConnected && isComponentMounted) {
           if (retryCount < maxRetries) {
             console.log(`🔄 Retrying search... (${retryCount + 1}/${maxRetries})`);
             setRetryCount(prev => prev + 1);
@@ -256,19 +268,21 @@ const VideoChat: React.FC = () => {
 
       return () => clearTimeout(searchTimeout);
     }
-  }, [isSearching, socket, isConnected, retryCount]);
+  }, [isSearching, socket, isConnected, retryCount, isComponentMounted]);
 
   // Mock WebRTC for testing
   useEffect(() => {
-    if (isUsingMockMode && isSearching && !isConnected) {
+    if (isUsingMockMode && isSearching && !isConnected && isComponentMounted) {
       console.log("🤖 Using mock mode - simulating connection");
       setTimeout(() => {
+        if (!isComponentMounted) return;
         setIsConnected(true);
         setIsSearching(false);
         setRemoteChatToken("mock_partner");
         
         // Simulate remote stream
         MockWebRTC.simulateConnection((stream) => {
+          if (!isComponentMounted) return;
           remoteStreamRef.current = stream;
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = stream;
@@ -276,7 +290,7 @@ const VideoChat: React.FC = () => {
         });
       }, 2000);
     }
-  }, [isUsingMockMode, isSearching, isConnected]);
+  }, [isUsingMockMode, isSearching, isConnected, isComponentMounted]);
 
   const initializeMedia = async () => {
     try {
@@ -286,6 +300,12 @@ const VideoChat: React.FC = () => {
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (!isComponentMounted) {
+        // Component unmounted, stop the stream
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+      
       localStreamRef.current = stream;
 
       if (localVideoRef.current) {

@@ -11,7 +11,6 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
-  console.log("SplashScreen rendered");
   const [connectionStatus, setConnectionStatus] = useState<{
     isTestingConnection: boolean;
     connectionResult: ConnectionTestResult | null;
@@ -23,8 +22,12 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
   });
 
   useEffect(() => {
+    let isMounted = true;
+    
     // Start connection test after 1 second
     const connectionTimer = setTimeout(() => {
+      if (!isMounted) return;
+      
       setConnectionStatus((prev) => ({
         ...prev,
         isTestingConnection: true,
@@ -35,10 +38,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       Promise.race([
         testFirebaseStorageConnection(),
         new Promise<ConnectionTestResult>((_, reject) => 
-          setTimeout(() => reject(new Error('Connection test timeout')), 15000)
+          setTimeout(() => reject(new Error('Connection test timeout')), 10000)
         )
       ])
         .then((result) => {
+          if (!isMounted) return;
           setConnectionStatus((prev) => ({
             ...prev,
             isTestingConnection: false,
@@ -46,6 +50,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           }));
         })
         .catch((error) => {
+          if (!isMounted) return;
           setConnectionStatus((prev) => ({
             ...prev,
             isTestingConnection: false,
@@ -68,15 +73,16 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
     // Hide splash after a reasonable time
     const timer = setTimeout(() => {
-      console.log("SplashScreen: hiding splash after timeout");
+      if (!isMounted) return;
       setIsVisible(false);
       setTimeout(() => {
-        console.log("SplashScreen: calling onComplete");
+        if (!isMounted) return;
         onComplete();
       }, 300); // Smooth transition
-    }, 4000); // Show splash for 4 seconds to allow connection test
+    }, 3000); // Reduced to 3 seconds
 
     return () => {
+      isMounted = false;
       clearTimeout(timer);
       clearTimeout(connectionTimer);
     };

@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAnalytics } from "./hooks/useAnalytics";
 
 import VideoChat from "./screens/VideoChat";
@@ -35,6 +35,7 @@ import LegalFooter from "./components/LegalFooter";
 import { initializeErrorMonitoring } from "./lib/errorMonitoring";
 
 import { useNavigate } from "react-router-dom";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebaseConfig";
@@ -54,25 +55,45 @@ function LoadingScreen() {
   );
 }
 
+// Error Fallback Component
+function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
+        <h2 className="text-xl font-bold text-red-600 mb-4">Something went wrong</h2>
+        <p className="text-gray-600 mb-4">
+          {import.meta.env.DEV ? error.message : 'An unexpected error occurred'}
+        </p>
+        <button 
+          onClick={resetErrorBoundary} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Error boundary for the app
-  const [hasError, setHasError] = useState(false);
-
-  if (hasError) {
-    return <div className="min-h-screen flex items-center justify-center"><p>Something went wrong. Please refresh the page.</p></div>;
-  }
-
   // Initialize analytics with error handling
-  try {
-    useAnalytics();
-  } catch (error) {
-    console.error("Analytics initialization failed:", error);
-  }
+  const initializeAnalytics = useCallback(() => {
+    try {
+      useAnalytics();
+    } catch (error) {
+      console.error("Analytics initialization failed:", error);
+      // Don't crash the app for analytics failures
+    }
+  }, []);
+
+  useEffect(() => {
+    initializeAnalytics();
+  }, [initializeAnalytics]);
 
   useEffect(() => {
     // Set up global error handler
@@ -80,9 +101,12 @@ function App() {
       console.error('Global error caught:', event.error);
       // Don't crash the app for non-critical errors
       if (event.error?.message?.includes('ResizeObserver') ||
-          event.error?.message?.includes('Non-Error promise rejection')) {
+          event.error?.message?.includes('Non-Error promise rejection') ||
+          event.error?.message?.includes('Loading chunk')) {
         event.preventDefault();
+        return;
       }
+      setError(event.error?.message || 'An unexpected error occurred');
     };
     
     window.addEventListener('error', handleGlobalError);
@@ -145,11 +169,30 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-
-
   const handleSplashComplete = () => {
     setShowSplash(false);
   };
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
+          <h2 className="text-xl font-bold text-red-600 mb-4">Application Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => {
+              setError(null);
+              window.location.reload();
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Reload Application
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Show splash screen
   if (showSplash) {
@@ -171,41 +214,43 @@ function App() {
   return (
     <AppStartupCheck>
       <UltraAppWrapper>
-        <Suspense fallback={<LoadingScreen />}>
-        <div className="app-container min-h-screen bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50 touch-manipulation native-scroll">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/onboarding" element={<OnboardingScreen />} />
-            <Route path="/user-setup" element={<UserSetup />} />
-            <Route path="/premium-trial" element={<ReferToUnlock />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/gender-select" element={<GenderSelect />} />
-            <Route path="/video-chat" element={<VideoChat />} />
-            <Route path="/voice" element={<VoicePage />} />
-            <Route path="/personal-chat" element={<PersonalChat />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/friends" element={<FriendsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/refer" element={<ReferToUnlock />} />
-            <Route path="/referral-code" element={<ReferralCodeScreen />} />
-            <Route path="/ai-chatbot" element={<AIChatbotPage />} />
-            <Route path="/premium" element={<PremiumPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-            <Route path="/admin" element={<AdminPanelPage />} />
-            <Route path="/spin-wheel" element={<SpinWheel />} />
-            <Route path="/storage-debug" element={<StorageDebugPage />} />
-            <Route path="/post-profile" element={<PostCallProfile />} />
-            <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
-            <Route path="/ad-testing" element={<AdTestingPage />} />
-            <Route path="*" element={<HomePage />} />
-          </Routes>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<LoadingScreen />}>
+            <div className="app-container min-h-screen bg-gradient-to-br from-peach-25 via-cream-50 to-blush-50 touch-manipulation native-scroll">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/onboarding" element={<OnboardingScreen />} />
+                <Route path="/user-setup" element={<UserSetup />} />
+                <Route path="/premium-trial" element={<ReferToUnlock />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/gender-select" element={<GenderSelect />} />
+                <Route path="/video-chat" element={<VideoChat />} />
+                <Route path="/voice" element={<VoicePage />} />
+                <Route path="/personal-chat" element={<PersonalChat />} />
+                <Route path="/chat" element={<ChatPage />} />
+                <Route path="/friends" element={<FriendsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/refer" element={<ReferToUnlock />} />
+                <Route path="/referral-code" element={<ReferralCodeScreen />} />
+                <Route path="/ai-chatbot" element={<AIChatbotPage />} />
+                <Route path="/premium" element={<PremiumPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                <Route path="/admin" element={<AdminPanelPage />} />
+                <Route path="/spin-wheel" element={<SpinWheel />} />
+                <Route path="/storage-debug" element={<StorageDebugPage />} />
+                <Route path="/post-profile" element={<PostCallProfile />} />
+                <Route path="/firebase-debug" element={<FirebaseDebugPage />} />
+                <Route path="/ad-testing" element={<AdTestingPage />} />
+                <Route path="*" element={<HomePage />} />
+              </Routes>
 
-          <PWAInstallPrompt />
-          <CookieConsent />
-          <LegalFooter />
-        </div>
-        </Suspense>
+              <PWAInstallPrompt />
+              <CookieConsent />
+              <LegalFooter />
+            </div>
+          </Suspense>
+        </ErrorBoundary>
       </UltraAppWrapper>
     </AppStartupCheck>
   );
