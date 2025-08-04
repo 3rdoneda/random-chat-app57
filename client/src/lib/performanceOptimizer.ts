@@ -142,7 +142,6 @@ class PerformanceOptimizer {
       <React.Suspense fallback={fallback ? React.createElement(fallback) : <div>Loading...</div>}>
         <LazyComponent {...props} />
       </React.Suspense>
-      </React.Suspense>
     );
 
     this.componentCache.set(cacheKey, WrappedComponent);
