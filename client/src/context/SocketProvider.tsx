@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 import { io, Socket } from "socket.io-client";
 import MockMatchingService from "../lib/mockMatchingService";
@@ -117,7 +118,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         
         // Try alternative port based on environment
         if (window.location.hostname.includes('webcontainer-api.io')) {
-          console.log("Trying alternative WebContainer port 81...");
+          console.log("Trying alternative WebContainer port 81 and 82...");
           const altProtocol = 'http';
           const altHost = window.location.hostname.replace('5173', '81');
           const altUrl = `${altProtocol}://${altHost}`;
@@ -139,9 +140,33 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
           });
           
           altSocket.on("connect_error", () => {
-            console.log("Alternative WebContainer port also failed, falling back to mock matching mode");
-            setIsUsingMockMode(true);
-            mockMatching.startBotSimulation();
+            console.log("Port 81 failed, trying port 82...");
+            const alt2Host = window.location.hostname.replace('5173', '82');
+            const alt2Url = `${altProtocol}://${alt2Host}`;
+            const alt2Socket = io(alt2Url, {
+              transports: ["websocket", "polling"],
+              secure: false,
+              timeout: 20000,
+              forceNew: true,
+              reconnection: true,
+              reconnectionAttempts: 3,
+              reconnectionDelay: 1000,
+              withCredentials: false,
+            });
+            
+            alt2Socket.on("connect", () => {
+              console.log("Connected to alternative WebContainer port 82:", alt2Socket.id);
+              setSocket(alt2Socket);
+              setIsUsingMockMode(false);
+            });
+            
+            alt2Socket.on("connect_error", () => {
+              console.log("All WebContainer ports failed, falling back to mock matching mode");
+              setIsUsingMockMode(true);
+              mockMatching.startBotSimulation();
+              alt2Socket.close();
+            });
+            
             altSocket.close();
           });
         } else if (window.location.hostname === "localhost" && socketUrl.includes(":8000")) {
